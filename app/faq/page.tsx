@@ -4,51 +4,54 @@ import { Card } from "@/components/ui/card"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "FAQ - Imgsharer | AI Image Sharpener",
-  description: "Frequently asked questions about Imgsharer's AI-powered image sharpening service.",
+  title: "FAQ — Imgsharer | AI Image Sharpener",
+  description:
+    "Learn how our AI image sharpener can unblur image issues, make pictures clearer, enhance selfies, rescue travel shots, and polish product photos with Imgsharer.",
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL}/faq` : "/faq",
+  },
 }
 
 const faqs = [
   {
-    question: "How does AI image sharpening work?",
+    question: "What is an AI Image Sharpener and how can Imgsharer help?",
     answer:
-      "Our AI uses advanced machine learning models trained on millions of images to intelligently enhance and sharpen your photos. The AI analyzes your image and applies sophisticated upscaling and sharpening techniques to improve clarity and detail while preserving natural appearance.",
+      "An AI image sharpener uses deep-learning to unblur images online and make pictures clearer without changing natural colors. Imgsharer enhances edges, textures, and small details so photos look crisp again—great for portraits, travel shots, product photos, and screenshots. It’s fast, browser-based, and designed for a clean workflow from upload to download.",
   },
   {
-    question: "What image formats are supported?",
-    answer: "We support JPEG, PNG, and WebP formats. Images must be under 4MB in size for optimal processing.",
+    question: "Can it unblur selfies and enhance makeup & hair?",
+    answer:
+      "Yes. For portraits, Imgsharer can unblur selfies, sharpen makeup details, and bring out hair and eye definition while keeping skin tones natural. If a face is extremely out of focus, try a larger source image and good lighting; otherwise the portrait enhancer will recover clarity and micro-contrast nicely.",
   },
   {
-    question: "Is there a limit on how many images I can sharpen?",
+    question: "How do I fix blurry travel photos or low-light shots?",
     answer:
-      "Yes, to ensure fair usage, we limit users to 4 images per minute and 12 images per day. If you need higher limits, please contact us about our premium plans.",
+      "Use Imgsharer to fix blurry travel photos—it reduces motion blur and noise to unblur vacation photos from night scenes, moving subjects, or handheld shots. Tip: upload the highest-resolution version you have; the tool restores edges first, then balances grain so landmarks, street lights, and skies look clearer without a harsh, over-processed look.",
   },
   {
-    question: "How long does it take to sharpen an image?",
+    question: "Will this make product photos clearer for Amazon/Etsy?",
     answer:
-      "Most images are processed in 5-15 seconds, depending on the size and complexity of the image. Our AI works quickly to deliver high-quality results.",
+      "Absolutely. The tool sharpens product photos to improve textures, labels, and small text, helping listings stand out. It keeps white backgrounds clean and avoids color shifts, so packaging, fabrics, and glossy surfaces remain true. For best results, upload a well-lit image; Imgsharer enhances clarity so shoppers see details that drive conversions.",
   },
   {
-    question: "Do you store my images?",
+    question: "Can I unblur screenshots or scanned documents?",
     answer:
-      "No, we do not store your images. All processing happens in real-time, and images are immediately discarded after processing. Your privacy and security are our top priorities.",
-  },
-  {
-    question: "What's the maximum resolution I can sharpen?",
-    answer:
-      "Our AI can upscale images up to 2048px width while maintaining quality. The output resolution depends on your input image size.",
-  },
-  {
-    question: "Can I use sharpened images commercially?",
-    answer:
-      "Yes, you retain all rights to your images. The sharpened versions are yours to use however you like, including for commercial purposes.",
-  },
-  {
-    question: "What if the sharpening doesn't work well?",
-    answer:
-      "AI sharpening works best on photos with some blur or softness. Extremely low-quality or heavily compressed images may not see significant improvement. Try uploading the highest quality version of your image for best results.",
+      "Yes—Imgsharer can unblur screenshots and make scanned text readable for receipts, PDFs, slides, and app UIs. It improves edge contrast on small fonts while controlling halos, so letters stay crisp. No account required for basic use; if a scan is very low-resolution, try a larger source or re-scan at higher DPI for best results.",
   },
 ]
+
+const faqStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.answer,
+    },
+  })),
+}
 
 export default function FAQPage() {
   return (
@@ -56,6 +59,10 @@ export default function FAQPage() {
       <Header />
       <div className="flex-1 pt-24 pb-16 px-4">
         <div className="max-w-3xl mx-auto">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
+          />
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-display font-bold text-neutral-900 mb-4">
               Frequently Asked Questions
@@ -78,6 +85,15 @@ export default function FAQPage() {
               Contact us at{" "}
               <a href="mailto:support@imgsharer.example" className="text-coral hover:underline">
                 support@imgsharer.example
+              </a>
+            </p>
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-neutral-600">
+              Ready to see the difference?{" "}
+              <a href="/" className="text-coral font-medium hover:underline">
+                Try Imgsharer now
               </a>
             </p>
           </div>

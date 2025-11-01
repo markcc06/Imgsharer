@@ -26,7 +26,7 @@ export default function BlogPage() {
             {blogPosts.map((post) => (
               <Card key={post.slug} className="p-6 hover:shadow-lg transition-shadow">
                 <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
                     <time className="text-sm text-neutral-500">
                       {new Date(post.publishedAt).toLocaleDateString("en-US", {
                         year: "numeric",
@@ -34,7 +34,10 @@ export default function BlogPage() {
                         day: "numeric",
                       })}
                     </time>
-                    <span className="text-xs px-2 py-1 bg-coral/10 text-coral rounded-full">{post.category}</span>
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-coral inline-flex items-center px-2 py-1 bg-coral/10 rounded-full">
+                      <span className="sr-only">Category:</span>
+                      {post.category}
+                    </h3>
                   </div>
                   <h2 className="text-2xl font-display font-bold text-neutral-900">{post.title.en}</h2>
                   <p className="text-neutral-600 leading-relaxed">{post.metaDescription.en}</p>

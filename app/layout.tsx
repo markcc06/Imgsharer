@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter, Space_Grotesk } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
+import { CookieBanner } from "@/components/CookieConsent"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -81,6 +82,7 @@ export default function RootLayout({
       <body className="font-sans bg-neutral-50 text-neutral-900 overflow-x-hidden">
         {children}
         <Toaster />
+        <CookieBanner />
       </body>
     </html>
   )
