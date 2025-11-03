@@ -73,22 +73,20 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   const ADSENSE_CLIENT =
-    typeof process !== "undefined" ? process.env.NEXT_PUBLIC_ADSENSE_CLIENT : undefined
+    typeof process !== "undefined"
+      ? process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-6728061725805697"
+      : "ca-pub-6728061725805697"
 
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
       <head>
-        {/* Conditionally inject AdSense base so Google CMP can auto-inject */}
-        {ADSENSE_CLIENT ? (
-          <>
-            <script
-              id="adsbygoogle-script"
-              async
-              crossOrigin="anonymous"
-              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-            />
-          </>
-        ) : null}
+        {/* AdSense base script for CMP auto-injection */}
+        <script
+          id="adsbygoogle-script"
+          async
+          crossOrigin="anonymous"
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+        ></script>
         <meta name="robots" content="index, follow" />
         <meta name="theme-color" content="#ff5733" />
         <meta name="msapplication-TileColor" content="#ff5733" />
