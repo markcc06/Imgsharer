@@ -16,6 +16,9 @@ import type { ConsentState } from "@/lib/consent"
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ""
 const ADS_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || ""
 
+const DISABLE_OLD_COOKIE =
+  typeof process !== "undefined" ? process.env.NEXT_PUBLIC_DISABLE_OLD_COOKIE_BANNER === "1" : false
+
 const ensureGtag = () => {
   if (typeof window === "undefined") return
   window.dataLayer = window.dataLayer || []
@@ -38,6 +41,10 @@ const buildState = (analytics: boolean, ads: boolean): ConsentState => ({
 })
 
 export default function CookieBanner() {
+  if (DISABLE_OLD_COOKIE) {
+    return null
+  }
+
   const [isMounted, setIsMounted] = useState(false)
   const [showBanner, setShowBanner] = useState(false)
   const [preferencesOpen, setPreferencesOpen] = useState(false)

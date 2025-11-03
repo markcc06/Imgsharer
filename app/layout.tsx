@@ -4,7 +4,6 @@ import { Inter, Space_Grotesk } from "next/font/google"
 import Script from "next/script"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
-import { CookieBanner } from "@/components/CookieConsent"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -73,9 +72,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const ADSENSE_CLIENT =
+    typeof process !== "undefined" ? process.env.NEXT_PUBLIC_ADSENSE_CLIENT : undefined
+
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
       <head>
+        {/* Conditionally inject AdSense base so Google CMP can auto-inject */}
+        {ADSENSE_CLIENT ? (
+          <>
+            <script
+              id="adsbygoogle-script"
+              async
+              crossOrigin="anonymous"
+              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+            />
+          </>
+        ) : null}
         <meta name="robots" content="index, follow" />
         <meta name="theme-color" content="#ff5733" />
         <meta name="msapplication-TileColor" content="#ff5733" />
@@ -102,20 +115,10 @@ export default function RootLayout({
               )
             })()
           : null}
-        {process.env.NODE_ENV === "production" ? (
-          <Script
-            id="adsense-base"
-            strategy="afterInteractive"
-            async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6728061725805697"
-            crossOrigin="anonymous"
-          />
-        ) : null}
       </head>
       <body className="font-sans bg-neutral-50 text-neutral-900 overflow-x-hidden">
         {children}
         <Toaster />
-        {process.env.NEXT_PUBLIC_DISABLE_OLD_COOKIE_BANNER !== "1" && <CookieBanner />}
       </body>
     </html>
   )
