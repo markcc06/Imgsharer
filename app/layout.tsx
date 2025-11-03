@@ -102,11 +102,20 @@ export default function RootLayout({
               )
             })()
           : null}
+        {process.env.NODE_ENV === "production" ? (
+          <Script
+            id="adsense-base"
+            strategy="afterInteractive"
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6728061725805697"
+            crossOrigin="anonymous"
+          />
+        ) : null}
       </head>
       <body className="font-sans bg-neutral-50 text-neutral-900 overflow-x-hidden">
         {children}
         <Toaster />
-        <CookieBanner />
+        {process.env.NEXT_PUBLIC_DISABLE_OLD_COOKIE_BANNER !== "1" && <CookieBanner />}
       </body>
     </html>
   )
