@@ -74,6 +74,20 @@ export function Header() {
             >
               Blog
             </Link>
+            <Link
+              href="/about"
+              title="About Imgsharer"
+              className="text-sm font-medium text-neutral-600 hover:text-[#ff7959] transition-colors"
+            >
+              About
+            </Link>
+            <Link
+              href="/contact"
+              title="Contact Imgsharer"
+              className="text-sm font-medium text-neutral-600 hover:text-[#ff7959] transition-colors"
+            >
+              Contact
+            </Link>
           </nav>
         </div>
       </div>

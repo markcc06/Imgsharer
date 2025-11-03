@@ -7,7 +7,7 @@ export function Footer() {
   return (
     <footer className="bg-white border-t border-neutral-200">
       <div className="container-custom py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mb-12">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <h3 className="text-2xl font-display font-bold mb-4 text-[#e63b14]">Imgsharer</h3>
@@ -17,7 +17,32 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Links */}
+          {/* Info */}
+          <div>
+            <h4 className="font-semibold mb-4 text-[#1a1a1a]">Info</h4>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link
+                  href="/about"
+                  title="About Imgsharer"
+                  className="text-[#555555] hover:text-[#ff7959] hover:underline transition-colors"
+                >
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  title="Contact Imgsharer"
+                  className="text-[#555555] hover:text-[#ff7959] hover:underline transition-colors"
+                >
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Product */}
           <div>
             <h4 className="font-semibold mb-4 text-[#1a1a1a]">Product</h4>
             <ul className="space-y-3 text-sm">
