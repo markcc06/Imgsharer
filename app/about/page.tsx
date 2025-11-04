@@ -5,6 +5,25 @@ import { Footer } from "@/components/footer"
 export const metadata: Metadata = {
   title: "About Us | ImageSharpenerAI",
   description: "Learn why we built ImageSharpenerAI and how we craft useful, delightful AI tools for better image clarity.",
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/about`
+      : "/about",
+  },
+  openGraph: {
+    title: "About Us | ImageSharpenerAI",
+    description:
+      "Learn why we built ImageSharpenerAI and how we craft useful, delightful AI tools for better image clarity.",
+    url: process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/about`
+      : undefined,
+  },
+  twitter: {
+    card: "summary",
+    title: "About Us | ImageSharpenerAI",
+    description:
+      "Learn why we built ImageSharpenerAI and how we craft useful, delightful AI tools for better image clarity.",
+  },
 }
 
 const structuredData = {

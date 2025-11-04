@@ -8,6 +8,23 @@ const CONTACT_EMAIL =
 export const metadata: Metadata = {
   title: "Contact | ImageSharpenerAI",
   description: "Contact the ImageSharpenerAI team for support, feedback, or partnership inquiries.",
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/contact`
+      : "/contact",
+  },
+  openGraph: {
+    title: "Contact | ImageSharpenerAI",
+    description: "Contact the ImageSharpenerAI team for support, feedback, or partnership inquiries.",
+    url: process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/contact`
+      : undefined,
+  },
+  twitter: {
+    card: "summary",
+    title: "Contact | ImageSharpenerAI",
+    description: "Contact the ImageSharpenerAI team for support, feedback, or partnership inquiries.",
+  },
 }
 
 export default function ContactPage() {

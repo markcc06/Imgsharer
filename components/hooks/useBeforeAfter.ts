@@ -56,7 +56,8 @@ export function useBeforeAfter(initialPosition = 40) {
       e.preventDefault()
       setPosition((prev) => Math.min(100, prev + 2))
     } else if (e.key === "Escape") {
-      e.currentTarget.blur()
+      const target = e.currentTarget as HTMLElement | null
+      target?.blur()
     }
   }, [])
 

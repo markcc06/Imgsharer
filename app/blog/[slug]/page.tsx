@@ -40,5 +40,17 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = getBlogPost(params.slug)
 
-  return <BlogPostClientPage post={post} params={params} />
+  if (!post) {
+    return <BlogPostClientPage post={null} params={params} />
+  }
+
+  return (
+    <BlogPostClientPage
+      post={{
+        ...post,
+        updatedAt: post.updatedAt ?? null,
+      }}
+      params={params}
+    />
+  )
 }
