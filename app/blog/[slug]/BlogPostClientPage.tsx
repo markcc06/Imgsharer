@@ -13,7 +13,9 @@ interface BlogPostClientPageProps {
     metaDescription: { en: string }
     keywords: string[]
     publishedAt: string
+    publishedAtDisplay: string
     updatedAt: string | null
+    updatedAtDisplay: string | null
     category: string
     body: { en: string }
     cta: { en: string }
@@ -42,21 +44,10 @@ export default function BlogPostClientPage({ post, params }: BlogPostClientPageP
         <header className="mb-12">
           <div className="flex items-center gap-3 mb-4">
             <time className="text-sm text-neutral-500">
-              {new Date(post.publishedAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              {post.publishedAtDisplay}
             </time>
-            {post.updatedAt && post.updatedAt !== post.publishedAt && (
-              <span className="text-sm text-neutral-400">
-                • Updated{" "}
-                {new Date(post.updatedAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
+            {post.updatedAtDisplay && (
+              <span className="text-sm text-neutral-400">• Updated {post.updatedAtDisplay}</span>
             )}
             <span className="text-xs px-2 py-1 bg-coral/10 text-coral rounded-full">{post.category}</span>
           </div>

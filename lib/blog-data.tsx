@@ -1,10 +1,14 @@
-export interface BlogPost {
+import { execSync } from "node:child_process"
+import fs from "node:fs"
+import path from "node:path"
+
+export interface RawBlogPost {
   slug: string
   title: {
     en: string
     zh: string
   }
-  publishedAt: string
+  publishedAt?: string
   updatedAt?: string
   category: string
   keywords: string[]
@@ -22,7 +26,7 @@ export interface BlogPost {
   }
 }
 
-export const blogPosts: BlogPost[] = [
+const rawBlogPosts: RawBlogPost[] = [
   {
     slug: "selfie-makeup-use-case",
     title: {
@@ -329,12 +333,141 @@ export const blogPosts: BlogPost[] = [
       zh: "免费试用AI图像锐化器——立即去模糊您的截图！",
     },
   },
-].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+]
 
-export function getBlogPost(slug: string): BlogPost | undefined {
-  return blogPosts.find((post) => post.slug === slug)
+const BLOG_TZ = process.env.NEXT_PUBLIC_BLOG_TZ || "America/New_York"
+const DATA_FILE_FALLBACK = path.join(process.cwd(), "lib", "blog-data.tsx")
+
+const potentialDirectories = [
+  ["content", "blog"],
+  ["src", "content", "blog"],
+  ["blog"],
+]
+
+const possibleExtensions = [".mdx", ".md", ".tsx", ".ts", ".jsx", ".js"]
+
+function resolvePostFilePath(slug: string): string {
+  for (const segments of potentialDirectories) {
+    for (const ext of possibleExtensions) {
+      const candidate = path.join(process.cwd(), ...segments, `${slug}${ext}`)
+      if (fs.existsSync(candidate)) {
+        return candidate
+      }
+    }
+  }
+
+  return DATA_FILE_FALLBACK
+}
+
+function runGit(command: string): string | null {
+  if (typeof window !== "undefined") return null
+  try {
+    return execSync(command, {
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+      .toString()
+      .trim()
+      .split("\n")[0]
+      .trim() || null
+  } catch {
+    return null
+  }
+}
+
+function parseDate(value?: string | null): Date | null {
+  if (!value) return null
+  const parsed = new Date(value)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+export function getPublishedAt(filePath: string, frontMatterDate?: string): string {
+  const frontDate = parseDate(frontMatterDate)
+  if (frontDate) {
+    return frontDate.toISOString()
+  }
+
+  if (typeof window !== "undefined") {
+    return new Date().toISOString()
+  }
+
+  const quotedPath = JSON.stringify(filePath)
+  const created = runGit(`git log --follow --diff-filter=A -1 --format=%cI ${quotedPath}`)
+  if (created) {
+    const createdDate = parseDate(created)
+    if (createdDate) {
+      return createdDate.toISOString()
+    }
+  }
+
+  const latest = runGit(`git log -1 --format=%cI ${quotedPath}`)
+  if (latest) {
+    const latestDate = parseDate(latest)
+    if (latestDate) {
+      return latestDate.toISOString()
+    }
+  }
+
+  return new Date().toISOString()
+}
+
+function formatForDisplay(iso: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: BLOG_TZ,
+  }).format(new Date(iso))
+}
+
+export interface BlogPost
+  extends Omit<RawBlogPost, "publishedAt" | "updatedAt"> {
+  publishedAt: string
+  updatedAt: string | null
+  publishedAtDisplay: string
+  updatedAtDisplay: string | null
+}
+
+let cachedPosts: BlogPost[] | null = null
+
+function buildPosts(): BlogPost[] {
+  if (cachedPosts) {
+    return cachedPosts
+  }
+
+  const posts = rawBlogPosts.map((rawPost) => {
+    const { publishedAt: frontMatterPublishedAt, updatedAt: frontMatterUpdatedAt, ...rest } = rawPost
+    const filePath = resolvePostFilePath(rawPost.slug)
+    const publishedAtIso = getPublishedAt(filePath, frontMatterPublishedAt)
+    const updatedAtIso = parseDate(frontMatterUpdatedAt)
+    const normalizedUpdatedAt = updatedAtIso ? updatedAtIso.toISOString() : null
+    const effectiveUpdatedAt =
+      normalizedUpdatedAt && normalizedUpdatedAt !== publishedAtIso
+        ? normalizedUpdatedAt
+        : null
+
+    return {
+      ...rest,
+      publishedAt: publishedAtIso,
+      updatedAt: effectiveUpdatedAt,
+      publishedAtDisplay: formatForDisplay(publishedAtIso),
+      updatedAtDisplay: effectiveUpdatedAt ? formatForDisplay(effectiveUpdatedAt) : null,
+    }
+  })
+
+  posts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+
+  cachedPosts = posts
+  return posts
+}
+
+export function getAllBlogPosts(): BlogPost[] {
+  return buildPosts()
+}
+
+export function getBlogPost(slug: string): BlogPost | null {
+  const posts = buildPosts()
+  return posts.find((post) => post.slug === slug) ?? null
 }
 
 export function getAllBlogSlugs(): string[] {
-  return blogPosts.map((post) => post.slug)
+  return rawBlogPosts.map((post) => post.slug)
 }

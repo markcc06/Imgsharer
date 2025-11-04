@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next"
+import { getAllBlogPosts } from "@/lib/blog-data"
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.imagesharpenerai.pro"
 
@@ -50,23 +51,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const blogModule = require("@/lib/blog-data")
-    const posts = (blogModule?.blogPosts ?? blogModule?.default ?? []) as Array<{ slug?: string }>
+  const posts = getAllBlogPosts()
 
-    for (const post of posts) {
-      if (post?.slug) {
-        entries.push({
-          url: `${BASE_URL}/blog/${post.slug}`,
-          lastModified: now,
-          changeFrequency: "monthly",
-          priority: 0.6,
-        })
-      }
-    }
-  } catch (error) {
-    // Silently ignore missing module or other issues.
+  for (const post of posts) {
+    const lastModified = post.updatedAt ? new Date(post.updatedAt) : new Date(post.publishedAt)
+    entries.push({
+      url: `${BASE_URL}/blog/${post.slug}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    })
   }
 
   return entries

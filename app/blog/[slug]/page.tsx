@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       description: post.metaDescription.en,
       type: "article",
       publishedTime: post.publishedAt,
-      modifiedTime: post.updatedAt,
+      modifiedTime: post.updatedAt ?? post.publishedAt,
       authors: ["Imgsharer"],
     },
     twitter: {
@@ -44,13 +44,5 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
     return <BlogPostClientPage post={null} params={params} />
   }
 
-  return (
-    <BlogPostClientPage
-      post={{
-        ...post,
-        updatedAt: post.updatedAt ?? null,
-      }}
-      params={params}
-    />
-  )
+  return <BlogPostClientPage post={post} params={params} />
 }
