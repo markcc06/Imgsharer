@@ -47,6 +47,9 @@ const rawBlogPosts: RawBlogPost[] = [
     },
     body: {
       en: `<h2>Clear eyes, natural skin</h2>
+<figure>
+  <img src="/images/blog/selfie-makeup-hero.jpg" alt="Woman smiling while taking a selfie on outdoor steps" loading="lazy" decoding="async" />
+</figure>
 <p>Great portraits hinge on sharp eyes, eyelashes, and hair edges. With the Portrait preset we gently enhance those areas while preserving skin texture—far better than cranking sharpness to the max. To get started quickly, use make picture clearer free, then adjust strength as needed.</p>
 
 <h2>Selfie workflow</h2>
@@ -125,6 +128,9 @@ const rawBlogPosts: RawBlogPost[] = [
     },
     body: {
       en: `<h2>Why travel photos go blurry (and what AI actually fixes)</h2>
+<figure>
+<img src="/images/blog/travel-use-case-hero.jpg" alt="Oceanfront pool at Bondi Icebergs with waves crashing against the deck" loading="lazy" decoding="async" />
+</figure>
 <p>Hand shake, low light, and moving scenes (cars/crowds) can smear details and soften edges. Our ai image sharpener applies controlled edge/texture enhancement so skies, building lines, hair, and far ridgelines look crisp—without noisy over-sharpening.</p>
 
 <h2>How to clear your vacation shots (free & fast)</h2>
@@ -208,6 +214,9 @@ const rawBlogPosts: RawBlogPost[] = [
     },
     body: {
       en: `<h2>Why product photos look "soft"</h2>
+<figure>
+<img src="/images/blog/ecommerce-use-case-hero.jpg" alt="Smartphone displaying the Amazon logo on a wooden table" loading="lazy" decoding="async" />
+</figure>
 <p>Compression, missed focus, and lightbox reflections reduce micro-contrast. Marketplaces (Amazon/Etsy/Shopify) prefer crisp edges and readable label text. Our ai image sharpener targets textures (fabric, metal, wood) and label edges to turn a blurry photo to clear while keeping the product's true look.</p>
 
 <h2>Listing workflow (3 steps)</h2>
@@ -281,6 +290,9 @@ const rawBlogPosts: RawBlogPost[] = [
     },
     body: {
       en: `<h2>Make small text readable</h2>
+<figure>
+  <img src="/images/blog/office-screenshots-hero.jpg" alt="Hand holding a smartphone taking a photo inside a gallery hall" loading="lazy" decoding="async" />
+</figure>
 <p>Meeting screenshots, system errors, and invoice/contract scans often look mushy. Choose the Document/Text preset to enhance strokes and edges; it also treats thin UI lines nicely. For web/app captures, tap the unblur screenshot button on the main screen.</p>
 
 <h2>How to process scans</h2>
@@ -351,6 +363,9 @@ rawBlogPosts.push(
     },
     body: {
       en: `<h2>How to unblur an image on iPhone?</h2>
+<figure>
+  <img src="/images/blog/unblur-iphone-hero.jpg" alt="Woman holding an iPhone with city buildings blurred in the background" loading="lazy" decoding="async" />
+</figure>
 <p>We’ve all been there: you nailed the pose and the lighting, but the selfie looks soft. Before you give up, try a quick two-stage rescue—light corrections in the Photos app, then an online pass with an <strong>AI Image Sharpener</strong>. You’ll <strong>unblur image</strong> issues without that over-processed “plastic skin” look. If you want a one-click route, <strong>Imgsharer</strong> makes it painless to upload, enhance, and download.</p>
 
 <h3>First, stabilize the basics (capture matters)</h3>
@@ -403,6 +418,9 @@ rawBlogPosts.push(
     },
     body: {
       en: `<h2>How to enhance a blurry photo?</h2>
+<figure>
+  <img src="/images/blog/enhance-travel-photo-hero.jpg" alt="Traveler shooting a city street with a DSLR camera" loading="lazy" decoding="async" />
+</figure>
 <p>You finally got that neon street shot—only to find a soft, noisy mess. Don’t scrap it. With a simple “denoise first, then sharpen” routine and a final pass through an <strong>AI Image Sharpener</strong>, you can <strong>fix a blurry photo</strong> enough to keep the mood and the details. <strong>Imgsharer</strong> lets you upload, enhance, and share in one sitting.</p>
 
 <h3>Diagnose the blur (so you don’t over-fix)</h3>
@@ -457,6 +475,9 @@ rawBlogPosts.push(
     },
     body: {
       en: `<h2>How to fix a blurry photo?</h2>
+<figure>
+  <img src="/images/blog/fix-blurry-product-hero.jpg" alt="Product packaging with barcode and ingredients text on a white tabletop" loading="lazy" decoding="async" />
+</figure>
 <p>Blurry product images tank click-through and trust. The fix isn’t just “more sharpening”—it’s a reliable workflow: ensure proper resolution, use an <strong>ai image denoiser</strong> to smooth noise, then an <strong>AI Image Sharpener</strong> to restore edge clarity. Use <strong>Imgsharer</strong> online to keep listings consistent.</p>
 
 <h3>Start with platform-compliant resolution</h3>
@@ -512,6 +533,9 @@ rawBlogPosts.push(
     },
     body: {
       en: `<h2>Can AI enhance image quality?</h2>
+<figure>
+  <img src="/images/blog/ai-enhance-quality-hero.jpg" alt="Person lit by colorful gradient light looking down at a smartphone" loading="lazy" decoding="async" />
+</figure>
 <p>Short answer: yes—within reason. An AI-based <strong>image quality enhancer</strong> can recover perceived detail and edge contrast, but it can’t recreate information that never existed. Treat AI like a smart finishing tool: denoise gently, sharpen selectively, and keep text readable. When you need a quick lift, <strong>Imgsharer – AI Image Sharpener</strong> is a handy final pass.</p>
 
 <h3>What “enhance” really means (and doesn’t)</h3>
@@ -574,6 +598,9 @@ rawBlogPosts.push(
     body: {
       en: `
 <h2>Blurry product photos cost clicks — here’s a fast, clean fix</h2>
+<figure>
+  <img src="/images/blog/ecommerce-fix-hero.jpg" alt="Pink Everyday Humans sunscreen tube and box on a neon green background" loading="lazy" decoding="async" />
+</figure>
 <p>Nothing kills add-to-cart like a mushy hero shot. If your studio rush, low light, or heavy compression turned a product image into a <strong>blurry picture</strong>, this guide shows <em>how to make a photo less blurry</em> without nuking your schedule.</p>
 
 <h3>Why do product images go soft?</h3>
@@ -643,6 +670,9 @@ rawBlogPosts.push(
     body: {
       en: `
 <h2>That once-in-a-lifetime shot, a little soft? We can still bring it back</h2>
+<figure>
+  <img src="/images/blog/travel-fix-hero.jpg" alt="Traveler smiling at sunset with palm trees in the background" loading="lazy" decoding="async" />
+</figure>
 <p>You nailed the composition — sea breeze, golden skin, neon skyline — but motion and low light left it soft. Here’s <strong>how to fix a blurry photo</strong> from your trip with an <strong>Ai image Sharpener</strong> so details feel alive again.</p>
 
 <h3>Quick check: what blurred it?</h3>
@@ -711,6 +741,9 @@ rawBlogPosts.push(
     body: {
       en: `
 <h2>Shot it on your phone and it turned out mushy? Here’s the fix</h2>
+<figure>
+  <img src="/images/blog/mobile-rescue-hero.jpg" alt="Silhouette holding a smartphone against purple window blinds" loading="lazy" decoding="async" />
+</figure>
 <p>Concert lights, speedy pets, indoor dinners — your camera app tried its best. If you ended up with a <strong>blurry picture</strong>, here’s the fast lane to <strong>fix a blurry photo</strong> without weird halos.</p>
 
 <h3>Phone-specific culprits</h3>
@@ -778,6 +811,9 @@ rawBlogPosts.push(
     body: {
       en: `
 <h2>Unreadable meeting photos waste time — make them clear</h2>
+<figure>
+  <img src="/images/blog/office-clarity-hero.jpeg" alt="Bright modern office interior with sunlight streaming through large windows" loading="lazy" decoding="async" />
+</figure>
 <p>We’ve all snapped slides from the back row and ended up with haze. Here’s an <strong>unblur tool</strong> workflow to <strong>fix a blurry photo</strong> so projector text and nameplates become readable again.</p>
 
 <h3>Common office blur sources</h3>
