@@ -13,6 +13,10 @@ export const metadata: Metadata = {
       ? `${process.env.NEXT_PUBLIC_SITE_URL}/contact`
       : "/contact",
   },
+  robots: {
+    index: false,
+    follow: true,
+  },
   openGraph: {
     title: "Contact | ImageSharpenerAI",
     description: "Contact the ImageSharpenerAI team for support, feedback, or partnership inquiries.",

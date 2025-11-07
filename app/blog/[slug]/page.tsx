@@ -1,4 +1,4 @@
-import { getBlogPost, getAllBlogSlugs } from "@/lib/blog-data"
+import { getBlogPost, getAllBlogSlugs, getRelatedPosts } from "@/lib/blog-data"
 import type { Metadata } from "next"
 import BlogPostClientPage from "./BlogPostClientPage"
 
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 
   return {
-    title: `${post.title.en} | Imgsharer Blog`,
+    title: post.title.en,
     description: post.metaDescription.en,
     keywords: post.keywords.join(", "),
     openGraph: {
@@ -41,8 +41,10 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = getBlogPost(params.slug)
 
   if (!post) {
-    return <BlogPostClientPage post={null} params={params} />
+    return <BlogPostClientPage post={null} params={params} relatedPosts={[]} />
   }
 
-  return <BlogPostClientPage post={post} params={params} />
+  const relatedPosts = getRelatedPosts(params.slug)
+
+  return <BlogPostClientPage post={post} params={params} relatedPosts={relatedPosts} />
 }

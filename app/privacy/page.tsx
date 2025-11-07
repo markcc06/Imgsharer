@@ -5,6 +5,10 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "Privacy Policy - Imgsharer",
   description: "Privacy Policy for Imgsharer's AI image sharpening service.",
+  robots: {
+    index: false,
+    follow: true,
+  },
 }
 
 export default function PrivacyPage() {

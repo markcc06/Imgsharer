@@ -5,6 +5,10 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "Terms of Service - Imgsharer",
   description: "Terms of Service for using Imgsharer's AI image sharpening service.",
+  robots: {
+    index: false,
+    follow: true,
+  },
 }
 
 export default function TermsPage() {

@@ -994,3 +994,57 @@ export function getBlogPost(slug: string): BlogPost | null {
 export function getAllBlogSlugs(): string[] {
   return rawBlogPosts.map((post) => post.slug)
 }
+
+export function getRelatedPosts(slug: string, limit = 3): BlogPost[] {
+  const posts = buildPosts()
+  const current = posts.find((post) => post.slug === slug)
+  if (!current) {
+    return []
+  }
+
+  const keywordSet = new Set(
+    (current.keywords ?? []).map((keyword) => keyword.toLowerCase())
+  )
+
+  const scored = posts
+    .filter((post) => post.slug !== slug)
+    .map((post) => {
+      let score = 0
+      if (post.category === current.category) {
+        score += 2
+      }
+      const overlap = post.keywords.reduce((total, keyword) => {
+        return keywordSet.has(keyword.toLowerCase()) ? total + 1 : total
+      }, 0)
+      score += overlap
+      return { post, score }
+    })
+    .sort((a, b) => {
+      if (b.score !== a.score) {
+        return b.score - a.score
+      }
+      return new Date(b.post.publishedAt).getTime() - new Date(a.post.publishedAt).getTime()
+    })
+    .map((entry) => entry.post)
+
+  const related: BlogPost[] = []
+  const seen = new Set<string>()
+
+  for (const candidate of scored) {
+    if (related.length >= limit) break
+    if (seen.has(candidate.slug)) continue
+    related.push(candidate)
+    seen.add(candidate.slug)
+  }
+
+  if (related.length < limit) {
+    for (const fallback of posts) {
+      if (related.length >= limit) break
+      if (fallback.slug === slug || seen.has(fallback.slug)) continue
+      related.push(fallback)
+      seen.add(fallback.slug)
+    }
+  }
+
+  return related.slice(0, limit)
+}

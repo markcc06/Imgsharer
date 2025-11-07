@@ -3,35 +3,34 @@
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
 import { ArticleLayout } from "@/components/ArticleLayout"
+import { buildArticleJsonLd } from "@/lib/seo"
+import type { BlogPost } from "@/lib/blog-data"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
 interface BlogPostClientPageProps {
-  post: {
-    slug: string
-    title: { en: string }
-    metaDescription: { en: string }
-    keywords: string[]
-    publishedAt: string
-    publishedAtDisplay: string
-    updatedAt: string | null
-    updatedAtDisplay: string | null
-    category: string
-    body: { en: string }
-    cta: { en: string }
-  } | null
+  post: BlogPost | null
   params: { slug: string }
+  relatedPosts: BlogPost[]
 }
 
-export default function BlogPostClientPage({ post, params }: BlogPostClientPageProps) {
+export default function BlogPostClientPage({ post, params, relatedPosts }: BlogPostClientPageProps) {
   if (!post) {
     notFound()
   }
+
+  const publishedIso = post.publishedAt
+  const updatedIso = post.updatedAt ?? post.publishedAt
+  const articleJsonLd = buildArticleJsonLd(post, publishedIso, updatedIso)
 
   return (
     <main className="min-h-screen flex flex-col">
       <Header />
       <ArticleLayout>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        />
         <Link
           href="/blog"
           className="inline-flex items-center gap-2 text-neutral-600 hover:text-neutral-900 mb-8 group"
@@ -59,6 +58,27 @@ export default function BlogPostClientPage({ post, params }: BlogPostClientPageP
           <div dangerouslySetInnerHTML={{ __html: post.body.en }} />
         </article>
 
+        {relatedPosts.length > 0 && (
+          <section className="mt-12 border-t border-neutral-200 pt-8">
+            <h3 className="text-lg font-semibold text-neutral-900 mb-4">Related articles</h3>
+            <ul className="space-y-3">
+              {relatedPosts.map((related) => (
+                <li key={related.slug}>
+                  <Link
+                    href={`/blog/${related.slug}`}
+                    className="text-coral font-medium hover:underline"
+                  >
+                    {related.title.en}
+                  </Link>
+                  {related.metaDescription.en && (
+                    <p className="text-sm text-neutral-600">{related.metaDescription.en}</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {/* CTA */}
         <div className="mt-12 p-6 bg-gradient-to-r from-coral/10 to-coral/5 rounded-2xl border border-coral/20">
           <p className="text-lg font-medium text-neutral-900 mb-4">{post.cta.en}</p>
@@ -69,38 +89,6 @@ export default function BlogPostClientPage({ post, params }: BlogPostClientPageP
             Try Free Now →
           </Link>
         </div>
-
-        {/* Schema.org structured data */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "BlogPosting",
-              headline: post.title.en,
-              datePublished: post.publishedAt,
-              dateModified: post.updatedAt || post.publishedAt,
-              author: {
-                "@type": "Organization",
-                name: "Imgsharer",
-              },
-              publisher: {
-                "@type": "Organization",
-                name: "Imgsharer",
-                logo: {
-                  "@type": "ImageObject",
-                  url: "https://imagesharpenerai.pro/icon.png",
-                },
-              },
-              description: post.metaDescription.en,
-              keywords: post.keywords.join(", "),
-              mainEntityOfPage: {
-                "@type": "WebPage",
-                "@id": `https://imagesharpenerai.pro/blog/${post.slug}`,
-              },
-            }),
-          }}
-        />
       </ArticleLayout>
       <Footer />
     </main>

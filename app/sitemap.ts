@@ -54,7 +54,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getAllBlogPosts()
 
   for (const post of posts) {
-    const lastModified = post.updatedAt ? new Date(post.updatedAt) : new Date(post.publishedAt)
+    const lastModifiedIso = post.updatedAt ?? post.publishedAt ?? now.toISOString()
+    const lastModified = new Date(lastModifiedIso)
     entries.push({
       url: `${BASE_URL}/blog/${post.slug}`,
       lastModified,

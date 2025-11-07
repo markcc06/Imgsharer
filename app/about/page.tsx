@@ -10,6 +10,10 @@ export const metadata: Metadata = {
       ? `${process.env.NEXT_PUBLIC_SITE_URL}/about`
       : "/about",
   },
+  robots: {
+    index: false,
+    follow: true,
+  },
   openGraph: {
     title: "About Us | ImageSharpenerAI",
     description:
