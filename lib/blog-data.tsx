@@ -856,6 +856,192 @@ rawBlogPosts.push(
     },
     publishedAt: "2025-11-05",
   },
+  {
+    slug: "old-photo-restoration-free-app",
+    title: {
+      en: "Grandma’s Faded Album, Fixed in Minutes (Free)",
+      zh: "",
+    },
+    publishedAt: "2025-11-06T05:00:00.000Z",
+    category: "Restoration",
+    keywords: [
+      "old photo restoration app free",
+      "AI Image Sharpener",
+      "imgsharer",
+      "fix a blurry photo",
+      "restore vintage photo",
+      "photo denoise",
+      "deblur old photo",
+      "scan cleanup",
+    ],
+    metaDescription: {
+      en: "Bring back detail in vintage prints with an old photo restoration app free. Use Imgsharer’s AI Image Sharpener to de-noise, de-blur, and fix a blurry photo fast.",
+      zh: "",
+    },
+    body: {
+      en: `
+<h2>Give your old family photos a second life — quickly and for free</h2>
+<figure>
+  <img src="/images/blog/old-photo-restoration-free-app-hero.jpg" alt="Hand holding two vintage black and white family photographs" loading="lazy" decoding="async" />
+</figure>
+<p>That soft, gray look in vintage prints isn’t your memory fading — it’s paper fiber, lab aging, and tiny scratches lowering contrast. The fix is simple: an <strong>old photo restoration app free</strong> powered by a modern <strong>AI Image Sharpener</strong>.</p>
+
+<h3>Capture once, restore once</h3>
+<ul>
+  <li><strong>Light it right:</strong> window light, no glare. Hold your phone parallel; take 2–3 shots.</li>
+  <li><strong>Drop into Imgsharer:</strong> choose the Old Photo preset to de-noise, de-blur, and re-add micro-contrast.</li>
+  <li><strong>Finish lightly:</strong> tone neutralize for yellow cast; export 300 DPI if you plan to reprint.</li>
+</ul>
+
+<h3>What the AI is doing (short and friendly)</h3>
+<ul>
+  <li><strong>De-noise</strong> on the luminance channel to avoid color blotches.</li>
+  <li><strong>De-blur</strong> (blind deconvolution) to recover edges without halos.</li>
+  <li><strong>Micro-contrast</strong> to reveal fabric, hair, and film texture.</li>
+</ul>
+
+<p>Need a quick comparison? Try a travel snapshot too and see what clarity looks like on landscapes: <a href="/blog/enhance-blurry-travel-photo">enhance a blurry travel photo</a>. When friends ask how to <strong>fix a blurry photo</strong>, you’ll have a one-click answer.</p>
+
+<h3>When to rescan vs. when AI is enough</h3>
+<ul>
+  <li><strong>Rescan</strong> if glare streaks or textured paper cause moiré.</li>
+  <li><strong>No rescan needed</strong> if the phone capture is even and matte — AI cleanup is faster.</li>
+</ul>
+
+<p>Restore a memory, frame it, gift it. With <strong>Imgsharer</strong> and its <strong>AI Image Sharpener</strong>, your album doesn’t have to stay fuzzy.</p>
+`,
+      zh: "",
+    },
+    cta: {
+      en: "Try Imgsharer’s AI Image Sharpener — upload a phone capture and watch your vintage print come back to life.",
+      zh: "",
+    },
+  },
+  {
+    slug: "unblur-document-photo-fast",
+    title: {
+      en: "The 10-Second “Scanner”: Unblur Document Photos Fast",
+      zh: "",
+    },
+    publishedAt: "2025-11-06T05:05:00.000Z",
+    category: "Office",
+    keywords: [
+      "unblur document photo",
+      "AI Image Sharpener",
+      "imgsharer",
+      "unblur image ai",
+      "OCR ready",
+      "desk scan",
+      "fix blurry text",
+      "document deblur",
+    ],
+    metaDescription: {
+      en: "Turn phone shots into OCR-ready scans. Unblur document photo with Imgsharer’s AI Image Sharpener: straighten, de-blur text edges, and export clean PDFs.",
+      zh: "",
+    },
+    body: {
+      en: `
+<h2>Turn a phone snap into a clean, searchable document</h2>
+<figure>
+  <img src="/images/blog/unblur-document-photo-fast-hero.jpg" alt="Person scanning a contract with a phone over a desk of paperwork" loading="lazy" decoding="async" />
+</figure>
+<p>You don’t need a flatbed. With a good capture and <strong>unblur image AI</strong>, it takes seconds to <strong>unblur document photo</strong> and make text OCR-ready.</p>
+
+<h3>Capture like a pro (with a phone)</h3>
+<ul>
+  <li><strong>Light:</strong> daylight from the side; avoid top-down glare.</li>
+  <li><strong>Angle:</strong> keep the camera parallel; enable grid; fill the frame.</li>
+  <li><strong>Burst:</strong> take 2–3 shots; one will be the crispiest.</li>
+</ul>
+
+<h3>Run a document pipeline in Imgsharer</h3>
+<ol>
+  <li><strong>De-skew:</strong> auto corner detect to straighten pages.</li>
+  <li><strong>Text de-blur:</strong> character-width deconvolution restores edge contrast.</li>
+  <li><strong>Adaptive threshold:</strong> separates ink from paper without losing faint strokes.</li>
+  <li><strong>Micro-contrast:</strong> pushes legibility for small fonts and stamps.</li>
+</ol>
+
+<p>Export a PDF for email or an image for apps that need pictures. For mobile shots in general, see <a href="/blog/unblur-image-iphone">how to unblur image on iPhone</a> — the same habits make every snap cleaner.</p>
+
+<h3>Quick fixes for common headaches</h3>
+<ul>
+  <li>Gray paper? Raise “paper clean.”</li>
+  <li>Receipts in color? Keep color on; some totals print red.</li>
+  <li>Shadow bands? Crop tighter and re-run the pass.</li>
+</ul>
+
+<p>When HR or Legal needs a clearer copy, <strong>Imgsharer</strong> and its <strong>AI Image Sharpener</strong> do the heavy lifting — fast, repeatable, reliable.</p>
+`,
+      zh: "",
+    },
+    cta: {
+      en: "Open Imgsharer, choose Document, and unblur document photo in one pass — sharp, clean, OCR-ready.",
+      zh: "",
+    },
+  },
+  {
+    slug: "sharpen-digital-art-without-halos",
+    title: {
+      en: "From Fuzzy to Gallery-Ready: Sharpen Digital Art Without Halos",
+      zh: "",
+    },
+    publishedAt: "2025-11-06T05:10:00.000Z",
+    category: "Creative",
+    keywords: [
+      "sharpen digital art photo",
+      "image sharpener ar",
+      "fix a blurry photo",
+      "imgsharer",
+      "illustration sharpening",
+      "anti-halo",
+      "micro-contrast",
+      "print-ready",
+    ],
+    metaDescription: {
+      en: "Edge-aware sharpening for artists. Sharpen digital art photo without halos using Imgsharer; protect line art, add micro-contrast, and export print-ready files.",
+      zh: "",
+    },
+    body: {
+      en: `
+<h2>Your lines should look intentional — not crunchy</h2>
+<figure>
+  <img src="/images/blog/sharpen-digital-art-without-halos-hero.png" alt="Digital artist detailing a warrior illustration on a tablet with a stylus" loading="lazy" decoding="async" />
+</figure>
+<p>Resizing and compression eat edge contrast. The answer isn’t “more sharpening” — it’s the <em>right</em> pass. Use an image sharpener that respects style and avoids halos.</p>
+
+<h3>A creator’s checklist</h3>
+<ul>
+  <li>Finish at 1.5–2× target and downscale smart (Lanczos/Bicubic).</li>
+  <li>Preview at 100%; judge at output size, not zoomed.</li>
+  <li>Treat line art more gently than textured fills.</li>
+</ul>
+
+<h3>Use Imgsharer’s Illustration preset</h3>
+<ul>
+  <li><strong>Edge-aware de-blur:</strong> deconvolution only where true edges exist.</li>
+  <li><strong>Micro-contrast:</strong> restores brush texture without plastic skin.</li>
+  <li><strong>Halo guard:</strong> thresholding that blocks bright rings around ink.</li>
+</ul>
+
+<p>Want to experiment live? Try the optional <strong>image sharpener AR</strong> preview: hold your phone over a print or screen and see the sharpened look while you frame. And if you ever need to <a href="/blog/fix-blurry-product-photo">fix a blurry photo</a> of your merch or prints, the product workflow helps too.</p>
+
+<h3>Settings that usually win</h3>
+<ul>
+  <li>Radius: 0.4–0.8 px for web exports; smaller canvases need smaller radii.</li>
+  <li>Amount: Medium first; raise only if your lines were truly soft.</li>
+  <li>Threshold: 2–6 to protect gradients and skin tones in character art.</li>
+</ul>
+
+<p>Make web posts crisp and prints intentional. With <strong>Imgsharer</strong> and its <strong>AI Image Sharpener</strong>, you can <strong>fix a blurry photo</strong> of your artwork or rescue a soft export in minutes.</p>
+`,
+      zh: "",
+    },
+    cta: {
+      en: "Try Imgsharer’s AI Image Sharpener with the Illustration preset — clean edges, no halos, print-ready.",
+      zh: "",
+    },
+  },
 )
 
 const BLOG_TZ = process.env.NEXT_PUBLIC_BLOG_TZ || "America/New_York"
