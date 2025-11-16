@@ -100,7 +100,7 @@ const rawBlogPosts: RawBlogPost[] = [
       en: "How to Unblur a Picture on iPhone (Selfie Edition): The Makeup Girl’s Guide to Getting Crystal-Clear Shots",
       zh: "",
     },
-    publishedAt: "2025-11-12T09:00:00-05:00",
+    publishedAt: "2025-11-15T10:00:00-05:00",
     category: "Selfie & Makeup",
     keywords: [
       "how to unblur a picture on iPhone",
