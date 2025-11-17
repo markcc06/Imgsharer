@@ -143,11 +143,11 @@ export function HeroSection() {
 
       <div className="relative z-30 container-custom py-12 md:py-16">
         <Reveal>
-          <div
-            data-hero-foreground
-            className="max-w-screen-lg mx-auto bg-white/10 bg-gradient-to-b from-white/8 to-white/5 ring-1 ring-white/15 rounded-3xl p-8 md:p-12 shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
-          >
-            <div className="text-center mb-8">
+            <div
+              data-hero-foreground
+              className="w-full max-w-6xl mx-auto bg-white/10 bg-gradient-to-b from-white/8 to-white/5 ring-1 ring-white/15 rounded-3xl px-10 py-8 md:px-16 md:py-14 shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
+            >
+            <div className="text-center mb-10">
               <div
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md bg-white/20 border border-white/30 mb-6 transition-all duration-600 ${
                   mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
@@ -158,21 +158,23 @@ export function HeroSection() {
                 <span className="text-sm font-medium text-white">AI-Powered Enhancement</span>
               </div>
 
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight tracking-tight">
-                <AnimatedText text="Free AI Image Sharpener" delay={0.2} />
-                <br />
-                <span className="text-2xl md:text-4xl">
-                  <AnimatedText text="Instantly Enhance Photo Clarity" delay={0.4} />
-                </span>
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight tracking-tight whitespace-nowrap">
+                <AnimatedText text="Free AI Image Sharpener & Upscaler" delay={0.2} />
               </h1>
+              <p className="text-2xl md:text-4xl font-semibold text-white mb-2">
+                <AnimatedText text="Enhance Photos and Fix Blurry Images in Seconds" delay={0.4} />
+              </p>
 
               <p
-                className={`text-base md:text-lg text-white/85 mb-8 leading-relaxed max-w-2xl mx-auto transition-all duration-600 ${
+                className={`text-base md:text-lg text-white/85 mb-10 leading-relaxed max-w-3xl mx-auto text-balance transition-all duration-600 ${
                   mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
                 }`}
                 style={{ transitionDelay: "0.8s" }}
               >
-                Enhance and restore photo clarity using AI. Upload, process, and download sharper photos in seconds.
+                Use our free AI image sharpener and AI image upscaler to remove blur from photos online, fix blurry pictures,
+                and enhance photo detail in one click.
+                <br />
+                Upload any AI picture or regular photo and get a clearer, sharper download in seconds.
               </p>
             </div>
 
