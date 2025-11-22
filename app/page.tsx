@@ -3,6 +3,7 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { HeroSection } from "@/components/hero-section"
+import { ProblemSolutionsSection } from "@/components/ProblemSolutionsSection"
 import { NewsletterSection } from "@/components/newsletter-section"
 import { Upload, Zap, Download, Shield, Sparkles, FileImage } from "lucide-react"
 import PreviewModal from "@/components/PreviewModal"
@@ -12,6 +13,7 @@ export default function HomePage() {
     <main className="min-h-screen flex flex-col bg-neutral-50">
       <Header />
       <HeroSection />
+      <ProblemSolutionsSection />
 
       <section className="py-16 lg:py-24 bg-white">
         <div className="container-custom">
