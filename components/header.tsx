@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { siteConfig } from "@/config/siteConfig"
 
 function SparklesIcon() {
   return (
@@ -49,12 +50,16 @@ export function Header() {
       <div className="container-custom">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" title="Imgsharer — AI image sharpener homepage" className="flex items-center gap-2 group">
+          <Link
+            href="/"
+            title={`${siteConfig.brandName} — AI image sharpener homepage`}
+            className="flex items-center gap-2 group"
+          >
             <div className="w-8 h-8 rounded-lg bg-[#ff5733] flex items-center justify-center text-white group-hover:bg-[#ff7959] transition-colors">
               <SparklesIcon />
             </div>
             <span className="text-xl font-display font-bold text-[#ff5733] group-hover:text-[#ff7959] transition-colors">
-              Imgsharer
+              {siteConfig.brandName}
             </span>
           </Link>
 
@@ -76,14 +81,14 @@ export function Header() {
             </Link>
             <Link
               href="/about"
-              title="About Imgsharer"
+              title={`About ${siteConfig.brandName}`}
               className="text-sm font-medium text-neutral-600 hover:text-[#ff7959] transition-colors"
             >
               About
             </Link>
             <Link
               href="/contact"
-              title="Contact Imgsharer"
+              title={`Contact ${siteConfig.brandName}`}
               className="text-sm font-medium text-neutral-600 hover:text-[#ff7959] transition-colors"
             >
               Contact

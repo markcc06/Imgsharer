@@ -1,14 +1,28 @@
+import Link from "next/link"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card } from "@/components/ui/card"
 import type { Metadata } from "next"
+import { siteConfig } from "@/config/siteConfig"
 
 export const metadata: Metadata = {
-  title: "FAQ — Imgsharer | AI Image Sharpener",
+  title: `FAQ — ${siteConfig.brandName} | AI Image Sharpener`,
   description:
     "Learn how our AI image sharpener can unblur image issues, make pictures clearer, enhance selfies, rescue travel shots, and polish product photos with Imgsharer.",
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL}/faq` : "/faq",
+    canonical: `${siteConfig.siteUrl}/faq`,
+  },
+  openGraph: {
+    title: `FAQ — ${siteConfig.brandName} | AI Image Sharpener`,
+    description:
+      "Learn how our AI image sharpener can unblur image issues, make pictures clearer, enhance selfies, rescue travel shots, and polish product photos with Imgsharer.",
+    url: `${siteConfig.siteUrl}/faq`,
+  },
+  twitter: {
+    card: "summary",
+    title: `FAQ — ${siteConfig.brandName} | AI Image Sharpener`,
+    description:
+      "Learn how our AI image sharpener can unblur image issues, make pictures clearer, enhance selfies, rescue travel shots, and polish product photos with Imgsharer.",
   },
 }
 
@@ -67,7 +81,7 @@ export default function FAQPage() {
             <h1 className="text-4xl md:text-5xl font-display font-bold text-neutral-900 mb-4">
               Frequently Asked Questions
             </h1>
-            <p className="text-lg text-neutral-600">Everything you need to know about Imgsharer</p>
+            <p className="text-lg text-neutral-600">Everything you need to know about {siteConfig.brandName}</p>
           </div>
 
           <div className="space-y-4">
@@ -81,20 +95,30 @@ export default function FAQPage() {
 
           <div className="mt-12 text-center">
             <p className="text-neutral-600 mb-4">Still have questions?</p>
-            <p className="text-sm text-neutral-500">
-              Contact us at{" "}
-              <a href="mailto:support@imgsharer.example" className="text-coral hover:underline">
-                support@imgsharer.example
-              </a>
-            </p>
+            {siteConfig.contactEmail ? (
+              <p className="text-sm text-neutral-500">
+                Contact us at{" "}
+                <a href={`mailto:${siteConfig.contactEmail}`} className="text-coral hover:underline">
+                  {siteConfig.contactEmail}
+                </a>
+              </p>
+            ) : (
+              <p className="text-sm text-neutral-500">
+                Contact us via the{" "}
+                <Link href="/contact" className="text-coral hover:underline">
+                  contact page
+                </Link>
+                .
+              </p>
+            )}
           </div>
 
           <div className="mt-8 text-center">
             <p className="text-neutral-600">
               Ready to see the difference?{" "}
-              <a href="/" className="text-coral font-medium hover:underline">
-                Try Imgsharer now
-              </a>
+              <Link href="/" className="text-coral font-medium hover:underline">
+                Try {siteConfig.brandName} now
+              </Link>
             </p>
           </div>
         </div>

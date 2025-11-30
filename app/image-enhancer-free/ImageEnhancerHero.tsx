@@ -3,15 +3,17 @@
 import { useCallback, useRef } from "react"
 
 import { useToast } from "@/hooks/use-toast"
-import { ALLOWED_FILE_TYPES } from "@/lib/constants"
 import { useUploadUI } from "@/lib/stores/upload-ui"
 import { Upload } from "lucide-react"
+import { getToolUploadLimits } from "@/lib/tool-pipeline"
 
 interface HeroBullet {
   icon: string
   title: string
   description: string
 }
+
+const uploadLimits = getToolUploadLimits()
 
 interface ImageEnhancerHeroProps {
   badge?: string
@@ -29,19 +31,19 @@ export function ImageEnhancerHero({ badge, title, subtitle, body, ctaText, bulle
 
   const handleFileSelect = useCallback(
     (file: File) => {
-      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      if (!uploadLimits.allowedMimeTypes.includes(file.type)) {
         toast({
           title: "Invalid file type",
-          description: "Please upload a JPEG, PNG, or WebP image.",
+          description: "Please upload a supported image format.",
           variant: "destructive",
         })
         return
       }
 
-      if (file.size > 4 * 1024 * 1024) {
+      if (file.size > uploadLimits.maxFileSizeBytes) {
         toast({
           title: "File too large",
-          description: "Please upload an image smaller than 4MB.",
+          description: `Please upload an image smaller than ${uploadLimits.maxFileSizeMb}MB.`,
           variant: "destructive",
         })
         return
@@ -133,13 +135,16 @@ export function ImageEnhancerHero({ badge, title, subtitle, body, ctaText, bulle
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-neutral-900 mb-1">Drop your image here, or click to browse</p>
-                  <p className="text-sm text-neutral-500">JPEG, PNG, WebP • Max 4MB</p>
+                  <p className="text-sm text-neutral-500">
+                    {uploadLimits.allowedMimeTypes.map((type) => type.split("/")[1].toUpperCase()).join(", ")} • Max{" "}
+                    {uploadLimits.maxFileSizeMb}MB
+                  </p>
                 </div>
               </div>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept={uploadLimits.allowedMimeTypes.join(",")}
                 onChange={handleFileInput}
                 className="hidden"
               />

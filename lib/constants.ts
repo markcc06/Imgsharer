@@ -1,5 +1,3 @@
-export const MAX_FILE_SIZE = 4 * 1024 * 1024 // 4MB
-export const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/webp"]
 export const MAX_DIMENSION = 4096
 export const RATE_LIMIT_PER_MINUTE = 4
 export const RATE_LIMIT_PER_DAY = 12

@@ -4,9 +4,11 @@ import type React from "react"
 
 import { useRef, useCallback, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
-import { MAX_FILE_SIZE, ALLOWED_FILE_TYPES } from "@/lib/constants"
 import { useUploadUI } from "@/lib/stores/upload-ui"
 import { uploaderBridge } from "@/lib/uploader-bridge"
+import { getToolUploadLimits } from "@/lib/tool-pipeline"
+
+const uploadLimits = getToolUploadLimits()
 
 function UploadIcon({ className }: { className?: string }) {
   return (
@@ -43,19 +45,19 @@ export default function UploadDropzone({ mode = "modal" }: { mode?: "standalone"
 
   const handleFileSelect = useCallback(
     (file: File) => {
-      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      if (!uploadLimits.allowedMimeTypes.includes(file.type)) {
         toast({
           title: "Invalid file type",
-          description: "Please upload a JPEG, PNG, or WebP image.",
+          description: "Please upload a supported image format.",
           variant: "destructive",
         })
         return
       }
 
-      if (file.size > MAX_FILE_SIZE) {
+      if (file.size > uploadLimits.maxFileSizeBytes) {
         toast({
           title: "File too large",
-          description: "Please upload an image smaller than 4MB.",
+          description: `Please upload an image smaller than ${uploadLimits.maxFileSizeMb}MB.`,
           variant: "destructive",
         })
         return
@@ -96,13 +98,16 @@ export default function UploadDropzone({ mode = "modal" }: { mode?: "standalone"
         </div>
         <div>
           <p className="text-xl font-semibold text-neutral-900 mb-2">Drop your image here, or click to browse</p>
-          <p className="text-sm text-neutral-600">Supports JPEG, PNG, WebP up to 4MB</p>
+          <p className="text-sm text-neutral-600">
+            Supports {uploadLimits.allowedMimeTypes.map((type) => type.split("/")[1].toUpperCase()).join(", ")} up to{" "}
+            {uploadLimits.maxFileSizeMb}MB
+          </p>
         </div>
       </div>
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept={uploadLimits.allowedMimeTypes.join(",")}
         onChange={handleFileInput}
         className="hidden"
       />

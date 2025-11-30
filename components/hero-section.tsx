@@ -7,10 +7,11 @@ import { AnimatedText } from "./animated-text"
 import { Reveal } from "./reveal"
 import HeroBgBeforeAfter from "./HeroBgBeforeAfter"
 import { useToast } from "@/hooks/use-toast"
-import { ALLOWED_FILE_TYPES } from "@/lib/constants"
 import { DEFAULT_HERO } from "@/lib/hero-constants"
 import { loadSessionPair, saveSessionPair, subscribeHeroUpdate, type HeroPair } from "@/lib/hero-bus"
 import { useUploadUI } from "@/lib/stores/upload-ui"
+import { getToolUploadLimits } from "@/lib/tool-pipeline"
+import type { LandingConfig } from "@/config/toolConfig"
 
 function SparklesIcon({ className }: { className?: string }) {
   return (
@@ -52,7 +53,13 @@ function UploadIcon({ className }: { className?: string }) {
   )
 }
 
-export function HeroSection() {
+const uploadLimits = getToolUploadLimits()
+
+type HeroSectionProps = {
+  hero: Pick<LandingConfig, "heroBadge" | "heroTitle" | "heroSubtitle" | "heroDescription" | "heroBullets">
+}
+
+export function HeroSection({ hero }: HeroSectionProps) {
   const [mounted, setMounted] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
@@ -76,19 +83,19 @@ export function HeroSection() {
     (file: File) => {
       console.log("[v0] handleFileSelect called with file:", file.name)
 
-      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      if (!uploadLimits.allowedMimeTypes.includes(file.type)) {
         toast({
           title: "Invalid file type",
-          description: "Please upload a JPEG, PNG, or WebP image.",
+          description: "Please upload a supported image format.",
           variant: "destructive",
         })
         return
       }
 
-      if (file.size > 4 * 1024 * 1024) {
+      if (file.size > uploadLimits.maxFileSizeBytes) {
         toast({
           title: "File too large",
-          description: "Please upload an image smaller than 4MB.",
+          description: `Please upload an image smaller than ${uploadLimits.maxFileSizeMb}MB.`,
           variant: "destructive",
         })
         return
@@ -129,6 +136,18 @@ export function HeroSection() {
     }
   }
 
+  const heroBadge = hero.heroBadge ?? "AI-Powered Enhancement"
+  const heroTitle = hero.heroTitle ?? "Free AI Image Sharpener & Upscaler"
+  const heroSubtitle = hero.heroSubtitle ?? "Enhance Photos and Fix Blurry Images in Seconds"
+  const heroDescription =
+    hero.heroDescription ??
+    "Use our free AI image sharpener and AI image upscaler to remove blur from photos online, fix blurry pictures, and enhance photo detail in one click. Upload any AI picture or regular photo and get a clearer, sharper download in seconds."
+  const heroBullets = hero.heroBullets ?? [
+    { title: "Lightning Fast", body: "" },
+    { title: "Secure & Private", body: "" },
+    { title: "AI-Enhanced", body: "" },
+  ]
+
   return (
     <section className="relative w-full min-h-[72vh] max-h-[920px] flex items-center justify-center overflow-hidden">
       <HeroBgBeforeAfter
@@ -155,14 +174,14 @@ export function HeroSection() {
                 style={{ transitionDelay: "0.1s" }}
               >
                 <SparklesIcon className="w-4 h-4 text-[#ff7959]" />
-                <span className="text-sm font-medium text-white">AI-Powered Enhancement</span>
+                <span className="text-sm font-medium text-white">{heroBadge}</span>
               </div>
 
               <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight tracking-tight whitespace-nowrap">
-                <AnimatedText text="Free AI Image Sharpener & Upscaler" delay={0.2} />
+                <AnimatedText text={heroTitle} delay={0.2} />
               </h1>
               <p className="text-2xl md:text-4xl font-semibold text-white mb-2">
-                <AnimatedText text="Enhance Photos and Fix Blurry Images in Seconds" delay={0.4} />
+                <AnimatedText text={heroSubtitle} delay={0.4} />
               </p>
 
               <p
@@ -171,10 +190,7 @@ export function HeroSection() {
                 }`}
                 style={{ transitionDelay: "0.8s" }}
               >
-                Use our free AI image sharpener and AI image upscaler to remove blur from photos online, fix blurry pictures,
-                and enhance photo detail in one click.
-                <br />
-                Upload any AI picture or regular photo and get a clearer, sharper download in seconds.
+                {heroDescription}
               </p>
             </div>
 
@@ -195,17 +211,20 @@ export function HeroSection() {
                     <UploadIcon className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <p className="text-lg font-semibold text-white mb-1">Drop your image here, or click to browse</p>
-                    <p className="text-sm text-neutral-300">JPEG, PNG, WebP • Max 4MB</p>
-                  </div>
+                  <p className="text-lg font-semibold text-white mb-1">Drop your image here, or click to browse</p>
+                  <p className="text-sm text-neutral-300">
+                    {uploadLimits.allowedMimeTypes.map((type) => type.split("/")[1].toUpperCase()).join(", ")} • Max{" "}
+                    {uploadLimits.maxFileSizeMb}MB
+                  </p>
                 </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={handleFileInput}
-                  className="hidden"
-                />
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={uploadLimits.allowedMimeTypes.join(",")}
+                onChange={handleFileInput}
+                className="hidden"
+              />
               </div>
             </div>
 
@@ -215,18 +234,12 @@ export function HeroSection() {
               }`}
               style={{ transitionDelay: "1.2s" }}
             >
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#ff7959]" />
-                <span>Lightning Fast</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#ff7959]" />
-                <span>Secure & Private</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#ff7959]" />
-                <span>AI-Enhanced</span>
-              </div>
+              {heroBullets.map((bullet) => (
+                <div key={bullet.title} className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#ff7959]" />
+                  <span>{bullet.title}</span>
+                </div>
+              ))}
             </div>
           </div>
         </Reveal>

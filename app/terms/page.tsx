@@ -1,13 +1,27 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import type { Metadata } from "next"
+import { siteConfig } from "@/config/siteConfig"
 
 export const metadata: Metadata = {
-  title: "Terms of Service - Imgsharer",
-  description: "Terms of Service for using Imgsharer's AI image sharpening service.",
+  title: `Terms of Service - ${siteConfig.brandName}`,
+  description: `Terms of Service for using ${siteConfig.brandName}'s AI image sharpening service.`,
+  alternates: {
+    canonical: `${siteConfig.siteUrl}/terms`,
+  },
   robots: {
     index: false,
     follow: true,
+  },
+  openGraph: {
+    title: `Terms of Service - ${siteConfig.brandName}`,
+    description: `Terms of Service for using ${siteConfig.brandName}'s AI image sharpening service.`,
+    url: `${siteConfig.siteUrl}/terms`,
+  },
+  twitter: {
+    card: "summary",
+    title: `Terms of Service - ${siteConfig.brandName}`,
+    description: `Terms of Service for using ${siteConfig.brandName}'s AI image sharpening service.`,
   },
 }
 
@@ -75,9 +89,15 @@ export default function TermsPage() {
             <h2 className="text-2xl font-semibold text-neutral-900 mb-4">7. Contact</h2>
             <p className="text-neutral-600 leading-relaxed">
               For questions about these Terms, contact us at{" "}
-              <a href="mailto:legal@imgsharer.example" className="text-coral hover:underline">
-                legal@imgsharer.example
-              </a>
+              {siteConfig.contactEmail ? (
+                <a href={`mailto:${siteConfig.contactEmail}`} className="text-coral hover:underline">
+                  {siteConfig.contactEmail}
+                </a>
+              ) : (
+                <a href="/contact" className="text-coral hover:underline">
+                  our contact page
+                </a>
+              )}
             </p>
           </section>
         </div>

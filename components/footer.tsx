@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import { siteConfig } from "@/config/siteConfig"
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -10,11 +11,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mb-12">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-2xl font-display font-bold mb-4 text-[#e63b14]">Imgsharer</h3>
-            <p className="text-[#555555] text-sm leading-relaxed max-w-md">
-              AI-powered image sharpening made simple. Upload, enhance, and download your images in seconds with
-              cutting-edge AI technology.
-            </p>
+            <h3 className="text-2xl font-display font-bold mb-4 text-[#e63b14]">{siteConfig.brandName}</h3>
+            <p className="text-[#555555] text-sm leading-relaxed max-w-md">{siteConfig.tagline}</p>
           </div>
 
           {/* Info */}
@@ -24,7 +22,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/about"
-                  title="About Imgsharer"
+                  title={`About ${siteConfig.brandName}`}
                   className="text-[#555555] hover:text-[#ff7959] hover:underline transition-colors"
                 >
                   About Us
@@ -33,7 +31,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/contact"
-                  title="Contact Imgsharer"
+                  title={`Contact ${siteConfig.brandName}`}
                   className="text-[#555555] hover:text-[#ff7959] hover:underline transition-colors"
                 >
                   Contact
@@ -95,8 +93,8 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="pt-8 border-t border-neutral-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-[#555555]">&copy; {currentYear} Imgsharer. All rights reserved.</p>
-          <p className="text-sm text-[#555555]">Powered by Imgsharer</p>
+          <p className="text-sm text-[#555555]">&copy; {currentYear} {siteConfig.brandName}. All rights reserved.</p>
+          <p className="text-sm text-[#555555]">Powered by {siteConfig.brandName}</p>
         </div>
       </div>
     </footer>

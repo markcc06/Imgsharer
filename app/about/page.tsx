@@ -1,32 +1,27 @@
 import type { Metadata } from "next"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { siteConfig } from "@/config/siteConfig"
 
 export const metadata: Metadata = {
-  title: "About Us | ImageSharpenerAI",
-  description: "Learn why we built ImageSharpenerAI and how we craft useful, delightful AI tools for better image clarity.",
+  title: `About Us | ${siteConfig.brandName}`,
+  description: `Learn why we built ${siteConfig.brandName} and how we craft useful, delightful AI tools for better image clarity.`,
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_SITE_URL
-      ? `${process.env.NEXT_PUBLIC_SITE_URL}/about`
-      : "/about",
+    canonical: `${siteConfig.siteUrl}/about`,
   },
   robots: {
     index: false,
     follow: true,
   },
   openGraph: {
-    title: "About Us | ImageSharpenerAI",
-    description:
-      "Learn why we built ImageSharpenerAI and how we craft useful, delightful AI tools for better image clarity.",
-    url: process.env.NEXT_PUBLIC_SITE_URL
-      ? `${process.env.NEXT_PUBLIC_SITE_URL}/about`
-      : undefined,
+    title: `About Us | ${siteConfig.brandName}`,
+    description: `Learn why we built ${siteConfig.brandName} and how we craft useful, delightful AI tools for better image clarity.`,
+    url: `${siteConfig.siteUrl}/about`,
   },
   twitter: {
     card: "summary",
-    title: "About Us | ImageSharpenerAI",
-    description:
-      "Learn why we built ImageSharpenerAI and how we craft useful, delightful AI tools for better image clarity.",
+    title: `About Us | ${siteConfig.brandName}`,
+    description: `Learn why we built ${siteConfig.brandName} and how we craft useful, delightful AI tools for better image clarity.`,
   },
 }
 
@@ -35,13 +30,13 @@ const structuredData = {
   "@graph": [
     {
       "@type": "Organization",
-      name: "ImageSharpenerAI",
-      url: "https://www.imagesharpenerai.pro",
+      name: siteConfig.brandName,
+      url: siteConfig.siteUrl,
     },
     {
       "@type": "WebSite",
-      name: "ImageSharpenerAI",
-      url: "https://www.imagesharpenerai.pro",
+      name: siteConfig.brandName,
+      url: siteConfig.siteUrl,
     },
   ],
 }
@@ -60,7 +55,7 @@ export default function AboutPage() {
             What makes us different is our willingness to experiment, create, and bring useful AI tools to life.
           </p>
           <p>
-            The idea for ImageSharpenerAI came directly from our daily work. Before building this project, we were a small
+            The idea for {siteConfig.brandName} came directly from our daily work. Before building this project, we were a small
             team working in digital media and content creation — producing tons of photos for travel blogs, food reviews,
             and lifestyle stories.
           </p>
@@ -75,7 +70,7 @@ export default function AboutPage() {
             with others who care about visual quality and creative expression?
           </p>
           <p>
-            ImageSharpenerAI is the result of that idea. It’s still in its early stage, but every feature and every detail has
+            {siteConfig.brandName} is the result of that idea. It’s still in its early stage, but every feature and every detail has
             been crafted with care. We’ll keep improving it based on your feedback and our own ideas, bringing more fun and
             creative features in the future.
           </p>
@@ -88,7 +83,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-semibold text-neutral-900">FAQ</h2>
             <div className="space-y-3">
               <div>
-                <h3 className="font-medium text-neutral-800">Is ImageSharpenerAI free?</h3>
+                <h3 className="font-medium text-neutral-800">Is {siteConfig.brandName} free?</h3>
                 <p className="text-neutral-700 text-sm">
                   We offer a free tier for light use; advanced features may be introduced over time.
                 </p>

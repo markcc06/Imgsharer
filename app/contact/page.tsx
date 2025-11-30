@@ -1,33 +1,27 @@
 import type { Metadata } from "next"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-
-const CONTACT_EMAIL =
-  typeof process !== "undefined" ? process.env.NEXT_PUBLIC_CONTACT_EMAIL : undefined
+import { siteConfig } from "@/config/siteConfig"
 
 export const metadata: Metadata = {
-  title: "Contact | ImageSharpenerAI",
-  description: "Contact the ImageSharpenerAI team for support, feedback, or partnership inquiries.",
+  title: `Contact | ${siteConfig.brandName}`,
+  description: `Contact the ${siteConfig.brandName} team for support, feedback, or partnership inquiries.`,
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_SITE_URL
-      ? `${process.env.NEXT_PUBLIC_SITE_URL}/contact`
-      : "/contact",
+    canonical: `${siteConfig.siteUrl}/contact`,
   },
   robots: {
     index: false,
     follow: true,
   },
   openGraph: {
-    title: "Contact | ImageSharpenerAI",
-    description: "Contact the ImageSharpenerAI team for support, feedback, or partnership inquiries.",
-    url: process.env.NEXT_PUBLIC_SITE_URL
-      ? `${process.env.NEXT_PUBLIC_SITE_URL}/contact`
-      : undefined,
+    title: `Contact | ${siteConfig.brandName}`,
+    description: `Contact the ${siteConfig.brandName} team for support, feedback, or partnership inquiries.`,
+    url: `${siteConfig.siteUrl}/contact`,
   },
   twitter: {
     card: "summary",
-    title: "Contact | ImageSharpenerAI",
-    description: "Contact the ImageSharpenerAI team for support, feedback, or partnership inquiries.",
+    title: `Contact | ${siteConfig.brandName}`,
+    description: `Contact the ${siteConfig.brandName} team for support, feedback, or partnership inquiries.`,
   },
 }
 
@@ -45,15 +39,15 @@ export default function ContactPage() {
             </p>
             <div className="rounded-xl border border-neutral-200 bg-white p-6 space-y-2 shadow-sm">
               <h2 className="text-xl font-semibold text-neutral-900">Email</h2>
-              {CONTACT_EMAIL ? (
+              {siteConfig.contactEmail ? (
                 <p className="text-neutral-700">
                   Reach us at{" "}
                   <a
-                    href={`mailto:${CONTACT_EMAIL}`}
+                    href={`mailto:${siteConfig.contactEmail}`}
                     className="text-[#ff5733] hover:underline"
                     rel="noopener"
                   >
-                    {CONTACT_EMAIL}
+                    {siteConfig.contactEmail}
                   </a>
                   .
                 </p>
@@ -77,7 +71,7 @@ export default function ContactPage() {
                 src="https://docs.google.com/forms/d/e/1FAIpQLScm8J-cM01J783TEbwnKrHJERfySq41UDR5xiyikS6yI63OGA/viewform?embedded=true"
                 width="100%"
                 height="700"
-                title="ImageSharpenerAI feedback form"
+                title={`${siteConfig.brandName} feedback form`}
               >
                 Loading…
               </iframe>

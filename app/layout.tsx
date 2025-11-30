@@ -4,6 +4,7 @@ import { Inter, Space_Grotesk } from "next/font/google"
 import Script from "next/script"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
+import { siteConfig } from "@/config/siteConfig"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,27 +18,29 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
 })
 
+const defaultTitle = "Free AI Image Sharpener Instantly Enhance Photo Clarity"
+const defaultDescription =
+  "Free AI image sharpener to enhance and restore photo clarity. Upload a picture, sharpen in seconds, then download crystal-clear results. Private and fast."
+
 export const metadata: Metadata = {
-  title: "Free AI Image Sharpener Instantly Enhance Photo Clarity | Imgsharer",
-  description:
-    "Free AI image sharpener to enhance and restore photo clarity. Upload a picture, sharpen in seconds, then download crystal-clear results. Private and fast.",
+  title: `${defaultTitle} | ${siteConfig.brandName}`,
+  description: defaultDescription,
   generator: "v0.app",
-  metadataBase: new URL("https://www.imagesharpenerai.pro"),
+  metadataBase: new URL(siteConfig.siteUrl),
   alternates: {
-    canonical: "https://www.imagesharpenerai.pro",
+    canonical: siteConfig.siteUrl,
   },
   robots: {
     index: true,
     follow: true,
   },
   openGraph: {
-    siteName: "Imgsharer",
-    title: "Free AI Image Sharpener Instantly Enhance Photo Clarity",
-    description:
-      "Free AI image sharpener to enhance and restore photo clarity. Upload a picture, sharpen in seconds, then download crystal-clear results. Private and fast.",
+    siteName: siteConfig.brandName,
+    title: defaultTitle,
+    description: defaultDescription,
     type: "website",
-    url: "https://www.imagesharpenerai.pro",
-    locale: "en_US",
+    url: siteConfig.siteUrl,
+    locale: siteConfig.defaultLocale ?? "en_US",
     images: [
       {
         url: "/hero/portrait-3840.jpg",
@@ -49,9 +52,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free AI Image Sharpener Instantly Enhance Photo Clarity",
-    description:
-      "Free AI image sharpener to enhance and restore photo clarity. Upload a picture, sharpen in seconds, then download crystal-clear results. Private and fast.",
+    title: defaultTitle,
+    description: defaultDescription,
     site: "@imgsharer",
     images: ["/hero/portrait-3840.jpg"],
   },
@@ -74,11 +76,11 @@ export default function RootLayout({
 }>) {
   const ADSENSE_CLIENT =
     typeof process !== "undefined"
-      ? process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-6728061725805697"
+      ? siteConfig.adsenseClientId ?? process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? "ca-pub-6728061725805697"
       : "ca-pub-6728061725805697"
 
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
+    <html lang={(siteConfig.defaultLocale ?? "en-US").split("-")[0]} className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
       <head>
         {/* AdSense base script for CMP auto-injection */}
         <script
@@ -92,7 +94,7 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#ff5733" />
         {process.env.NODE_ENV === "production"
           ? (() => {
-              const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-VZXMJJJQD5"
+              const GA_ID = siteConfig.gaMeasurementId ?? process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-VZXMJJJQD5"
               if (!GA_ID) return null
               return (
                 <>

@@ -1,13 +1,27 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import type { Metadata } from "next"
+import { siteConfig } from "@/config/siteConfig"
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - Imgsharer",
-  description: "Privacy Policy for Imgsharer's AI image sharpening service.",
+  title: `Privacy Policy - ${siteConfig.brandName}`,
+  description: `Privacy Policy for ${siteConfig.brandName}'s AI image sharpening service.`,
+  alternates: {
+    canonical: `${siteConfig.siteUrl}/privacy`,
+  },
   robots: {
     index: false,
     follow: true,
+  },
+  openGraph: {
+    title: `Privacy Policy - ${siteConfig.brandName}`,
+    description: `Privacy Policy for ${siteConfig.brandName}'s AI image sharpening service.`,
+    url: `${siteConfig.siteUrl}/privacy`,
+  },
+  twitter: {
+    card: "summary",
+    title: `Privacy Policy - ${siteConfig.brandName}`,
+    description: `Privacy Policy for ${siteConfig.brandName}'s AI image sharpening service.`,
   },
 }
 
@@ -85,9 +99,15 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-semibold text-neutral-900 mb-4">8. Contact Us</h2>
             <p className="text-neutral-600 leading-relaxed">
               If you have questions about this Privacy Policy, contact us at{" "}
-              <a href="mailto:privacy@imgsharer.example" className="text-coral hover:underline">
-                privacy@imgsharer.example
-              </a>
+              {siteConfig.contactEmail ? (
+                <a href={`mailto:${siteConfig.contactEmail}`} className="text-coral hover:underline">
+                  {siteConfig.contactEmail}
+                </a>
+              ) : (
+                <a href="/contact" className="text-coral hover:underline">
+                  our contact page
+                </a>
+              )}
             </p>
           </section>
         </div>

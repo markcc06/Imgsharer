@@ -8,14 +8,9 @@ import { BeforeAfterSlider } from "@/components/before-after-slider"
 import { BlurPanel } from "@/components/blur-panel"
 import { Reveal } from "@/components/reveal"
 import { useUploadUI } from "@/lib/stores/upload-ui"
-import {
-  MAX_FILE_SIZE,
-  ALLOWED_FILE_TYPES,
-  REPLICATE_MAX_DIMENSION,
-  REPLICATE_MAX_DIMENSION_PAID,
-  STABILITY_DIM_MULTIPLE,
-} from "@/lib/constants"
+import { REPLICATE_MAX_DIMENSION, REPLICATE_MAX_DIMENSION_PAID, STABILITY_DIM_MULTIPLE } from "@/lib/constants"
 import { publishHeroUpdate } from "@/lib/hero-bus"
+import { getToolUploadLimits, getToolApiEndpoint } from "@/lib/tool-pipeline"
 
 import Pica from "pica"
 
@@ -78,6 +73,9 @@ function DownloadIcon({ className }: { className?: string }) {
     </svg>
   )
 }
+
+const uploadLimits = getToolUploadLimits()
+const apiEndpoint = getToolApiEndpoint()
 
 function Loader2Icon({ className }: { className?: string }) {
   return (
@@ -247,19 +245,19 @@ export function ImageUploader({
 
   const handleFileSelect = useCallback(
     (file: File) => {
-      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      if (!uploadLimits.allowedMimeTypes.includes(file.type)) {
         toast({
           title: "Invalid file type",
-          description: "Please upload a JPEG, PNG, or WebP image.",
+          description: "Please upload a supported image format.",
           variant: "destructive",
         })
         return
       }
 
-      if (file.size > MAX_FILE_SIZE) {
+      if (file.size > uploadLimits.maxFileSizeBytes) {
         toast({
           title: "File too large",
-          description: "Please upload an image smaller than 4MB.",
+          description: `Please upload an image smaller than ${uploadLimits.maxFileSizeMb}MB.`,
           variant: "destructive",
         })
         return
@@ -319,7 +317,7 @@ export function ImageUploader({
       formData.append("scale", scale.toString())
       formData.append("face_enhance", faceEnhance.toString())
 
-      console.log("[v0] Sending request to /api/sharpen...")
+      console.log("[v0] Sending request to", apiEndpoint)
       console.log("[v0] FormData contents:", {
         imageSize: processedBlob.size,
         scale,
@@ -331,7 +329,7 @@ export function ImageUploader({
       }, 1000)
 
       console.log("[v0] Calling fetch...")
-      const apiResponse = await fetch("/api/sharpen", {
+      const apiResponse = await fetch(apiEndpoint, {
         method: "POST",
         body: formData,
         signal: controller.signal,
@@ -473,13 +471,16 @@ export function ImageUploader({
                   <p className="text-xl font-semibold text-neutral-900 mb-2">
                     Drop your image here, or click to browse
                   </p>
-                  <p className="text-sm text-neutral-600">Supports JPEG, PNG, WebP up to 4MB</p>
+                  <p className="text-sm text-neutral-600">
+                    Supports {uploadLimits.allowedMimeTypes.map((type) => type.split("/")[1].toUpperCase()).join(", ")} up to{" "}
+                    {uploadLimits.maxFileSizeMb}MB
+                  </p>
                 </div>
               </div>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept={uploadLimits.allowedMimeTypes.join(",")}
                 onChange={handleFileInput}
                 className="hidden"
               />

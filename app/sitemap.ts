@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next"
 import { getAllBlogPosts } from "@/lib/blog-data"
+import { siteConfig } from "@/config/siteConfig"
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.imagesharpenerai.pro"
+const BASE_URL = siteConfig.siteUrl
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()
@@ -12,6 +13,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1.0,
+    },
+    {
+      url: `${BASE_URL}/blurry-photo`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/image-enhancer-free`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/make-picture-clear`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
     },
     {
       url: `${BASE_URL}/blog`,
