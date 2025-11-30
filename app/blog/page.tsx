@@ -7,8 +7,6 @@ import { getAllBlogPosts } from "@/lib/blog-data"
 import { paginate } from "@/lib/pagination"
 import { buildLandingMetadata } from "@/lib/seo-config"
 
-export const runtime = "edge"
-
 export const metadata: Metadata = {
   ...buildLandingMetadata("/blog"),
 }

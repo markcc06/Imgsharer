@@ -1,7 +1,3 @@
-import { execSync } from "node:child_process"
-import fs from "node:fs"
-import path from "node:path"
-
 export interface RawBlogPost {
   slug: string
   title: {
@@ -1302,78 +1298,11 @@ rawBlogPosts.push(
 )
 
 const BLOG_TZ = process.env.NEXT_PUBLIC_BLOG_TZ || "America/New_York"
-const DATA_FILE_FALLBACK = path.join(process.cwd(), "lib", "blog-data.tsx")
-
-const potentialDirectories = [
-  ["content", "blog"],
-  ["src", "content", "blog"],
-  ["blog"],
-]
-
-const possibleExtensions = [".mdx", ".md", ".tsx", ".ts", ".jsx", ".js"]
-
-function resolvePostFilePath(slug: string): string {
-  for (const segments of potentialDirectories) {
-    for (const ext of possibleExtensions) {
-      const candidate = path.join(process.cwd(), ...segments, `${slug}${ext}`)
-      if (fs.existsSync(candidate)) {
-        return candidate
-      }
-    }
-  }
-
-  return DATA_FILE_FALLBACK
-}
-
-function runGit(command: string): string | null {
-  if (typeof window !== "undefined") return null
-  try {
-    return execSync(command, {
-      stdio: ["ignore", "pipe", "ignore"],
-    })
-      .toString()
-      .trim()
-      .split("\n")[0]
-      .trim() || null
-  } catch {
-    return null
-  }
-}
 
 function parseDate(value?: string | null): Date | null {
   if (!value) return null
   const parsed = new Date(value)
   return Number.isNaN(parsed.getTime()) ? null : parsed
-}
-
-export function getPublishedAt(filePath: string, frontMatterDate?: string): string {
-  const frontDate = parseDate(frontMatterDate)
-  if (frontDate) {
-    return frontDate.toISOString()
-  }
-
-  if (typeof window !== "undefined") {
-    return new Date().toISOString()
-  }
-
-  const quotedPath = JSON.stringify(filePath)
-  const created = runGit(`git log --follow --diff-filter=A -1 --format=%cI ${quotedPath}`)
-  if (created) {
-    const createdDate = parseDate(created)
-    if (createdDate) {
-      return createdDate.toISOString()
-    }
-  }
-
-  const latest = runGit(`git log -1 --format=%cI ${quotedPath}`)
-  if (latest) {
-    const latestDate = parseDate(latest)
-    if (latestDate) {
-      return latestDate.toISOString()
-    }
-  }
-
-  return new Date().toISOString()
 }
 
 function formatForDisplay(iso: string): string {
@@ -1401,8 +1330,8 @@ function buildPosts(): BlogPost[] {
 
   const posts = rawBlogPosts.map((rawPost) => {
     const { publishedAt: frontMatterPublishedAt, updatedAt: frontMatterUpdatedAt, ...rest } = rawPost
-    const filePath = resolvePostFilePath(rawPost.slug)
-    const publishedAtIso = getPublishedAt(filePath, frontMatterPublishedAt)
+    const frontPublished = parseDate(frontMatterPublishedAt)
+    const publishedAtIso = frontPublished ? frontPublished.toISOString() : new Date().toISOString()
     const updatedAtIso = parseDate(frontMatterUpdatedAt)
     const normalizedUpdatedAt = updatedAtIso ? updatedAtIso.toISOString() : null
     const effectiveUpdatedAt =

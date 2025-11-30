@@ -3,8 +3,6 @@ import type { Metadata } from "next"
 import BlogPostClientPage from "./BlogPostClientPage"
 import { siteConfig } from "@/config/siteConfig"
 
-export const runtime = "edge"
-
 export async function generateStaticParams() {
   return getAllBlogSlugs().map((slug) => ({
     slug,
