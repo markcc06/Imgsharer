@@ -1,6 +1,9 @@
 import { getBlogPost, getAllBlogSlugs, getRelatedPosts } from "@/lib/blog-data"
 import type { Metadata } from "next"
 import BlogPostClientPage from "./BlogPostClientPage"
+import { siteConfig } from "@/config/siteConfig"
+
+export const runtime = "edge"
 
 export async function generateStaticParams() {
   return getAllBlogSlugs().map((slug) => ({
@@ -27,7 +30,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       type: "article",
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt ?? post.publishedAt,
-      authors: ["Imgsharer"],
+      authors: [siteConfig.brandName],
     },
     twitter: {
       card: "summary_large_image",

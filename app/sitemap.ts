@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next"
 import { getAllBlogPosts } from "@/lib/blog-data"
 import { siteConfig } from "@/config/siteConfig"
 
+export const runtime = "edge"
+
 const BASE_URL = siteConfig.siteUrl
 
 export default function sitemap(): MetadataRoute.Sitemap {

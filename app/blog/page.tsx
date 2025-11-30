@@ -2,15 +2,15 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
-import Head from "next/head"
 import type { Metadata } from "next"
 import { getAllBlogPosts } from "@/lib/blog-data"
 import { paginate } from "@/lib/pagination"
+import { buildLandingMetadata } from "@/lib/seo-config"
+
+export const runtime = "edge"
 
 export const metadata: Metadata = {
-  title: "Blog - Free AI Image Sharpener Tips & Use Cases | Imgsharer",
-  description:
-    "Learn how to unblur photos, sharpen product images, enhance selfies, and fix blurry screenshots with AI. Free tutorials and tips.",
+  ...buildLandingMetadata("/blog"),
 }
 
 export default function BlogPage({
@@ -52,10 +52,6 @@ export default function BlogPage({
 
   return (
     <main className="min-h-screen flex flex-col">
-      <Head>
-        {prevUrl ? <link rel="prev" href={prevUrl} /> : null}
-        {nextUrl ? <link rel="next" href={nextUrl} /> : null}
-      </Head>
       <Header />
       <div className="flex-1 pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
