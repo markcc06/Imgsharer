@@ -4,11 +4,22 @@ import { RATE_LIMIT_PER_MINUTE, RATE_LIMIT_PER_DAY } from "@/lib/constants"
 
 console.log("[SERVER] Sharpen route module loading...")
 
-export const runtime = "nodejs"
+export const runtime = "edge"
 export const dynamic = "force-dynamic"
 export const maxDuration = 60
 
 const MAX_UPLOAD = 4_500_000 // 4.5MB
+
+function arrayBufferToBase64(buffer: ArrayBuffer) {
+  const bytes = new Uint8Array(buffer)
+  const chunkSize = 0x8000
+  let binary = ""
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize)
+    binary += String.fromCharCode(...chunk)
+  }
+  return btoa(binary)
+}
 
 export async function POST(request: NextRequest) {
   console.log("[SERVER] POST function called")
@@ -75,8 +86,7 @@ export async function POST(request: NextRequest) {
     }
 
     const arrayBuffer = await file.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
-    const base64 = buffer.toString("base64")
+    const base64 = arrayBufferToBase64(arrayBuffer)
     const mimeType = file.type || "image/jpeg"
     const dataUri = `data:${mimeType};base64,${base64}`
 
@@ -165,7 +175,7 @@ export async function POST(request: NextRequest) {
     }
 
     const imageBuffer = await imageResponse.arrayBuffer()
-    const imageBase64 = Buffer.from(imageBuffer).toString("base64")
+    const imageBase64 = arrayBufferToBase64(imageBuffer)
     console.log("[SERVER] Image downloaded and converted to base64, size:", imageBase64.length, "chars")
 
     return NextResponse.json({
