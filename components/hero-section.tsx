@@ -138,7 +138,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
 
   const heroBadge = hero.heroBadge ?? "AI-Powered Enhancement"
   const heroTitle = hero.heroTitle ?? "Free AI Image Sharpener & Upscaler"
-  const heroSubtitle = hero.heroSubtitle ?? "Enhance Photos and Fix Blurry Images in Seconds"
+  const heroSubtitle = hero.heroSubtitle ?? "enhance Photos and Fix Blurry Images in Seconds"
   const heroDescription =
     hero.heroDescription ??
     "Use our free AI image sharpener and AI image upscaler to remove blur from photos online, fix blurry pictures, and enhance photo detail in one click. Upload any AI picture or regular photo and get a clearer, sharper download in seconds."
