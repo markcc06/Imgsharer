@@ -87,6 +87,13 @@ export function Header() {
               About
             </Link>
             <Link
+              href="/christmas-wallpaper"
+              title="Wallpaper Hub — seasonal AI wallpaper generator"
+              className="text-sm font-medium text-neutral-600 hover:text-[#ff7959] transition-colors"
+            >
+              Wallpaper Hub
+            </Link>
+            <Link
               href="/contact"
               title={`Contact ${siteConfig.brandName}`}
               className="text-sm font-medium text-neutral-600 hover:text-[#ff7959] transition-colors"

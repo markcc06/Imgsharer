@@ -1,0 +1,54 @@
+<svg width="960" height="540" viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#031226" />
+      <stop offset="60%" stop-color="#0b253c" />
+      <stop offset="100%" stop-color="#152c38" />
+    </linearGradient>
+    <radialGradient id="aurora" cx="0.5" cy="0.1" r="0.7">
+      <stop offset="0%" stop-color="#ffe2b3" stop-opacity="0.9" />
+      <stop offset="70%" stop-color="#ff946d" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#ff5c4d" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="ice" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dff1ff" />
+      <stop offset="70%" stop-color="#a9d4ff" />
+      <stop offset="100%" stop-color="#7cc5ff" />
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#sky)" />
+  <rect width="960" height="540" fill="url(#aurora)" />
+  <g fill="#fff" opacity="0.7">
+    <circle cx="60" cy="80" r="2" />
+    <circle cx="120" cy="50" r="3" />
+    <circle cx="200" cy="100" r="2" />
+    <circle cx="320" cy="40" r="2" />
+    <circle cx="560" cy="90" r="2" />
+    <circle cx="760" cy="50" r="3" />
+    <circle cx="880" cy="120" r="2" />
+  </g>
+  <rect x="0" y="280" width="960" height="260" fill="url(#ice)" />
+  <path d="M0 320 Q160 260 320 320 T640 320 T960 320 L960 540 L0 540 Z" fill="#f5fbff" />
+  <g>
+    <path d="M160 320 L220 200 L280 320 Z" fill="#0f432e" />
+    <path d="M460 320 L520 190 L580 320 Z" fill="#0f4f39" />
+    <path d="M680 320 L740 210 L800 320 Z" fill="#135c45" />
+  </g>
+  <g fill="#ffd966">
+    <circle cx="460" cy="210" r="9" />
+    <circle cx="520" cy="230" r="6" />
+    <circle cx="550" cy="200" r="5" />
+  </g>
+  <rect x="240" y="260" width="160" height="120" rx="16" fill="#b53232" opacity="0.9" />
+  <rect x="265" y="285" width="110" height="70" rx="8" fill="#ffe8c6" />
+  <rect x="285" y="300" width="24" height="55" fill="#b53232" />
+  <rect x="325" y="300" width="24" height="55" fill="#b53232" />
+  <rect x="365" y="300" width="24" height="55" fill="#b53232" />
+  <path d="M240 260 L320 200 L400 260 Z" fill="#ffd966" />
+  <g opacity="0.35" fill="#fff">
+    <circle cx="320" cy="360" r="3" />
+    <circle cx="520" cy="360" r="2" />
+    <circle cx="660" cy="340" r="3" />
+    <circle cx="160" cy="350" r="2" />
+  </g>
+</svg>

@@ -6,6 +6,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  env: {
+    REPLICATE_API_TOKEN: process.env.REPLICATE_API_TOKEN,
+  },
   images: {
     unoptimized: true,
   },
