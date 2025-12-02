@@ -108,7 +108,7 @@ export default function ChristmasWallpaperPage() {
                 Free AI Christmas Wallpaper Generator
               </h1>
               <p className="text-lg text-neutral-600 leading-relaxed max-w-2xl">
-                Create cozy AI Christmas wallpapers for your desktop, iPhone and Android in seconds. Type a prompt or choose a preset style, then generate 4K festive backgrounds you can further sharpen and upscale with Imgsharer.
+                Create cozy AI Christmas wallpapers for your desktop, iPhone and Android in seconds. Describe a scene or choose an art style, then generate 4K festive backgrounds you can further sharpen and upscale with Imgsharer.
               </p>
               <div className="mt-10 flex flex-wrap gap-4 items-center">
                 <Button asChild className="h-12 px-8 text-base font-semibold">

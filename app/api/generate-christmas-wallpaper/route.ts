@@ -8,11 +8,13 @@ const replicate = new Replicate({
 const MODEL_VERSION =
   "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc"
 
-const STYLE_SUFFIX: Record<string, string> = {
-  realistic: "highly detailed realistic photo, 4k, soft lighting, sharp focus",
-  cartoon: "cute 2D cartoon illustration, bold outlines, pastel colors, kids storybook style",
-  pixel: "isometric pixel art, 16-bit game style, crisp pixels, game map view",
-  cinematic: "cinematic lighting, shallow depth of field, dramatic composition, bokeh background",
+type ArtStyleKey = "realistic" | "cartoon" | "pixel" | "cinematic"
+
+const STYLE_SUFFIX: Record<ArtStyleKey, string> = {
+  realistic: "highly detailed realistic photo, 4k, soft lighting",
+  cartoon: "cute 2D cartoon illustration, bold outlines, pastel colors",
+  pixel: "isometric pixel art, 16-bit game style",
+  cinematic: "cinematic lighting, shallow depth of field, bokeh background",
 }
 
 type GenerateRequest = {
@@ -23,9 +25,16 @@ type GenerateRequest = {
 
 const DEFAULT_SCENE = "Cozy Christmas living room with fireplace, decorated tree and warm lights"
 
+function getArtStyleKey(style?: string): ArtStyleKey {
+  if (style === "cartoon" || style === "pixel" || style === "cinematic" || style === "realistic") {
+    return style
+  }
+  return "realistic"
+}
+
 function buildPrompt(scene: string | undefined, artStyle?: string) {
   const baseScene = scene && scene.trim().length > 0 ? scene.trim() : DEFAULT_SCENE
-  const styleSuffix = STYLE_SUFFIX[artStyle ?? ""] ?? STYLE_SUFFIX.realistic
+  const styleSuffix = STYLE_SUFFIX[getArtStyleKey(artStyle)]
   return `${baseScene}, ${styleSuffix}`
 }
 

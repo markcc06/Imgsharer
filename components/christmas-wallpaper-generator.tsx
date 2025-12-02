@@ -6,26 +6,54 @@ import { useState, type MouseEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const artStyles = [
-  { label: "Realistic photo", key: "realistic" as const },
-  { label: "Cute cartoon", key: "cartoon" as const },
-  { label: "Pixel art", key: "pixel" as const },
-  { label: "Cinematic", key: "cinematic" as const },
+type ArtStyleKey = "realistic" | "cartoon" | "pixel" | "cinematic"
+
+const artStyles: { label: string; key: ArtStyleKey }[] = [
+  { label: "Realistic photo", key: "realistic" },
+  { label: "Cute cartoon", key: "cartoon" },
+  { label: "Pixel art", key: "pixel" },
+  { label: "Cinematic", key: "cinematic" },
 ]
 
-const SCENE_IDEAS = {
-  cozy: "Cozy Christmas living room with fireplace, decorated tree and warm lights",
-  minimal: "Minimal snowy landscape with a single pine tree and soft pastel sky",
-  village: "Cute isometric Christmas village with tiny houses, snow and Christmas lights",
-  bokeh: "Soft Christmas bokeh lights with warm festive colors, abstract background",
-} as const
+type SceneIdeaKey = "cozy" | "minimal" | "cute" | "bokeh" | "desktop"
 
-const sceneIdeaButtons = [
-  { key: "cozy", label: "Cozy living room", value: SCENE_IDEAS.cozy },
-  { key: "minimal", label: "Minimal snow landscape", value: SCENE_IDEAS.minimal },
-  { key: "village", label: "Cute Christmas village", value: SCENE_IDEAS.village },
-  { key: "bokeh", label: "Bokeh lights background", value: SCENE_IDEAS.bokeh },
+const sceneIdeaButtons: { key: SceneIdeaKey; label: string; value: string }[] = [
+  {
+    key: "cozy",
+    label: "Cozy living room",
+    value: "Cozy Christmas living room with fireplace, decorated tree and warm lights",
+  },
+  {
+    key: "minimal",
+    label: "Minimal snow landscape",
+    value: "Minimal snowy landscape with a single pine tree and soft pastel sky",
+  },
+  {
+    key: "cute",
+    label: "Cute cartoon Christmas",
+    value: "Cute cartoon Christmas scene with playful characters, gifts and twinkling lights",
+  },
+  {
+    key: "bokeh",
+    label: "Aesthetic bokeh lights",
+    value: "Soft Christmas bokeh lights with warm festive colors, abstract background",
+  },
+  {
+    key: "desktop",
+    label: "4K desktop scene",
+    value: "Wide 4K Christmas desktop scene with snowy mountains and glowing city lights",
+  },
 ]
+
+const SCENE_IDEA_MAP = sceneIdeaButtons.reduce(
+  (acc, idea) => {
+    acc[idea.key] = idea.value
+    return acc
+  },
+  {} as Record<SceneIdeaKey, string>,
+)
+
+const DEFAULT_SCENE_KEY: SceneIdeaKey = "cozy"
 
 type OutputOption = {
   id: "desktop" | "iphone" | "android"
@@ -40,7 +68,8 @@ const outputOptions: OutputOption[] = [
 ]
 
 export function ChristmasWallpaperGenerator() {
-  const [selectedArtStyle, setSelectedArtStyle] = useState<(typeof artStyles)[number]["key"]>(artStyles[0].key)
+  const [selectedArtStyle, setSelectedArtStyle] = useState<ArtStyleKey>(artStyles[0].key)
+  const [selectedSceneIdea, setSelectedSceneIdea] = useState<SceneIdeaKey>(DEFAULT_SCENE_KEY)
   const [sceneDescription, setSceneDescription] = useState("")
   const [selectedOutput, setSelectedOutput] = useState<OutputOption>(outputOptions[0])
   const [selectedSize, setSelectedSize] = useState<"desktop" | "phone">(outputOptions[0].size)
@@ -55,6 +84,11 @@ export function ChristmasWallpaperGenerator() {
     setIsLoading(true)
     setError(null)
 
+    const resolvedScene =
+      sceneDescription.trim().length > 0
+        ? sceneDescription.trim()
+        : SCENE_IDEA_MAP[selectedSceneIdea] ?? SCENE_IDEA_MAP[DEFAULT_SCENE_KEY]
+
     try {
       const response = await fetch("/api/generate-christmas-wallpaper", {
         method: "POST",
@@ -63,7 +97,7 @@ export function ChristmasWallpaperGenerator() {
         },
         body: JSON.stringify({
           artStyle: selectedArtStyle,
-          scene: sceneDescription,
+          scene: resolvedScene,
           outputType: selectedSize,
         }),
       })
@@ -80,6 +114,11 @@ export function ChristmasWallpaperGenerator() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleSceneIdeaClick = (key: SceneIdeaKey, value: string) => {
+    setSceneDescription(value)
+    setSelectedSceneIdea(key)
   }
 
   const handleOutputSelect = (option: OutputOption) => {
@@ -135,8 +174,13 @@ export function ChristmasWallpaperGenerator() {
                 <button
                   key={idea.key}
                   type="button"
-                  onClick={() => setSceneDescription(idea.value)}
-                  className="px-4 py-2 rounded-full text-xs border border-neutral-200 text-neutral-600 hover:border-[#FF6B35]/50 hover:text-[#FF6B35] transition-colors"
+                  onClick={() => handleSceneIdeaClick(idea.key, idea.value)}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-xs border transition-colors",
+                    selectedSceneIdea === idea.key
+                      ? "border-[#FF6B35] text-[#FF6B35] bg-[#FF6B35]/10"
+                      : "border-neutral-200 text-neutral-600 hover:border-[#FF6B35]/50 hover:text-[#FF6B35]",
+                  )}
                 >
                   {idea.label}
                 </button>
