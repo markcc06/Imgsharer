@@ -127,15 +127,15 @@ export function ChristmasWallpaperGenerator() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-2">
-      <div className="bg-white rounded-3xl border border-neutral-200 p-6 lg:p-8 shadow-sm">
-        <p className="text-sm text-neutral-600 mb-6">
+    <div className="grid gap-8 lg:gap-10 lg:grid-cols-2">
+      <div className="bg-white rounded-3xl border border-neutral-200 p-6 lg:p-8 shadow-sm space-y-6">
+        <p className="text-sm text-neutral-600">
           Choose an art style and describe your scene. We’ll combine both so you can generate AI Christmas wallpapers in one click.
         </p>
 
-        <div className="space-y-5">
+        <div className="space-y-6">
           <div>
-            <p className="text-sm font-semibold text-neutral-900 mb-3">Art style</p>
+            <p className="text-base font-semibold text-neutral-900 mb-3">Art style</p>
             <div className="flex flex-wrap gap-2">
               {artStyles.map((style) => (
                 <button
@@ -143,7 +143,7 @@ export function ChristmasWallpaperGenerator() {
                   type="button"
                   onClick={() => setSelectedArtStyle(style.key)}
                   className={cn(
-                    "px-4 py-2 rounded-full text-sm border transition-colors",
+                    "px-4 py-2.5 rounded-full text-sm border transition-colors",
                     selectedArtStyle === style.key
                       ? "bg-[#FF6B35]/10 border-[#FF6B35] text-[#FF6B35]"
                       : "border-neutral-200 text-neutral-600 hover:border-[#FF6B35]/50 hover:text-[#FF6B35]",
@@ -155,11 +155,13 @@ export function ChristmasWallpaperGenerator() {
             </div>
           </div>
 
-          <label className="block">
-            <span className="text-sm font-semibold text-neutral-900">Scene description</span>
-            <p className="text-xs text-neutral-500 mt-1">
+          <label className="block space-y-2">
+            <div>
+              <span className="text-base font-semibold text-neutral-900">Scene description</span>
+              <p className="text-xs text-neutral-500 mt-1">
               Describe the Christmas scene you want. We’ll combine this with your selected art style.
             </p>
+            </div>
             <textarea
               className="mt-2 w-full rounded-2xl border border-neutral-200 bg-white p-4 text-sm text-neutral-800 placeholder:text-neutral-400 focus:border-[#FF6B35] focus:ring-0 outline-none min-h-[120px]"
               placeholder="Cozy Christmas living room with fireplace, decorated tree and warm lights"
@@ -189,7 +191,7 @@ export function ChristmasWallpaperGenerator() {
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-neutral-900 mb-3">Output type</p>
+            <p className="text-base font-semibold text-neutral-900 mb-3">Output type</p>
             <div className="flex flex-wrap gap-2">
               {outputOptions.map((option) => (
                 <button

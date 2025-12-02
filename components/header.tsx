@@ -27,8 +27,17 @@ function SparklesIcon() {
   )
 }
 
+const navLinks = [
+  { href: "/faq", label: "FAQ" },
+  { href: "/blog", label: "Blog" },
+  { href: "/about", label: "About" },
+  { href: "/christmas-wallpaper", label: "Christmas Wallpaper" },
+  { href: "/contact", label: "Contact" },
+]
+
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,7 +48,22 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMenuOpen(false)
+      }
+    }
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  const mobileNav = [{ href: "/", label: "Home" }, ...navLinks]
+
+  const closeMenu = () => setIsMenuOpen(false)
+
   return (
+    <>
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
@@ -47,7 +71,7 @@ export function Header() {
         isScrolled ? "bg-white/90 border-neutral-200" : "bg-white/60 border-white/20",
       )}
     >
-      <div className="container-custom">
+      <div className="container-custom relative">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link
@@ -65,44 +89,64 @@ export function Header() {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link
-              href="/faq"
-              title="FAQ — AI image sharpener help center"
-              className="text-sm font-medium text-neutral-600 hover:text-[#ff7959] transition-colors"
-            >
-              FAQ
-            </Link>
-            <Link
-              href="/blog"
-              title="Blog — tutorials and release notes"
-              className="text-sm font-medium text-neutral-600 hover:text-[#ff7959] transition-colors"
-            >
-              Blog
-            </Link>
-            <Link
-              href="/about"
-              title={`About ${siteConfig.brandName}`}
-              className="text-sm font-medium text-neutral-600 hover:text-[#ff7959] transition-colors"
-            >
-              About
-            </Link>
-            <Link
-              href="/christmas-wallpaper"
-              title="Wallpaper Hub — seasonal AI wallpaper generator"
-              className="text-sm font-medium text-neutral-600 hover:text-[#ff7959] transition-colors"
-            >
-              Wallpaper Hub
-            </Link>
-            <Link
-              href="/contact"
-              title={`Contact ${siteConfig.brandName}`}
-              className="text-sm font-medium text-neutral-600 hover:text-[#ff7959] transition-colors"
-            >
-              Contact
-            </Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                title={`${link.label} — ${siteConfig.brandName}`}
+                className="text-sm font-medium text-neutral-600 hover:text-[#ff7959] transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
+
+          <button
+            type="button"
+            className="md:hidden inline-flex items-center justify-center rounded-lg border border-white/40 bg-white/70 px-3 py-2 text-[#ff5733] shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff5733]"
+            aria-label={isMenuOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+          >
+            <span className="sr-only">{isMenuOpen ? "Close navigation" : "Open navigation"}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              {isMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+              )}
+            </svg>
+          </button>
         </div>
+
+        {isMenuOpen ? (
+          <div className="md:hidden absolute left-0 right-0 top-full mt-2 px-4 pb-4">
+            <div className="rounded-2xl border border-white/60 bg-white/95 shadow-lg shadow-black/5">
+              <div className="flex flex-col divide-y divide-neutral-200">
+                {mobileNav.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="px-4 py-3 text-sm font-semibold text-neutral-700 hover:text-[#ff5733] focus-visible:bg-neutral-50"
+                    onClick={closeMenu}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
     </header>
+    {isMenuOpen ? <div className="md:hidden fixed inset-0 z-40 bg-black/10" onClick={closeMenu} /> : null}
+    </>
   )
 }

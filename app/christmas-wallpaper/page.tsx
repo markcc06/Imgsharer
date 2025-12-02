@@ -101,22 +101,22 @@ export default function ChristmasWallpaperPage() {
 
       <section className="pt-32 pb-16 lg:pb-24 bg-gradient-to-b from-white via-white to-neutral-50">
         <div className="container-custom">
-          <div className="grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] items-center">
-            <div>
+          <div className="grid gap-10 lg:gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] items-center">
+            <div className="max-w-2xl mx-auto text-center lg:text-left">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#FF6B35] mb-4">Wallpaper Hub</p>
-              <h1 className="text-4xl lg:text-5xl font-bold text-[#1a1a1a] tracking-tight mb-6">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1a1a1a] tracking-tight mb-6">
                 Free AI Christmas Wallpaper Generator
               </h1>
-              <p className="text-lg text-neutral-600 leading-relaxed max-w-2xl">
+              <p className="text-base sm:text-lg text-neutral-600 leading-relaxed max-w-2xl mx-auto lg:mx-0">
                 Create cozy AI Christmas wallpapers for your desktop, iPhone and Android in seconds. Describe a scene or choose an art style, then generate 4K festive backgrounds you can further sharpen and upscale with Imgsharer.
               </p>
-              <div className="mt-10 flex flex-wrap gap-4 items-center">
-                <Button asChild className="h-12 px-8 text-base font-semibold">
+              <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 items-center">
+                <Button asChild className="h-12 px-8 text-base font-semibold w-full sm:w-auto">
                   <a href="#generator">Generate Christmas Wallpaper</a>
                 </Button>
                 <Link
                   href="/"
-                  className="text-sm font-semibold text-[#FF6B35] hover:text-[#ff8c63] transition-colors underline-offset-4 hover:underline"
+                  className="text-sm font-semibold text-[#FF6B35] hover:text-[#ff8c63] transition-colors underline-offset-4 hover:underline w-full sm:w-auto text-center"
                 >
                   Enhance an existing wallpaper instead
                 </Link>
@@ -164,9 +164,9 @@ export default function ChristmasWallpaperPage() {
 
       <section id="generator" className="py-16 lg:py-24 bg-white">
         <div className="container-custom">
-          <div className="max-w-3xl mb-10">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#1a1a1a] mb-4">How to Generate Your Christmas Wallpaper</h2>
-            <p className="text-lg text-neutral-600">
+          <div className="max-w-3xl mb-10 space-y-4 text-center md:text-left mx-auto">
+            <h2 className="text-3xl lg:text-4xl font-bold text-[#1a1a1a]">How to Generate Your Christmas Wallpaper</h2>
+            <p className="text-base sm:text-lg text-neutral-600">
               Follow the prompts below to plan your perfect festive background. We’ll wire in the AI model shortly, so everything you configure here will translate to one-click wallpaper generation.
             </p>
           </div>
@@ -176,17 +176,17 @@ export default function ChristmasWallpaperPage() {
 
       <section className="py-16 lg:py-24 bg-neutral-50">
         <div className="container-custom">
-          <div className="max-w-3xl">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#1a1a1a] mb-4">Why Use Imgsharer for Christmas Wallpapers</h2>
-            <p className="text-lg text-neutral-600">
+          <div className="max-w-3xl space-y-4 text-center md:text-left mx-auto">
+            <h2 className="text-3xl lg:text-4xl font-bold text-[#1a1a1a]">Why Use Imgsharer for Christmas Wallpapers</h2>
+            <p className="text-base sm:text-lg text-neutral-600">
               Imgsharer already powers millions of sharp, enhanced photos—now the same pipeline helps your seasonal wallpapers look polished across every device.
             </p>
           </div>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
             {benefits.map((benefit) => (
               <div
                 key={benefit.title}
-                className="bg-white rounded-3xl border border-neutral-200 p-8 shadow-sm hover:shadow-lg transition-shadow"
+                className="bg-white rounded-3xl border border-neutral-200 p-6 sm:p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow"
               >
                 <h3 className="text-xl font-semibold text-[#1a1a1a] mb-3">{benefit.title}</h3>
                 <p className="text-neutral-600">{benefit.description}</p>
@@ -198,14 +198,14 @@ export default function ChristmasWallpaperPage() {
 
       <section className="py-16 lg:py-20 bg-white">
         <div className="container-custom">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl space-y-4 text-center md:text-left mx-auto">
             <h2 className="text-3xl lg:text-4xl font-bold text-[#1a1a1a] mb-4">
               Sharpen Any Christmas Wallpaper You Already Have
             </h2>
-            <p className="text-lg text-neutral-600 mb-8">
+            <p className="text-base sm:text-lg text-neutral-600">
               Already downloaded a festive background? Send it through Imgsharer’s flagship AI Image Sharpener to remove blur, fix noise and upscale before sharing it on desktop or mobile.
             </p>
-            <Button asChild className="h-12 px-8 text-base font-semibold">
+            <Button asChild className="h-12 px-8 text-base font-semibold w-full sm:w-auto">
               <Link href="/">Open AI Image Sharpener</Link>
             </Button>
           </div>
@@ -214,7 +214,7 @@ export default function ChristmasWallpaperPage() {
 
       <section className="py-16 lg:py-24 bg-neutral-50">
         <div className="container-custom">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl text-center md:text-left mx-auto">
             <h2 className="text-3xl lg:text-4xl font-bold text-[#1a1a1a] mb-8">Christmas Wallpaper Generator FAQ</h2>
           </div>
           <div className="space-y-6">

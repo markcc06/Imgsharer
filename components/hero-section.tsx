@@ -160,13 +160,13 @@ export function HeroSection({ hero }: HeroSectionProps) {
 
       <div className="absolute inset-0 z-[12] grain-texture" />
 
-      <div className="relative z-30 container-custom py-12 md:py-16">
+      <div className="relative z-30 container-custom py-12 md:py-16 px-4 sm:px-6">
         <Reveal>
             <div
               data-hero-foreground
-              className="w-full max-w-6xl mx-auto bg-white/10 bg-gradient-to-b from-white/8 to-white/5 ring-1 ring-white/15 rounded-3xl px-10 py-8 md:px-16 md:py-14 shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
+              className="w-full max-w-6xl mx-auto bg-white/10 bg-gradient-to-b from-white/8 to-white/5 ring-1 ring-white/15 rounded-3xl px-6 py-8 sm:px-10 md:px-16 md:py-14 shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
             >
-            <div className="text-center mb-10">
+            <div className="text-center mb-10 max-w-3xl mx-auto space-y-4">
               <div
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md bg-white/20 border border-white/30 mb-6 transition-all duration-600 ${
                   mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
@@ -177,15 +177,15 @@ export function HeroSection({ hero }: HeroSectionProps) {
                 <span className="text-sm font-medium text-white">{heroBadge}</span>
               </div>
 
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight tracking-tight whitespace-nowrap">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-4 leading-tight tracking-tight">
                 <AnimatedText text={heroTitle} delay={0.2} />
               </h1>
-              <p className="text-2xl md:text-4xl font-semibold text-white mb-2">
+              <p className="text-xl sm:text-2xl md:text-4xl font-semibold text-white mb-2">
                 <AnimatedText text={heroSubtitle} delay={0.4} />
               </p>
 
               <p
-                className={`text-base md:text-lg text-white/85 mb-10 leading-relaxed max-w-3xl mx-auto text-balance transition-all duration-600 ${
+                className={`text-base sm:text-lg text-white/85 mb-10 leading-relaxed max-w-2xl mx-auto text-balance px-2 transition-all duration-600 ${
                   mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
                 }`}
                 style={{ transitionDelay: "0.8s" }}
@@ -204,15 +204,15 @@ export function HeroSection({ hero }: HeroSectionProps) {
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
                 onClick={() => fileInputRef.current?.click()}
-                className="backdrop-blur-md bg-white/10 border-2 border-dashed border-white/30 rounded-2xl p-8 cursor-pointer hover:bg-white/15 hover:border-white/40 transition-all group"
+                className="backdrop-blur-md bg-white/10 border-2 border-dashed border-white/30 rounded-2xl p-6 sm:p-8 cursor-pointer hover:bg-white/15 hover:border-white/40 transition-all group"
               >
                 <div className="flex flex-col items-center gap-4 text-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#ff5733] to-[#e63b14] flex items-center justify-center shadow-lg shadow-[#ff5733]/25 group-hover:scale-110 transition-transform">
                     <UploadIcon className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                  <p className="text-lg font-semibold text-white mb-1">Drop your image here, or click to browse</p>
-                  <p className="text-sm text-neutral-300">
+                  <p className="text-base sm:text-lg font-semibold text-white mb-1 text-balance">Drop your image here, or click to browse</p>
+                  <p className="text-sm text-neutral-300 text-balance">
                     {uploadLimits.allowedMimeTypes.map((type) => type.split("/")[1].toUpperCase()).join(", ")} • Max{" "}
                     {uploadLimits.maxFileSizeMb}MB
                   </p>
