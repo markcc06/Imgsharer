@@ -25,6 +25,47 @@ type GenerateRequest = {
 
 const DEFAULT_SCENE = "Cozy Christmas living room with fireplace, decorated tree and warm lights"
 
+const MAX_REQUESTS_PER_DAY = 6
+
+type RateLimitEntry = {
+  count: number
+  resetAt: number
+}
+
+const globalForRateLimit = globalThis as typeof globalThis & {
+  __imgsharerChristmasRateLimit?: Map<string, RateLimitEntry>
+}
+
+const rateLimitStore =
+  globalForRateLimit.__imgsharerChristmasRateLimit ?? new Map<string, RateLimitEntry>()
+
+if (!globalForRateLimit.__imgsharerChristmasRateLimit) {
+  globalForRateLimit.__imgsharerChristmasRateLimit = rateLimitStore
+}
+
+function getNextResetTimestamp() {
+  const now = new Date()
+  const nextMidnightUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)
+  return nextMidnightUtc
+}
+
+function getClientIp(req: Request) {
+  const header = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip")
+  if (!header) return "unknown"
+  return header.split(",")[0]?.trim() || "unknown"
+}
+
+function getRateLimitEntry(ip: string) {
+  const now = Date.now()
+  const existing = rateLimitStore.get(ip)
+  if (!existing || now >= existing.resetAt) {
+    const fresh: RateLimitEntry = { count: 0, resetAt: getNextResetTimestamp() }
+    rateLimitStore.set(ip, fresh)
+    return fresh
+  }
+  return existing
+}
+
 function getArtStyleKey(style?: string): ArtStyleKey {
   if (style === "cartoon" || style === "pixel" || style === "cinematic" || style === "realistic") {
     return style
@@ -54,6 +95,19 @@ export async function POST(req: Request) {
   }
 
   try {
+    const clientIp = getClientIp(req)
+    const usage = getRateLimitEntry(clientIp)
+    if (usage.count >= MAX_REQUESTS_PER_DAY) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "You've reached today's free Christmas wallpaper limit. Please come back tomorrow.",
+        },
+        { status: 429 },
+      )
+    }
+    usage.count += 1
+
     const body = (await req.json()) as GenerateRequest
     const { width, height } = getSize(body.outputType)
     const prompt = buildPrompt(body.scene, body.artStyle)
