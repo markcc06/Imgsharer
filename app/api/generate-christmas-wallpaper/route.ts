@@ -95,18 +95,21 @@ export async function POST(req: Request) {
   }
 
   try {
-    const clientIp = getClientIp(req)
-    const usage = getRateLimitEntry(clientIp)
-    if (usage.count >= MAX_REQUESTS_PER_DAY) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "You've reached today's free Christmas wallpaper limit. Please come back tomorrow.",
-        },
-        { status: 429 },
-      )
+    const isProduction = process.env.NODE_ENV === "production"
+    if (isProduction) {
+      const clientIp = getClientIp(req)
+      const usage = getRateLimitEntry(clientIp)
+      if (usage.count >= MAX_REQUESTS_PER_DAY) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: "You've reached today's free Christmas wallpaper limit. Please come back tomorrow.",
+          },
+          { status: 429 },
+        )
+      }
+      usage.count += 1
     }
-    usage.count += 1
 
     const body = (await req.json()) as GenerateRequest
     const { width, height } = getSize(body.outputType)

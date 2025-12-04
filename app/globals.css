@@ -205,6 +205,36 @@
   .warm-gradient-bg {
     background: linear-gradient(135deg, #fff5e6 0%, #ffe8d6 25%, #ffd4c4 50%, #ffe8d6 75%, #fff5e6 100%);
   }
+
+  .christmas-scroll-row-left {
+    animation: christmas-scroll-left 40s linear infinite;
+  }
+
+  .christmas-scroll-row-right {
+    animation: christmas-scroll-right 40s linear infinite;
+  }
+
+  .christmas-scroll-paused:hover {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes christmas-scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes christmas-scroll-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 @layer components {
