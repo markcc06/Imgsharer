@@ -30,7 +30,9 @@ export async function generateMetadata({ params }: ThemePageProps): Promise<Meta
     }
   }
 
-  const title = `${theme.name} Christmas Wallpapers | Imgsharer`
+  const isCozy = theme.slug === "cute-wallpaper-for-christmas"
+  const baseTitle = isCozy ? "cute wallpaper for christmas" : `${theme.name} Christmas Wallpapers`
+  const title = `${baseTitle} | Imgsharer`
   const description = `${theme.tagline} Explore AI-generated ${theme.name.toLowerCase()} Christmas wallpapers for phones and desktops.`
 
   return {
@@ -51,6 +53,8 @@ export default function ChristmasThemePage({ params }: ThemePageProps) {
   if (!theme) {
     notFound()
   }
+
+  const isCozy = theme.slug === "cute-wallpaper-for-christmas"
 
   const wallpapersForTheme = CHRISTMAS_WALLPAPERS.filter((wallpaper) =>
     wallpaper.themes.includes(theme.slug),
@@ -79,7 +83,7 @@ export default function ChristmasThemePage({ params }: ThemePageProps) {
               <div className="relative z-10 space-y-3 max-w-xl">
                 <span className="text-3xl">{theme.emoji}</span>
                 <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
-                  {theme.name} Wallpapers
+                  {isCozy ? "cute wallpaper for christmas" : `${theme.name} Wallpapers`}
                 </h1>
                 <p className="text-sm text-neutral-800">{theme.tagline}</p>
                 <p className="text-xs text-neutral-800/90">
@@ -99,7 +103,7 @@ export default function ChristmasThemePage({ params }: ThemePageProps) {
                 id="theme-wallpapers-heading"
                 className="text-lg font-semibold text-[#1a1a1a] md:text-xl"
               >
-                {theme.name} Christmas wallpapers
+                {isCozy ? "Cute Christmas Wallpapers" : `${theme.name} Christmas wallpapers`}
               </h2>
               <p className="text-xs text-neutral-500">
                 Tap an image to open and download.

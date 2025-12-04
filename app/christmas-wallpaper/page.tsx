@@ -205,7 +205,11 @@ export default function ChristmasWallpaperPage() {
                     <div className="relative z-10 space-y-1">
                       <span className="text-xl">{theme.emoji}</span>
                       <h3 className="text-sm font-semibold text-[#1a1a1a]">{theme.name}</h3>
-                      <p className="line-clamp-2 text-xs text-neutral-700">{theme.tagline}</p>
+                      <p className="line-clamp-2 text-xs text-neutral-700">
+                        {theme.slug === "cute-wallpaper-for-christmas"
+                          ? "cute wallpaper for christmas"
+                          : theme.tagline}
+                      </p>
                     </div>
                     <span className="relative z-10 mt-4 inline-flex items-center gap-1 text-xs font-medium text-[#FF6B35] group-hover:text-[#ff8c63]">
                       View collection
@@ -231,37 +235,42 @@ export default function ChristmasWallpaperPage() {
                 All Christmas wallpapers
               </h2>
               <p className="text-xs text-neutral-500">
-                Gently scrolling preview from all themes. Hover to pause.
+                Gently scrolling preview plus full gallery. Tap an image to open and download.
               </p>
             </div>
 
             <div className="space-y-4">
+              {/* Featured scrolling rows */}
               <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white px-4 py-4">
-                <div className="christmas-scroll-row-left christmas-scroll-paused flex gap-4">
-                  {loopRow(firstRow).map((wallpaper, index) => (
-                    <div
-                      key={`${wallpaper.id}-row1-${index}`}
-                      className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white"
-                    >
-                      <div className="relative">
-                        <Image
-                          src={wallpaper.src}
-                          alt={wallpaper.alt}
-                          width={640}
-                          height={960}
-                          className="h-full w-[140px] md:w-[180px] object-cover transition duration-300 group-hover:scale-[1.03]"
-                        />
+                <div className="christmas-scroll-row-left christmas-scroll-paused flex min-w-max gap-4">
+                  {loopRow(firstRow.length > 0 ? firstRow : CHRISTMAS_WALLPAPERS).map(
+                    (wallpaper, index) => (
+                      <div
+                        key={`${wallpaper.id}-strip1-${index}`}
+                        className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white"
+                      >
+                        <div className="relative">
+                          <Image
+                            src={wallpaper.src}
+                            alt={wallpaper.alt}
+                            width={640}
+                            height={960}
+                            className="h-full w-[140px] md:w-[180px] object-cover transition duration-300 group-hover:scale-[1.03]"
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </div>
 
               <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white px-4 py-4">
-                <div className="christmas-scroll-row-right christmas-scroll-paused flex gap-4">
-                  {loopRow(secondRow.length > 0 ? secondRow : firstRow).map((wallpaper, index) => (
+                <div className="christmas-scroll-row-right christmas-scroll-paused flex min-w-max gap-4">
+                  {loopRow(
+                    secondRow.length > 0 ? secondRow : CHRISTMAS_WALLPAPERS,
+                  ).map((wallpaper, index) => (
                     <div
-                      key={`${wallpaper.id}-row2-${index}`}
+                      key={`${wallpaper.id}-strip2-${index}`}
                       className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white"
                     >
                       <div className="relative">

@@ -8,18 +8,18 @@ export type ChristmasTheme = {
 
 export const CHRISTMAS_THEMES: ChristmasTheme[] = [
   {
-    slug: "cozy-christmas-living-room",
+    slug: "cute-wallpaper-for-christmas",
     name: "Cozy Christmas",
-    tagline: "Warm lights, gifts, and golden bokeh glow.",
+    tagline: "cozy christmas Christmas wallpapers",
     accentColor: "from-amber-400 to-orange-500",
     emoji: "🕯️",
   },
   {
     slug: "winter-cabin-at-night",
-    name: "Winter Cabin",
-    tagline: "Snowy cabins, fireplace windows, quiet forest nights.",
-    accentColor: "from-sky-400 to-blue-600",
-    emoji: "🏔️",
+    name: "Cyber Steam-Punk",
+    tagline: "Retro-futuristic Christmas streets, armored wanderers and glowing cables in the snow.",
+    accentColor: "from-amber-500 to-slate-900",
+    emoji: "⚙️",
   },
   {
     slug: "christmas-tree-lights",
@@ -30,10 +30,10 @@ export const CHRISTMAS_THEMES: ChristmasTheme[] = [
   },
   {
     slug: "ice-castle-queen",
-    name: "Ice Castle",
-    tagline: "Snow queens, frozen palaces, blue and white fantasy.",
-    accentColor: "from-cyan-300 to-blue-500",
-    emoji: "❄️",
+    name: "Horror Christmas",
+    tagline: "Dark rooms, eerie Christmas trees, ghostly silhouettes and flickering red-green lights.",
+    accentColor: "from-slate-800 to-emerald-900",
+    emoji: "🕯️",
   },
   {
     slug: "cosmic-space-christmas",
@@ -64,4 +64,3 @@ export const CHRISTMAS_THEMES: ChristmasTheme[] = [
     emoji: "🌨️",
   },
 ]
-

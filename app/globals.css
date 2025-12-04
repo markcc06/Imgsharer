@@ -207,11 +207,11 @@
   }
 
   .christmas-scroll-row-left {
-    animation: christmas-scroll-left 40s linear infinite;
+    animation: christmas-scroll-left 90s linear infinite;
   }
 
   .christmas-scroll-row-right {
-    animation: christmas-scroll-right 40s linear infinite;
+    animation: christmas-scroll-right 90s linear infinite;
   }
 
   .christmas-scroll-paused:hover {
