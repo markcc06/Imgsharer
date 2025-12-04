@@ -1,8 +1,3 @@
-import fs from "fs"
-import path from "path"
-
-import { CHRISTMAS_THEMES } from "./themes"
-
 export type ChristmasWallpaper = {
   id: string
   src: string
@@ -10,66 +5,606 @@ export type ChristmasWallpaper = {
   themes: string[]
 }
 
-const WALLPAPERS_ROOT = path.join(process.cwd(), "public", "wallpapers")
+export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
+  {
+    id: "cute-wallpaper-for-christmas--wallpapers-cozy-christmas-01",
+    src: "/wallpapers/Cozy Christmas wallpapers/:wallpapers:Cozy Christmas 01.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas--wallpapers-cozy-christmas-02",
+    src: "/wallpapers/Cozy Christmas wallpapers/:wallpapers:Cozy Christmas 02.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-1",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 1.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-10",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 10.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-11",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 11.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-14",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 14.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-17",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 17.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-2",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 2.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-20",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 20.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-21",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 21.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-23",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 23.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-29",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 29.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-30",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 30.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-32",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 32.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-5",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 5.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-new-6",
+    src: "/wallpapers/Cozy Christmas wallpapers/new 6.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-out-0-1-",
+    src: "/wallpapers/Cozy Christmas wallpapers/out-0 (1).png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-out-0-13-",
+    src: "/wallpapers/Cozy Christmas wallpapers/out-0 (13).png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-out-0-20-",
+    src: "/wallpapers/Cozy Christmas wallpapers/out-0 (20).png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-out-0-21-",
+    src: "/wallpapers/Cozy Christmas wallpapers/out-0 (21).png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-out-0-22-",
+    src: "/wallpapers/Cozy Christmas wallpapers/out-0 (22).png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-out-0-23-",
+    src: "/wallpapers/Cozy Christmas wallpapers/out-0 (23).png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-out-0-24-",
+    src: "/wallpapers/Cozy Christmas wallpapers/out-0 (24).png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-out-0-3-",
+    src: "/wallpapers/Cozy Christmas wallpapers/out-0 (3).png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-out-0-7-",
+    src: "/wallpapers/Cozy Christmas wallpapers/out-0 (7).png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cute-wallpaper-for-christmas-out-0-8-",
+    src: "/wallpapers/Cozy Christmas wallpapers/out-0 (8).png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  // Cyber Steam-Punk (winter-cabin-at-night)
+  {
+    id: "winter-cabin-at-night-cyber-steam-punk-01",
+    src: "/wallpapers/Cyber Steam-Punk wallpapers/:wallpapers:Cyber Steam-Punk 01.png",
+    alt: "AI-generated Cyber Steam-Punk Christmas wallpaper",
+    themes: ["winter-cabin-at-night"],
+  },
+  {
+    id: "winter-cabin-at-night-new-24",
+    src: "/wallpapers/Cyber Steam-Punk wallpapers/new 24.png",
+    alt: "AI-generated Cyber Steam-Punk Christmas wallpaper",
+    themes: ["winter-cabin-at-night"],
+  },
+  {
+    id: "winter-cabin-at-night-new-25",
+    src: "/wallpapers/Cyber Steam-Punk wallpapers/new 25.png",
+    alt: "AI-generated Cyber Steam-Punk Christmas wallpaper",
+    themes: ["winter-cabin-at-night"],
+  },
+  {
+    id: "winter-cabin-at-night-new-26",
+    src: "/wallpapers/Cyber Steam-Punk wallpapers/new 26.png",
+    alt: "AI-generated Cyber Steam-Punk Christmas wallpaper",
+    themes: ["winter-cabin-at-night"],
+  },
+  {
+    id: "winter-cabin-at-night-new-28",
+    src: "/wallpapers/Cyber Steam-Punk wallpapers/new 28.png",
+    alt: "AI-generated Cyber Steam-Punk Christmas wallpaper",
+    themes: ["winter-cabin-at-night"],
+  },
+  {
+    id: "winter-cabin-at-night-out-0-11",
+    src: "/wallpapers/Cyber Steam-Punk wallpapers/out-0 (11).png",
+    alt: "AI-generated Cyber Steam-Punk Christmas wallpaper",
+    themes: ["winter-cabin-at-night"],
+  },
+  {
+    id: "winter-cabin-at-night-out-0-12",
+    src: "/wallpapers/Cyber Steam-Punk wallpapers/out-0 (12).png",
+    alt: "AI-generated Cyber Steam-Punk Christmas wallpaper",
+    themes: ["winter-cabin-at-night"],
+  },
+  {
+    id: "winter-cabin-at-night-out-0-14",
+    src: "/wallpapers/Cyber Steam-Punk wallpapers/out-0 (14).png",
+    alt: "AI-generated Cyber Steam-Punk Christmas wallpaper",
+    themes: ["winter-cabin-at-night"],
+  },
+  {
+    id: "winter-cabin-at-night-out-0-34",
+    src: "/wallpapers/Cyber Steam-Punk wallpapers/out-0 (34).png",
+    alt: "AI-generated Cyber Steam-Punk Christmas wallpaper",
+    themes: ["winter-cabin-at-night"],
+  },
+  {
+    id: "winter-cabin-at-night-out-0-35",
+    src: "/wallpapers/Cyber Steam-Punk wallpapers/out-0 (35).png",
+    alt: "AI-generated Cyber Steam-Punk Christmas wallpaper",
+    themes: ["winter-cabin-at-night"],
+  },
 
-// Map from folder name under /public/wallpapers to theme slug
-const THEME_FOLDER_MAP: Record<string, string> = {
-  "Cozy Christmas wallpapers": "cute-wallpaper-for-christmas",
-  "Cyber Steam-Punk wallpapers": "winter-cabin-at-night",
-  "Christmas Tree wallpapers": "christmas-tree-lights",
-  "Horror Christmas wallpapers": "ice-castle-queen",
-  "Cosmic Christmas wallpapers": "cosmic-space-christmas",
-  "Cute Robots wallpapers": "cute-christmas-robots",
-  "Pastel Candy wallpapers": "pastel-candy-christmas",
-  "Snow Aesthetic wallpapers": "snowy-forest-aesthetic",
-}
+  // Christmas Tree (christmas-tree-lights)
+  {
+    id: "christmas-tree-lights-tree-01",
+    src: "/wallpapers/Christmas Tree wallpapers/:wallpapers:Christmas Tree 01.png",
+    alt: "AI-generated Christmas Tree wallpaper",
+    themes: ["christmas-tree-lights"],
+  },
+  {
+    id: "christmas-tree-lights-new-15",
+    src: "/wallpapers/Christmas Tree wallpapers/new 15.png",
+    alt: "AI-generated Christmas Tree wallpaper",
+    themes: ["christmas-tree-lights"],
+  },
+  {
+    id: "christmas-tree-lights-new-22",
+    src: "/wallpapers/Christmas Tree wallpapers/new 22.png",
+    alt: "AI-generated Christmas Tree wallpaper",
+    themes: ["christmas-tree-lights"],
+  },
+  {
+    id: "christmas-tree-lights-new-27",
+    src: "/wallpapers/Christmas Tree wallpapers/new 27.png",
+    alt: "AI-generated Christmas Tree wallpaper",
+    themes: ["christmas-tree-lights"],
+  },
+  {
+    id: "christmas-tree-lights-new-3",
+    src: "/wallpapers/Christmas Tree wallpapers/new 3.png",
+    alt: "AI-generated Christmas Tree wallpaper",
+    themes: ["christmas-tree-lights"],
+  },
+  {
+    id: "christmas-tree-lights-new-4",
+    src: "/wallpapers/Christmas Tree wallpapers/new 4.png",
+    alt: "AI-generated Christmas Tree wallpaper",
+    themes: ["christmas-tree-lights"],
+  },
+  {
+    id: "christmas-tree-lights-new-40",
+    src: "/wallpapers/Christmas Tree wallpapers/new 40.png",
+    alt: "AI-generated Christmas Tree wallpaper",
+    themes: ["christmas-tree-lights"],
+  },
+  {
+    id: "christmas-tree-lights-out-0-36",
+    src: "/wallpapers/Christmas Tree wallpapers/out-0 (36).png",
+    alt: "AI-generated Christmas Tree wallpaper",
+    themes: ["christmas-tree-lights"],
+  },
+  {
+    id: "christmas-tree-lights-out-0-37",
+    src: "/wallpapers/Christmas Tree wallpapers/out-0 (37).png",
+    alt: "AI-generated Christmas Tree wallpaper",
+    themes: ["christmas-tree-lights"],
+  },
+  {
+    id: "christmas-tree-lights-out-0-4",
+    src: "/wallpapers/Christmas Tree wallpapers/out-0 (4).png",
+    alt: "AI-generated Christmas Tree wallpaper",
+    themes: ["christmas-tree-lights"],
+  },
+  {
+    id: "christmas-tree-lights-out-0-5",
+    src: "/wallpapers/Christmas Tree wallpapers/out-0 (5).png",
+    alt: "AI-generated Christmas Tree wallpaper",
+    themes: ["christmas-tree-lights"],
+  },
 
-const themeBySlug = new Map(CHRISTMAS_THEMES.map((theme) => [theme.slug, theme]))
+  // Horror Christmas (ice-castle-queen)
+  {
+    id: "ice-castle-queen-new-35",
+    src: "/wallpapers/Horror Christmas wallpapers/new 35.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-37",
+    src: "/wallpapers/Horror Christmas wallpapers/new 37.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-38",
+    src: "/wallpapers/Horror Christmas wallpapers/new 38.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-39",
+    src: "/wallpapers/Horror Christmas wallpapers/new 39.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-43",
+    src: "/wallpapers/Horror Christmas wallpapers/new 43.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-46",
+    src: "/wallpapers/Horror Christmas wallpapers/new 46.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-47",
+    src: "/wallpapers/Horror Christmas wallpapers/new 47.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-48",
+    src: "/wallpapers/Horror Christmas wallpapers/new 48.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-49",
+    src: "/wallpapers/Horror Christmas wallpapers/new 49.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-51",
+    src: "/wallpapers/Horror Christmas wallpapers/new 51.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-52",
+    src: "/wallpapers/Horror Christmas wallpapers/new 52.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-53",
+    src: "/wallpapers/Horror Christmas wallpapers/new 53.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-54",
+    src: "/wallpapers/Horror Christmas wallpapers/new 54.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-55",
+    src: "/wallpapers/Horror Christmas wallpapers/new 55.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-56",
+    src: "/wallpapers/Horror Christmas wallpapers/new 56.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-57",
+    src: "/wallpapers/Horror Christmas wallpapers/new 57.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-58",
+    src: "/wallpapers/Horror Christmas wallpapers/new 58.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-60",
+    src: "/wallpapers/Horror Christmas wallpapers/new 60.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-61",
+    src: "/wallpapers/Horror Christmas wallpapers/new 61.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "ice-castle-queen-new-62",
+    src: "/wallpapers/Horror Christmas wallpapers/new 62.png",
+    alt: "AI-generated Horror Christmas wallpaper",
+    themes: ["ice-castle-queen"],
+  },
 
-function safeReadDir(dir: string): string[] {
-  try {
-    return fs.readdirSync(dir, { withFileTypes: true }).filter((entry) => entry.isFile()).map((entry) => entry.name)
-  } catch {
-    return []
-  }
-}
+  // Cosmic Christmas (cosmic-space-christmas)
+  {
+    id: "cosmic-space-christmas-cosmic-01",
+    src: "/wallpapers/Cosmic Christmas wallpapers/:wallpapers:Cosmic Christmas 01.png",
+    alt: "AI-generated Cosmic Christmas wallpaper",
+    themes: ["cosmic-space-christmas"],
+  },
+  {
+    id: "cosmic-space-christmas-new-19",
+    src: "/wallpapers/Cosmic Christmas wallpapers/new 19.png",
+    alt: "AI-generated Cosmic Christmas wallpaper",
+    themes: ["cosmic-space-christmas"],
+  },
+  {
+    id: "cosmic-space-christmas-out-0-40",
+    src: "/wallpapers/Cosmic Christmas wallpapers/out-0 (40).png",
+    alt: "AI-generated Cosmic Christmas wallpaper",
+    themes: ["cosmic-space-christmas"],
+  },
 
-function isImageFile(filename: string): boolean {
-  return /\.(png|jpe?g|webp|svg)$/i.test(filename)
-}
+  // Cute Robots (cute-christmas-robots)
+  {
+    id: "cute-christmas-robots-robots-01",
+    src: "/wallpapers/Cute Robots wallpapers/:wallpapers:Cute Robots 01.png",
+    alt: "AI-generated Cute Robots Christmas wallpaper",
+    themes: ["cute-christmas-robots"],
+  },
+  {
+    id: "cute-christmas-robots-new-16",
+    src: "/wallpapers/Cute Robots wallpapers/new 16.png",
+    alt: "AI-generated Cute Robots Christmas wallpaper",
+    themes: ["cute-christmas-robots"],
+  },
+  {
+    id: "cute-christmas-robots-new-31",
+    src: "/wallpapers/Cute Robots wallpapers/new 31.png",
+    alt: "AI-generated Cute Robots Christmas wallpaper",
+    themes: ["cute-christmas-robots"],
+  },
+  {
+    id: "cute-christmas-robots-out-0-39",
+    src: "/wallpapers/Cute Robots wallpapers/out-0 (39).png",
+    alt: "AI-generated Cute Robots Christmas wallpaper",
+    themes: ["cute-christmas-robots"],
+  },
 
-function toId(themeSlug: string, filename: string): string {
-  const basename = filename.replace(/\.[^/.]+$/, "")
-  return `${themeSlug}-${basename}`.toLowerCase().replace(/[^a-z0-9-]+/g, "-")
-}
+  // Pastel Candy (pastel-candy-christmas)
+  {
+    id: "pastel-candy-christmas-out-0-29",
+    src: "/wallpapers/Pastel Candy wallpapers/out-0 (29).png",
+    alt: "AI-generated Pastel Candy Christmas wallpaper",
+    themes: ["pastel-candy-christmas"],
+  },
+  {
+    id: "pastel-candy-christmas-out-0-30",
+    src: "/wallpapers/Pastel Candy wallpapers/out-0 (30).png",
+    alt: "AI-generated Pastel Candy Christmas wallpaper",
+    themes: ["pastel-candy-christmas"],
+  },
+  {
+    id: "pastel-candy-christmas-out-0-31",
+    src: "/wallpapers/Pastel Candy wallpapers/out-0 (31).png",
+    alt: "AI-generated Pastel Candy Christmas wallpaper",
+    themes: ["pastel-candy-christmas"],
+  },
 
-function buildAlt(themeSlug: string): string {
-  const theme = themeBySlug.get(themeSlug)
-  const themeName = theme?.name ?? "Christmas"
-  return `AI-generated ${themeName} Christmas wallpaper`
-}
-
-function buildWallpapersFromFolders(): ChristmasWallpaper[] {
-  const wallpapers: ChristmasWallpaper[] = []
-
-  for (const [folderName, themeSlug] of Object.entries(THEME_FOLDER_MAP)) {
-    const dirPath = path.join(WALLPAPERS_ROOT, folderName)
-    const files = safeReadDir(dirPath).filter(isImageFile)
-
-    const alt = buildAlt(themeSlug)
-
-    for (const filename of files) {
-      const src = `/wallpapers/${folderName}/${filename}`
-      wallpapers.push({
-        id: toId(themeSlug, filename),
-        src,
-        alt,
-        themes: [themeSlug],
-      })
-    }
-  }
-
-  return wallpapers
-}
-
-export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = buildWallpapersFromFolders()
+  // Snow Aesthetic (snowy-forest-aesthetic)
+  {
+    id: "snowy-forest-aesthetic-snow-01",
+    src: "/wallpapers/Snow Aesthetic wallpapers/:wallpapers:Snow Aesthetic 01.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-snow-02",
+    src: "/wallpapers/Snow Aesthetic wallpapers/:wallpapers:Snow Aesthetic 02.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-new-12",
+    src: "/wallpapers/Snow Aesthetic wallpapers/new 12.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-new-13",
+    src: "/wallpapers/Snow Aesthetic wallpapers/new 13.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-new-18",
+    src: "/wallpapers/Snow Aesthetic wallpapers/new 18.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-new-33",
+    src: "/wallpapers/Snow Aesthetic wallpapers/new 33.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-new-34",
+    src: "/wallpapers/Snow Aesthetic wallpapers/new 34.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-new-36",
+    src: "/wallpapers/Snow Aesthetic wallpapers/new 36.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-new-41",
+    src: "/wallpapers/Snow Aesthetic wallpapers/new 41.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-new-42",
+    src: "/wallpapers/Snow Aesthetic wallpapers/new 42.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-new-7",
+    src: "/wallpapers/Snow Aesthetic wallpapers/new 7.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-new-8",
+    src: "/wallpapers/Snow Aesthetic wallpapers/new 8.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-new-9",
+    src: "/wallpapers/Snow Aesthetic wallpapers/new 9.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-out-0-10",
+    src: "/wallpapers/Snow Aesthetic wallpapers/out-0 (10).png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-out-0-16",
+    src: "/wallpapers/Snow Aesthetic wallpapers/out-0 (16).png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-out-0-27",
+    src: "/wallpapers/Snow Aesthetic wallpapers/out-0 (27).png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-out-0-32",
+    src: "/wallpapers/Snow Aesthetic wallpapers/out-0 (32).png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-out-0-33",
+    src: "/wallpapers/Snow Aesthetic wallpapers/out-0 (33).png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-out-0-42",
+    src: "/wallpapers/Snow Aesthetic wallpapers/out-0 (42).png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-out-0-43",
+    src: "/wallpapers/Snow Aesthetic wallpapers/out-0 (43).png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-out-0-9",
+    src: "/wallpapers/Snow Aesthetic wallpapers/out-0 (9).png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+]

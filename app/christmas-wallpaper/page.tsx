@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { ChristmasWallpaperGenerator } from "@/components/christmas-wallpaper-generator"
 import { siteConfig } from "@/config/siteConfig"
 import { CHRISTMAS_THEMES } from "./themes"
-import { CHRISTMAS_WALLPAPERS } from "./wallpapers"
 
 const productionUrl = siteConfig.siteUrl.replace(/\/$/, "")
 const christmasWallpaperUrl = `${productionUrl}/christmas-wallpaper`
@@ -96,13 +95,6 @@ export default function ChristmasWallpaperPage() {
       operatingSystem: "Web",
     },
   }
-
-  const shuffled = [...CHRISTMAS_WALLPAPERS].sort(() => Math.random() - 0.5)
-  const midpoint = Math.ceil(shuffled.length / 2)
-  const firstRow = shuffled.slice(0, midpoint)
-  const secondRow = shuffled.slice(midpoint)
-
-  const loopRow = (row: typeof CHRISTMAS_WALLPAPERS) => [...row, ...row]
 
   return (
     <main className="min-h-screen flex flex-col bg-neutral-50 text-neutral-900">
@@ -217,74 +209,6 @@ export default function ChristmasWallpaperPage() {
                     </span>
                   </Link>
                 ))}
-              </div>
-            </div>
-          </section>
-
-          {/* All wallpapers grid */}
-          <section
-            id="all-wallpapers"
-            aria-labelledby="all-wallpapers-heading"
-            className="space-y-4"
-          >
-            <div className="flex items-baseline justify-between gap-2">
-              <h2
-                id="all-wallpapers-heading"
-                className="text-lg font-semibold text-[#1a1a1a] md:text-xl"
-              >
-                All Christmas wallpapers
-              </h2>
-              <p className="text-xs text-neutral-500">
-                Gently scrolling preview plus full gallery. Tap an image to open and download.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {/* Featured scrolling rows */}
-              <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white px-4 py-4">
-                <div className="christmas-scroll-row-left christmas-scroll-paused flex min-w-max gap-4">
-                  {loopRow(firstRow.length > 0 ? firstRow : CHRISTMAS_WALLPAPERS).map(
-                    (wallpaper, index) => (
-                      <div
-                        key={`${wallpaper.id}-strip1-${index}`}
-                        className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white"
-                      >
-                        <div className="relative">
-                          <Image
-                            src={wallpaper.src}
-                            alt={wallpaper.alt}
-                            width={640}
-                            height={960}
-                            className="h-full w-[140px] md:w-[180px] object-cover transition duration-300 group-hover:scale-[1.03]"
-                          />
-                        </div>
-                      </div>
-                    ),
-                  )}
-                </div>
-              </div>
-
-              <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white px-4 py-4">
-                <div className="christmas-scroll-row-right christmas-scroll-paused flex min-w-max gap-4">
-                  {loopRow(
-                    secondRow.length > 0 ? secondRow : CHRISTMAS_WALLPAPERS,
-                  ).map((wallpaper, index) => (
-                    <div
-                      key={`${wallpaper.id}-strip2-${index}`}
-                      className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white"
-                    >
-                      <div className="relative">
-                        <Image
-                          src={wallpaper.src}
-                          alt={wallpaper.alt}
-                          width={640}
-                          height={960}
-                          className="h-full w-[140px] md:w-[180px] object-cover transition duration-300 group-hover:scale-[1.03]"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           </section>
