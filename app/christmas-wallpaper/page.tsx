@@ -118,7 +118,7 @@ export default function ChristmasWallpaperPage() {
                 </p>
                 <div className="flex flex-wrap items-center gap-3 pt-2">
                   <a
-                    href="#all-wallpapers"
+                    href="#featured-wallpapers"
                     className="rounded-full bg-[#FF6B35] px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-[#FF6B35]/30 hover:bg-[#ff8c63]"
                   >
                     Browse all wallpapers

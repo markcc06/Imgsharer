@@ -79,11 +79,8 @@ function buildPrompt(scene: string | undefined, artStyle?: string) {
   return `${baseScene}, ${styleSuffix}`
 }
 
-function getSize(outputType: string | undefined) {
-  if (outputType === "desktop") {
-    return { width: 1536, height: 864 }
-  }
-  return { width: 896, height: 1792 }
+function getSize(_outputType: string | undefined) {
+  return { width: 1024, height: 1536 }
 }
 
 export async function POST(req: Request) {

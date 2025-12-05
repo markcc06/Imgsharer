@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useMemo } from "react"
+import { useEffect, useState } from "react"
 
 import type { ThemePreview } from "./themePreviews"
 import { THEME_PREVIEWS } from "./themePreviews"
@@ -27,10 +27,15 @@ function shuffleArray<T>(items: T[]): T[] {
 }
 
 export function ChristmasThemePreviewGrid() {
-  const previews: PreviewWithImage[] = useMemo(() => {
-    const shuffledThemes = shuffleArray(THEME_PREVIEWS)
+  const initialPreviews: PreviewWithImage[] = THEME_PREVIEWS.map((theme) => ({
+    ...theme,
+    previewImage: theme.imageOptions[0],
+  }))
 
-    return shuffledThemes.map((theme) => {
+  const [previews, setPreviews] = useState<PreviewWithImage[]>(initialPreviews)
+
+  useEffect(() => {
+    const randomized = shuffleArray(THEME_PREVIEWS).map((theme) => {
       const previewImage = getRandomItem(theme.imageOptions) ?? theme.imageOptions[0]
 
       return {
@@ -38,10 +43,12 @@ export function ChristmasThemePreviewGrid() {
         previewImage,
       }
     })
+
+    setPreviews(randomized)
   }, [])
 
   return (
-    <section className="space-y-4">
+    <section id="featured-wallpapers" className="space-y-4">
       <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-[#1a1a1a] md:text-xl">
@@ -81,4 +88,3 @@ export function ChristmasThemePreviewGrid() {
     </section>
   )
 }
-
