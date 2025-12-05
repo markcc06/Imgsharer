@@ -34,15 +34,24 @@ export async function generateMetadata({ params }: ThemePageProps): Promise<Meta
   const baseTitle = isCozy ? "cute wallpaper for christmas" : `${theme.name} Christmas Wallpapers`
   const title = `${baseTitle} | Imgsharer`
   const description = `${theme.tagline} Explore AI-generated ${theme.name.toLowerCase()} Christmas wallpapers for phones and desktops.`
+  const canonicalUrl = `${siteConfig.siteUrl.replace(/\/$/, "")}/christmas-wallpaper/${theme.slug}`
 
   return {
     title,
     description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
       description,
-      url: `${siteConfig.siteUrl.replace(/\/$/, "")}/christmas-wallpaper/${theme.slug}`,
+      url: canonicalUrl,
       type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
   }
 }

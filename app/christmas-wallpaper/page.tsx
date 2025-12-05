@@ -17,12 +17,21 @@ export const metadata: Metadata = {
   title: "Free AI Christmas Wallpaper Generator (4K Desktop & Mobile) | Imgsharer",
   description:
     "Create free AI Christmas wallpapers in seconds. Generate cozy Christmas backgrounds for desktop, iPhone and Android, then sharpen and upscale them with Imgsharer.",
+  alternates: {
+    canonical: christmasWallpaperUrl,
+  },
   openGraph: {
     title: "Free AI Christmas Wallpaper Generator (4K Desktop & Mobile)",
     description:
       "Generate festive AI Christmas wallpapers for phone and desktop. One-click creation plus AI sharpening and upscaling.",
     url: christmasWallpaperUrl,
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Free AI Christmas Wallpaper Generator (4K Desktop & Mobile) | Imgsharer",
+    description:
+      "Create free AI Christmas wallpapers in seconds. Generate cozy Christmas backgrounds for desktop, iPhone and Android, then sharpen and upscale them with Imgsharer.",
   },
 }
 
@@ -94,6 +103,16 @@ export default function ChristmasWallpaperPage() {
       name: "Imgsharer Christmas Wallpaper Generator",
       applicationCategory: "ImageEditor",
       operatingSystem: "Web",
+    },
+    about: {
+      "@type": "ItemList",
+      name: "Christmas wallpaper themes",
+      itemListElement: CHRISTMAS_THEMES.map((theme, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: `${theme.name} Christmas wallpapers`,
+        url: `${christmasWallpaperUrl}/${theme.slug}`,
+      })),
     },
   }
 
