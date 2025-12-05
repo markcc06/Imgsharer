@@ -7,6 +7,7 @@ import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { ChristmasWallpaperGenerator } from "@/components/christmas-wallpaper-generator"
 import { siteConfig } from "@/config/siteConfig"
+import { ChristmasThemePreviewGrid } from "./ChristmasThemePreviewGrid"
 import { CHRISTMAS_THEMES } from "./themes"
 
 const productionUrl = siteConfig.siteUrl.replace(/\/$/, "")
@@ -231,6 +232,9 @@ export default function ChristmasWallpaperPage() {
               ))}
             </div>
           </section>
+
+          {/* Featured previews from each theme */}
+          <ChristmasThemePreviewGrid />
 
           {/* How to use these wallpapers */}
           <section className="rounded-2xl border border-neutral-200 bg-white p-4 md:p-5">
