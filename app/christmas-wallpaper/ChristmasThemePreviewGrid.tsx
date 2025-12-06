@@ -45,6 +45,14 @@ function createInitialPreviews(): PreviewWithImage[] {
   })
 }
 
+function getDownloadFileName(src: string, slug: string) {
+  const parts = src.split("/")
+  const original = parts[parts.length - 1] ?? ""
+  const extension = original.includes(".") ? original.slice(original.lastIndexOf(".")) : ".png"
+  const baseName = slug.replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "")
+  return `${baseName}${extension}`
+}
+
 export function ChristmasThemePreviewGrid() {
   const [previews, setPreviews] = useState<PreviewWithImage[]>(() => createInitialPreviews())
 
@@ -91,6 +99,19 @@ export function ChristmasThemePreviewGrid() {
                 sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                 className="object-cover transition duration-300 group-hover:scale-[1.03]"
               />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition group-hover:opacity-100">
+                <div className="absolute inset-x-0 bottom-3 flex justify-center">
+                  <a
+                    href={theme.previewImage}
+                    download
+                    download={getDownloadFileName(theme.previewImage, theme.slug)}
+                    onClick={(event) => event.stopPropagation()}
+                    className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-white/95 px-4 py-2 text-xs font-semibold text-[#1a1a1a] shadow-md transition hover:bg-white"
+                  >
+                    Download
+                  </a>
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-1 flex-col gap-1 px-3 pb-3 pt-2">

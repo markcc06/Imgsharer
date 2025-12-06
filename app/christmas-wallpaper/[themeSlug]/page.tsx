@@ -139,13 +139,7 @@ export default function ChristmasThemePage({ params }: ThemePageProps) {
             </div>
 
             {THEME_DESCRIPTIONS[theme.slug] ? (
-              <p className="text-sm text-neutral-500 max-w-2xl mb-6 leading-relaxed">
-                {THEME_DESCRIPTIONS[theme.slug]}
-              </p>
-            ) : null}
-
-            {THEME_DESCRIPTIONS[theme.slug] ? (
-              <p className="text-sm text-neutral-500 max-w-2xl mb-6 leading-relaxed">
+              <p className="text-sm text-neutral-500 max-w-2xl leading-relaxed">
                 {THEME_DESCRIPTIONS[theme.slug]}
               </p>
             ) : null}
@@ -162,8 +156,20 @@ export default function ChristmasThemePage({ params }: ThemePageProps) {
                       alt={wallpaper.alt}
                       width={640}
                       height={960}
-                      className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                      sizes="(min-width: 1280px) 20vw, (min-width: 768px) 33vw, 50vw"
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
                     />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition group-hover:opacity-100">
+                      <div className="absolute inset-x-0 bottom-3 flex justify-center px-2">
+                        <a
+                          href={wallpaper.src}
+                          download={`${theme.slug}-${wallpaper.id}.png`}
+                          className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-white/95 px-4 py-2 text-xs font-semibold text-[#1a1a1a] shadow-md transition hover:bg-white"
+                        >
+                          Download
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
