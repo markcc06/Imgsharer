@@ -19,6 +19,12 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
     themes: ["cute-wallpaper-for-christmas"],
   },
   {
+    id: "cute-wallpaper-for-christmas-20251206-2011-boa-s-christmas-gesture-simple-compose-01kbss257ff12taq5p8tc6n2k1-png",
+    src: "/wallpapers/Cozy Christmas wallpapers/20251206_2011_Boa's Christmas Gesture_simple_compose_01kbss257ff12taq5p8tc6n2k1.png",
+    alt: "AI-generated Cozy Christmas wallpaper",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
     id: "cute-wallpaper-for-christmas-new-1-png",
     src: "/wallpapers/Cozy Christmas wallpapers/new 1.png",
     alt: "AI-generated Cozy Christmas wallpaper",
@@ -579,6 +585,18 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snowy-forest-aesthetic-20251205-2053-anime-empress-christmas-elegance-simple-compose-01kbq932cnfpxr8w3na7d510kw-png",
     src: "/wallpapers/Snow Aesthetic wallpapers/20251205_2053_Anime Empress Christmas Elegance_simple_compose_01kbq932cnfpxr8w3na7d510kw.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-20251206-1949-godzilla-s-cosmic-clash-simple-compose-01kbsqt2rdfnd8p3znmw59wn9x-png",
+    src: "/wallpapers/Snow Aesthetic wallpapers/20251206_1949_Godzilla's Cosmic Clash_simple_compose_01kbsqt2rdfnd8p3znmw59wn9x.png",
+    alt: "AI-generated Snow Aesthetic Christmas wallpaper",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snowy-forest-aesthetic-20251206-1953-epic-monster-clash-simple-compose-01kbsr235xf0ds535cnd6fajhw-png",
+    src: "/wallpapers/Snow Aesthetic wallpapers/20251206_1953_Epic Monster Clash_simple_compose_01kbsr235xf0ds535cnd6fajhw.png",
     alt: "AI-generated Snow Aesthetic Christmas wallpaper",
     themes: ["snowy-forest-aesthetic"],
   },
