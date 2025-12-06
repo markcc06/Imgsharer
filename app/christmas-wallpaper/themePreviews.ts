@@ -1,4 +1,4 @@
-import { CHRISTMAS_WALLPAPERS } from "./wallpapers"
+import { CHRISTMAS_WALLPAPERS, type ChristmasWallpaper } from "./wallpapers"
 
 export type ThemePreview = {
   slug: string
@@ -93,18 +93,30 @@ export const THEME_PREVIEWS: ThemePreview[] = [
   },
 ]
 
-export function getImageOptionsForTheme(slug: string, limit = 12): string[] {
-  const images = CHRISTMAS_WALLPAPERS.filter((wallpaper) => wallpaper.themes.includes(slug)).map(
-    (wallpaper) => wallpaper.src,
-  )
-  const unique = Array.from(new Set(images))
-  return unique.slice(0, limit)
+export function getImageOptionsForTheme(slug: string, limit = 12): ChristmasWallpaper[] {
+  return CHRISTMAS_WALLPAPERS.filter((wallpaper) => wallpaper.themes.includes(slug)).slice(0, limit)
 }
 
-export function getFallbackImages(slug: string): string[] {
+export function getFallbackImages(slug: string): ChristmasWallpaper[] {
   const theme = THEME_PREVIEWS.find((preview) => preview.slug === slug)
   if (theme?.fallbackImages?.length) {
-    return theme.fallbackImages
+      return theme.fallbackImages.map((src, index) => ({
+        id: `${slug}-fallback-${index}`,
+        src,
+        thumbnailSrc: src,
+        blurDataURL: "",
+        alt: `${theme.title} wallpaper`,
+        themes: [slug],
+      }))
   }
-  return [DEFAULT_PREVIEW_IMAGE]
+  return [
+    {
+      id: `${slug}-fallback-0`,
+      src: DEFAULT_PREVIEW_IMAGE,
+      thumbnailSrc: DEFAULT_PREVIEW_IMAGE,
+      blurDataURL: "",
+      alt: "Christmas wallpaper",
+      themes: [slug],
+    },
+  ]
 }

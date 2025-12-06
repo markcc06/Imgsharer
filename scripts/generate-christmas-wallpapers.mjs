@@ -3,10 +3,12 @@
 import { promises as fs } from "fs"
 import path from "path"
 import { fileURLToPath } from "url"
+import sharp from "sharp"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.join(__dirname, "..")
 const PUBLIC_WALLPAPER_DIR = path.join(ROOT, "public", "wallpapers")
+const THUMBNAIL_ROOT = path.join(PUBLIC_WALLPAPER_DIR, "thumbnails")
 const OUTPUT_FILE = path.join(ROOT, "app", "christmas-wallpaper", "wallpapers.ts")
 
 const THEME_DIRECTORIES = [
@@ -76,15 +78,58 @@ async function getFiles(dir) {
 
 async function buildWallpaperData() {
   const wallpapers = []
+  const downloadCounters = new Map()
 
   for (const theme of THEME_DIRECTORIES) {
     const themeDir = path.join(PUBLIC_WALLPAPER_DIR, theme.dir)
+    const thumbnailDir = path.join(THUMBNAIL_ROOT, theme.dir)
+    await fs.mkdir(thumbnailDir, { recursive: true })
     const files = await getFiles(themeDir)
 
     for (const file of files) {
+      const absoluteFilePath = path.join(themeDir, file)
+      const baseName = slugify(file.replace(/\.[^.]+$/, ""))
+      const thumbnailFileName = `${baseName}.webp`
+      const thumbnailAbsolutePath = path.join(thumbnailDir, thumbnailFileName)
+      const thumbnailRelativePath = `/wallpapers/thumbnails/${theme.dir}/${thumbnailFileName}`
+      const extension = path.extname(file) || ".png"
+      const downloadCount = (downloadCounters.get(theme.slug) ?? 0) + 1
+      downloadCounters.set(theme.slug, downloadCount)
+      const downloadName = `${theme.slug}-${String(downloadCount).padStart(2, "0")}${extension}`
+
+      try {
+        const thumbnailExists = await fs
+          .access(thumbnailAbsolutePath)
+          .then(() => true)
+          .catch(() => false)
+
+        if (!thumbnailExists) {
+          await sharp(absoluteFilePath)
+            .resize({ width: 800, height: 1200, fit: "inside", withoutEnlargement: true })
+            .toFormat("webp", { quality: 70 })
+            .toFile(thumbnailAbsolutePath)
+        }
+      } catch (error) {
+        console.warn(`Failed to generate thumbnail for ${absoluteFilePath}`, error)
+      }
+
+      let blurDataURL = ""
+      try {
+        const blurBuffer = await sharp(absoluteFilePath)
+          .resize({ width: 24 })
+          .toFormat("webp", { quality: 40 })
+          .toBuffer()
+        blurDataURL = `data:image/webp;base64,${blurBuffer.toString("base64")}`
+      } catch (error) {
+        console.warn(`Failed to generate blur placeholder for ${absoluteFilePath}`, error)
+      }
+
       wallpapers.push({
         id: `${theme.slug}-${slugify(file)}`,
         src: `/wallpapers/${theme.dir}/${file}`,
+        thumbnailSrc: thumbnailRelativePath,
+        blurDataURL,
+        downloadName,
         alt: `AI-generated ${theme.altText}`,
         themes: [theme.slug],
       })
@@ -100,6 +145,9 @@ function buildFileContent(wallpapers) {
       (wallpaper) => `  {
     id: "${wallpaper.id}",
     src: "${wallpaper.src}",
+    thumbnailSrc: "${wallpaper.thumbnailSrc}",
+    blurDataURL: "${wallpaper.blurDataURL}",
+    downloadName: "${wallpaper.downloadName}",
     alt: "${wallpaper.alt}",
     themes: ["${wallpaper.themes[0]}"],
   }`,
@@ -109,6 +157,9 @@ function buildFileContent(wallpapers) {
   return `export type ChristmasWallpaper = {
   id: string
   src: string
+  thumbnailSrc: string
+  blurDataURL: string
+  downloadName: string
   alt: string
   themes: string[]
 }
