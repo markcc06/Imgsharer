@@ -1,10 +1,14 @@
+import { CHRISTMAS_WALLPAPERS } from "./wallpapers"
+
 export type ThemePreview = {
   slug: string
   title: string
   description: string
   href: string
-  imageOptions: string[]
+  fallbackImages?: string[]
 }
+
+const DEFAULT_PREVIEW_IMAGE = "/wallpapers/christmas-phone-cozy.png"
 
 export const THEME_PREVIEWS: ThemePreview[] = [
   {
@@ -12,10 +16,9 @@ export const THEME_PREVIEWS: ThemePreview[] = [
     title: "Cozy Christmas",
     description: "Warm fireplaces, glowing trees and soft lights for a snug Christmas mood.",
     href: "/christmas-wallpaper/cute-wallpaper-for-christmas",
-    imageOptions: [
+    fallbackImages: [
       "/wallpapers/Cozy Christmas wallpapers/:wallpapers:Cozy Christmas 01.png",
       "/wallpapers/Cozy Christmas wallpapers/new 1.png",
-      "/wallpapers/Cozy Christmas wallpapers/new 10.png",
     ],
   },
   {
@@ -23,10 +26,9 @@ export const THEME_PREVIEWS: ThemePreview[] = [
     title: "Cyber Steam-Punk",
     description: "Retro-futuristic streets, glowing cables and armored silhouettes in the snow.",
     href: "/christmas-wallpaper/winter-cabin-at-night",
-    imageOptions: [
+    fallbackImages: [
       "/wallpapers/Cyber Steam-Punk wallpapers/:wallpapers:Cyber Steam-Punk 01.png",
       "/wallpapers/Cyber Steam-Punk wallpapers/new 24.png",
-      "/wallpapers/Cyber Steam-Punk wallpapers/new 25.png",
     ],
   },
   {
@@ -34,10 +36,9 @@ export const THEME_PREVIEWS: ThemePreview[] = [
     title: "Christmas Tree Lights",
     description: "Classic trees, ornaments and bokeh fairy lights for timeless wallpapers.",
     href: "/christmas-wallpaper/christmas-tree-lights",
-    imageOptions: [
+    fallbackImages: [
       "/wallpapers/Christmas Tree wallpapers/:wallpapers:Christmas Tree 01.png",
       "/wallpapers/Christmas Tree wallpapers/new 15.png",
-      "/wallpapers/Christmas Tree wallpapers/new 22.png",
     ],
   },
   {
@@ -45,10 +46,9 @@ export const THEME_PREVIEWS: ThemePreview[] = [
     title: "Horror Christmas",
     description: "Eerie mansions, ghostly silhouettes and flickering red-green lights.",
     href: "/christmas-wallpaper/ice-castle-queen",
-    imageOptions: [
+    fallbackImages: [
       "/wallpapers/Horror Christmas wallpapers/new 39.png",
       "/wallpapers/Horror Christmas wallpapers/new 48.png",
-      "/wallpapers/Horror Christmas wallpapers/new 49.png",
     ],
   },
   {
@@ -56,10 +56,9 @@ export const THEME_PREVIEWS: ThemePreview[] = [
     title: "Cosmic Christmas",
     description: "Galaxies, planets and nebulae with a festive color palette.",
     href: "/christmas-wallpaper/cosmic-space-christmas",
-    imageOptions: [
+    fallbackImages: [
       "/wallpapers/Cosmic Christmas wallpapers/:wallpapers:Cosmic Christmas 01.png",
       "/wallpapers/Cosmic Christmas wallpapers/new 19.png",
-      "/wallpapers/Cosmic Christmas wallpapers/out-0 (40).png",
     ],
   },
   {
@@ -67,10 +66,9 @@ export const THEME_PREVIEWS: ThemePreview[] = [
     title: "Cute Robots",
     description: "Adorable Christmas robots, neon gifts and sci‑fi toy shop vibes.",
     href: "/christmas-wallpaper/cute-christmas-robots",
-    imageOptions: [
+    fallbackImages: [
       "/wallpapers/Cute Robots wallpapers/:wallpapers:Cute Robots 01.png",
       "/wallpapers/Cute Robots wallpapers/new 16.png",
-      "/wallpapers/Cute Robots wallpapers/new 31.png",
     ],
   },
   {
@@ -78,10 +76,9 @@ export const THEME_PREVIEWS: ThemePreview[] = [
     title: "Pastel Candy",
     description: "Candy clouds, marshmallows and soft pastel gradients for dreamy screens.",
     href: "/christmas-wallpaper/pastel-candy-christmas",
-    imageOptions: [
+    fallbackImages: [
       "/wallpapers/Pastel Candy wallpapers/out-0 (29).png",
       "/wallpapers/Pastel Candy wallpapers/out-0 (30).png",
-      "/wallpapers/Pastel Candy wallpapers/out-0 (31).png",
     ],
   },
   {
@@ -89,10 +86,25 @@ export const THEME_PREVIEWS: ThemePreview[] = [
     title: "Snow Aesthetic",
     description: "Minimal snowy forests, soft light and calm winter horizons.",
     href: "/christmas-wallpaper/snowy-forest-aesthetic",
-    imageOptions: [
+    fallbackImages: [
       "/wallpapers/Snow Aesthetic wallpapers/:wallpapers:Snow Aesthetic 01.png",
       "/wallpapers/Snow Aesthetic wallpapers/:wallpapers:Snow Aesthetic 02.png",
-      "/wallpapers/Snow Aesthetic wallpapers/new 12.png",
     ],
   },
 ]
+
+export function getImageOptionsForTheme(slug: string, limit = 12): string[] {
+  const images = CHRISTMAS_WALLPAPERS.filter((wallpaper) => wallpaper.themes.includes(slug)).map(
+    (wallpaper) => wallpaper.src,
+  )
+  const unique = Array.from(new Set(images))
+  return unique.slice(0, limit)
+}
+
+export function getFallbackImages(slug: string): string[] {
+  const theme = THEME_PREVIEWS.find((preview) => preview.slug === slug)
+  if (theme?.fallbackImages?.length) {
+    return theme.fallbackImages
+  }
+  return [DEFAULT_PREVIEW_IMAGE]
+}

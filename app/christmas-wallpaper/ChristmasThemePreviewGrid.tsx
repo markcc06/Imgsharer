@@ -5,10 +5,15 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 
 import type { ThemePreview } from "./themePreviews"
-import { THEME_PREVIEWS } from "./themePreviews"
+import {
+  THEME_PREVIEWS,
+  getFallbackImages,
+  getImageOptionsForTheme,
+} from "./themePreviews"
 
 type PreviewWithImage = ThemePreview & {
   previewImage: string
+  imageOptions: string[]
 }
 
 function getRandomItem<T>(items: T[]): T | undefined {
@@ -26,20 +31,30 @@ function shuffleArray<T>(items: T[]): T[] {
   return copy
 }
 
-export function ChristmasThemePreviewGrid() {
-  const initialPreviews: PreviewWithImage[] = THEME_PREVIEWS.map((theme) => ({
-    ...theme,
-    previewImage: theme.imageOptions[0],
-  }))
+function createInitialPreviews(): PreviewWithImage[] {
+  return THEME_PREVIEWS.map((theme) => {
+    const options = getImageOptionsForTheme(theme.slug)
+    const resolvedOptions = options.length > 0 ? options : getFallbackImages(theme.slug)
+    const previewImage = resolvedOptions[0] ?? ""
 
-  const [previews, setPreviews] = useState<PreviewWithImage[]>(initialPreviews)
+    return {
+      ...theme,
+      imageOptions: resolvedOptions,
+      previewImage,
+    }
+  })
+}
+
+export function ChristmasThemePreviewGrid() {
+  const [previews, setPreviews] = useState<PreviewWithImage[]>(() => createInitialPreviews())
 
   useEffect(() => {
-    const randomized = shuffleArray(THEME_PREVIEWS).map((theme) => {
-      const previewImage = getRandomItem(theme.imageOptions) ?? theme.imageOptions[0]
+    const randomized = shuffleArray(createInitialPreviews()).map((preview) => {
+      const previewImage =
+        getRandomItem(preview.imageOptions) ?? preview.previewImage
 
       return {
-        ...theme,
+        ...preview,
         previewImage,
       }
     })
