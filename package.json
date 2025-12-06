@@ -7,7 +7,8 @@
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start",
-    "ctx:snapshot": "node scripts/ctx-snapshot.mjs"
+    "ctx:snapshot": "node scripts/ctx-snapshot.mjs",
+    "wallpapers:sync": "node scripts/generate-christmas-wallpapers.mjs"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",

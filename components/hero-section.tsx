@@ -166,7 +166,7 @@ export function HeroSection({ hero }: HeroSectionProps) {
               data-hero-foreground
               className="w-full max-w-6xl mx-auto bg-white/10 bg-gradient-to-b from-white/8 to-white/5 ring-1 ring-white/15 rounded-3xl px-6 py-8 sm:px-10 md:px-16 md:py-14 shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
             >
-            <div className="text-center mb-10 max-w-3xl mx-auto space-y-4">
+            <div className="text-center mb-10 mx-auto space-y-4 flex flex-col items-center max-w-full px-2">
               <div
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md bg-white/20 border border-white/30 mb-6 transition-all duration-600 ${
                   mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
@@ -177,15 +177,15 @@ export function HeroSection({ hero }: HeroSectionProps) {
                 <span className="text-sm font-medium text-white">{heroBadge}</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-4 leading-tight tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-4 leading-tight tracking-tight lg:whitespace-nowrap">
                 <AnimatedText text={heroTitle} delay={0.2} />
               </h1>
-              <p className="text-xl sm:text-2xl md:text-4xl font-semibold text-white mb-2">
+              <p className="text-xl sm:text-2xl md:text-4xl font-semibold text-white mb-2 lg:whitespace-nowrap">
                 <AnimatedText text={heroSubtitle} delay={0.4} />
               </p>
 
               <p
-                className={`text-base sm:text-lg text-white/85 mb-10 leading-relaxed max-w-2xl mx-auto text-balance px-2 transition-all duration-600 ${
+                className={`text-base sm:text-lg text-white/85 mb-10 leading-relaxed max-w-3xl mx-auto text-balance px-2 transition-all duration-600 ${
                   mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
                 }`}
                 style={{ transitionDelay: "0.8s" }}

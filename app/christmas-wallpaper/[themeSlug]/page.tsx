@@ -9,6 +9,25 @@ import { siteConfig } from "@/config/siteConfig"
 import { CHRISTMAS_THEMES, type ChristmasTheme } from "../themes"
 import { CHRISTMAS_WALLPAPERS } from "../wallpapers"
 
+const THEME_DESCRIPTIONS: Record<string, string> = {
+  "cute-wallpaper-for-christmas":
+    "Warm and cozy Christmas wallpapers filled with fireplaces, candlelit bookshelves, and snow-dusted windows. Perfect for phones or desktops when you want gentle lights, nostalgic textures, and a peaceful holiday mood that feels like cocoa nights and handwritten cards by the fire.",
+  "pastel-candy-christmas":
+    "Cute Christmas wallpapers packed with pastel palettes, marshmallow clouds, and playful characters. These soft-focus graphics brighten phones, tablets, or desktops for kids, teens, and anyone who loves adorable, candy-coated holiday scenes with charming details and dreamy color gradients.",
+  "ice-castle-queen":
+    "Dark Christmas wallpapers that mix festive ornaments with gothic silhouettes, haunted cabins, and flickering red-green light. Ideal for fans of spooky December atmospheres, these scenes keep the holly-and-ivy spirit while adding moody shadows, candle smoke, and mysterious, cinematic contrasts.",
+  "winter-cabin-at-night":
+    "Futuristic Christmas wallpapers that trade village streets for neon runways, sci-fi towers, and glowing cables in the snow. Think cyberpunk tinsel, armored wanderers, and multicolored mist—bold backdrops for anyone who wants holiday energy with a high-tech, synthwave-inspired twist.",
+  "cosmic-space-christmas":
+    "Cosmic Christmas wallpapers featuring astronauts, auroras, drifting planets, and presents floating through shimmering galaxies. Perfect for sci-fi fans who want dreamy seasonal art, these scenes pair deep-space gradients with subtle holiday cues like glowing ornaments, cosmic snow, and calm starlit skies.",
+  "christmas-tree-lights":
+    "Fantasy Christmas wallpapers brimming with enchanted evergreens, shimmering ornaments, and magical woodland glow. Ideal when you want tree-lined cabins, sparkling bridges, and fairytale plazas that make every screen feel like a wonderland of warm light and softly falling snow.",
+  "cute-christmas-robots":
+    "Steampunk Christmas wallpapers inspired by brass gears, mechanical reindeer, glowing lanterns, and retro laboratory vibes. These whimsical robots bring a playful industrial twist to seasonal backgrounds while still feeling cozy enough for storybook desktops or sci-fi phone lock screens.",
+  "snowy-forest-aesthetic":
+    "Minimal Christmas wallpapers built from pristine snowscapes, soft gradients, and calm branches catching morning light. Ideal for modern setups that prefer quiet elegance, the images keep details subtle so your phone or desktop feels clean, airy, and gently festive all season long.",
+}
+
 type ThemePageProps = {
   params: {
     themeSlug: string
@@ -118,6 +137,18 @@ export default function ChristmasThemePage({ params }: ThemePageProps) {
                 Tap an image to open and download.
               </p>
             </div>
+
+            {THEME_DESCRIPTIONS[theme.slug] ? (
+              <p className="text-sm text-neutral-500 max-w-2xl mb-6 leading-relaxed">
+                {THEME_DESCRIPTIONS[theme.slug]}
+              </p>
+            ) : null}
+
+            {THEME_DESCRIPTIONS[theme.slug] ? (
+              <p className="text-sm text-neutral-500 max-w-2xl mb-6 leading-relaxed">
+                {THEME_DESCRIPTIONS[theme.slug]}
+              </p>
+            ) : null}
 
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
               {images.map((wallpaper) => (
