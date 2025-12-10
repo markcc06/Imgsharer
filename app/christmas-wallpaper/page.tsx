@@ -4,6 +4,7 @@ import Link from "next/link"
 
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import PreviewModal from "@/components/PreviewModal"
 import { Button } from "@/components/ui/button"
 import { ChristmasWallpaperGenerator } from "@/components/christmas-wallpaper-generator"
 import { siteConfig } from "@/config/siteConfig"
@@ -333,6 +334,7 @@ export default function ChristmasWallpaperPage() {
         </div>
       </div>
       <Footer />
+      <PreviewModal />
     </main>
   )
 }

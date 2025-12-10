@@ -96,6 +96,19 @@ function Loader2Icon({ className }: { className?: string }) {
   )
 }
 
+function getFileNameFromPath(path: string, fallback: string): string {
+  try {
+    const url = new URL(path, "http://localhost")
+    const parts = url.pathname.split("/")
+    const last = parts[parts.length - 1]
+    return last || fallback
+  } catch {
+    const parts = path.split("/")
+    const last = parts[parts.length - 1]
+    return last || fallback
+  }
+}
+
 // Helper function to process image in browser
 async function processImageInBrowser(file: File, preserveFullRes = false): Promise<Blob> {
   return new Promise((resolve, reject) => {
@@ -205,12 +218,14 @@ export function ImageUploader({
   const [fileName, setFileName] = useState<string>("")
   const [progress, setProgress] = useState(0)
   const abortControllerRef = useRef<AbortController | null>(null)
+  const fakeIntervalRef = useRef<number | null>(null)
   const [isRateLimited, setIsRateLimited] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [scale, setScale] = useState<number>(4)
   const [faceEnhance, setFaceEnhance] = useState<boolean>(true)
+  const [isFakeMode, setIsFakeMode] = useState(false)
   const { toast } = useToast()
-  const { close: closeModal } = useUploadUI()
+  const { close: closeModal, pendingWallpaper } = useUploadUI()
 
   useEffect(() => {
     if (initialImage) {
@@ -240,8 +255,57 @@ export function ImageUploader({
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }
+      if (fakeIntervalRef.current !== null) {
+        window.clearInterval(fakeIntervalRef.current)
+        fakeIntervalRef.current = null
+      }
     }
   }, [])
+
+  useEffect(() => {
+    if (!pendingWallpaper) {
+      setIsFakeMode(false)
+      return
+    }
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+    }
+
+    if (fakeIntervalRef.current !== null) {
+      window.clearInterval(fakeIntervalRef.current)
+      fakeIntervalRef.current = null
+    }
+
+    setIsFakeMode(true)
+    setOriginalImage(pendingWallpaper.previewSrc)
+    setSharpenedImage(null)
+    // Use the configured downloadName so filenames stay consistent (e.g. snow-aesthetic-01.png)
+    setFileName(pendingWallpaper.downloadName || "wallpaper-4k.png")
+    setProgress(0)
+    setIsProcessing(true)
+
+    const totalDurationMs = 2500
+    const stepMs = 100
+    const steps = Math.max(1, Math.floor(totalDurationMs / stepMs))
+    let currentStep = 0
+
+    fakeIntervalRef.current = window.setInterval(() => {
+      currentStep += 1
+      const nextProgress = Math.min(100, Math.round((currentStep / steps) * 100))
+      setProgress(nextProgress)
+
+      if (nextProgress >= 100) {
+        if (fakeIntervalRef.current !== null) {
+          window.clearInterval(fakeIntervalRef.current)
+          fakeIntervalRef.current = null
+        }
+        setSharpenedImage(pendingWallpaper.highResSrc)
+        setIsProcessing(false)
+      }
+    }, stepMs)
+  }, [pendingWallpaper])
 
   const handleFileSelect = useCallback(
     (file: File) => {
@@ -289,6 +353,10 @@ export function ImageUploader({
   }
 
   const handleSharpen = async () => {
+    if (isFakeMode) {
+      return
+    }
+
     if (!originalImage) return
 
     if (abortControllerRef.current) {
@@ -441,11 +509,16 @@ export function ImageUploader({
       abortControllerRef.current.abort()
       abortControllerRef.current = null
     }
+    if (fakeIntervalRef.current !== null) {
+      window.clearInterval(fakeIntervalRef.current)
+      fakeIntervalRef.current = null
+    }
     setOriginalImage(null)
     setSharpenedImage(null)
     setFileName("")
     setProgress(0)
     setIsProcessing(false)
+    setIsFakeMode(false)
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }
@@ -494,22 +567,56 @@ export function ImageUploader({
                   <h3 className="text-3xl font-bold text-neutral-900">Before & After</h3>
                 </div>
                 <BeforeAfterSlider beforeImage={originalImage} afterImage={sharpenedImage} />
-                <div className="flex gap-3 mt-8">
+                <div
+                  className={
+                    isFakeMode
+                      ? "mt-8 flex justify-center"
+                      : "flex gap-3 mt-8"
+                  }
+                >
                   <Button
                     onClick={handleDownload}
-                    className="flex-1 bg-gradient-to-r from-brand-primary to-brand-primary-light hover:from-brand-primary/90 hover:to-brand-primary-light/90 text-white rounded-full py-6 font-medium shadow-lg shadow-brand-primary/25"
+                    className="flex-1 md:flex-none min-w-[12rem] bg-gradient-to-r from-brand-primary to-brand-primary-light hover:from-brand-primary/90 hover:to-brand-primary-light/90 text-white rounded-full py-6 font-medium shadow-lg shadow-brand-primary/25"
                   >
                     <DownloadIcon className="w-4 h-4 mr-2" />
-                    Download Sharpened
+                    {isFakeMode ? "Download 4K" : "Download Sharpened"}
                   </Button>
-                  <Button
-                    onClick={handleReset}
-                    variant="outline"
-                    className="rounded-full px-8 py-6 border-neutral-300 hover:bg-neutral-900/5 bg-white/60 backdrop-blur-sm"
-                  >
-                    Upload New
-                  </Button>
+                  {!isFakeMode && (
+                    <Button
+                      onClick={handleReset}
+                      variant="outline"
+                      className="rounded-full px-8 py-6 border-neutral-300 hover:bg-neutral-900/5 bg-white/60 backdrop-blur-sm"
+                    >
+                      Upload New
+                    </Button>
+                  )}
                 </div>
+              </BlurPanel>
+            ) : isFakeMode ? (
+              <BlurPanel className="p-8 lg:p-12 bg-white/40 backdrop-blur-md grain-texture border border-white/30">
+                <div className="mb-6">
+                  <h3 className="text-3xl font-bold text-neutral-900">Upscaling to 4K...</h3>
+                  <p className="mt-2 text-sm text-neutral-600">
+                    We’re preparing a high-resolution version of this wallpaper.
+                  </p>
+                </div>
+                <div className="relative aspect-video rounded-xl overflow-hidden bg-neutral-100 mb-6">
+                  <img
+                    src={originalImage || "/placeholder.svg"}
+                    alt="Original preview"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                {isProcessing && progress > 0 && (
+                  <div className="mt-2">
+                    <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-brand-primary to-brand-primary-light transition-all duration-300"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
               </BlurPanel>
             ) : (
               <BlurPanel className="p-8 lg:p-12 bg-white/40 backdrop-blur-md grain-texture border border-white/30">

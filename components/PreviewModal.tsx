@@ -26,7 +26,7 @@ function XIcon({ className }: { className?: string }) {
 }
 
 export default function PreviewModal() {
-  const { isOpen, close, file, objectUrl } = useUploadUI()
+  const { isOpen, close, file, objectUrl, pendingWallpaper } = useUploadUI()
 
   console.log(
     "[v0] PreviewModal render - isOpen:",
@@ -35,6 +35,8 @@ export default function PreviewModal() {
     file?.name,
     "objectUrl:",
     objectUrl ? "exists" : "null",
+    "pendingWallpaper:",
+    pendingWallpaper ? "exists" : "null",
   )
 
   useEffect(() => {
@@ -50,6 +52,8 @@ export default function PreviewModal() {
 
   if (typeof window === "undefined") return null
   if (!isOpen) return null
+
+  const shouldShowUploader = !!file || !!pendingWallpaper
 
   return createPortal(
     <div aria-modal="true" role="dialog" className="fixed inset-0 z-[100]">
@@ -75,16 +79,19 @@ export default function PreviewModal() {
             <XIcon className="w-5 h-5 text-neutral-900" />
           </button>
 
-          {!file ? (
+          {!shouldShowUploader ? (
             <>
-              {console.log("[v0] Rendering UploadDropzone (no file)")}
+              {console.log("[v0] Rendering UploadDropzone (no file, no pending wallpaper)")}
               <UploadDropzone mode="modal" />
             </>
           ) : (
             <>
-              {console.log("[v0] Rendering ImageUploader with file:", file.name)}
+              {console.log(
+                "[v0] Rendering ImageUploader",
+                file ? `with file: ${file.name}` : "with pending wallpaper",
+              )}
               <ImageUploader
-                initialImage={{ image: objectUrl || "", fileName: file.name }}
+                initialImage={file ? { image: objectUrl || "", fileName: file.name } : undefined}
                 onSharpenComplete={() => {}}
               />
             </>

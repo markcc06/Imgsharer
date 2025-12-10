@@ -1,13 +1,15 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import PreviewModal from "@/components/PreviewModal"
+import { WallpaperDeepLinker } from "@/components/WallpaperDeepLinker"
 import { siteConfig } from "@/config/siteConfig"
 import { CHRISTMAS_THEMES, type ChristmasTheme } from "../themes"
 import { CHRISTMAS_WALLPAPERS } from "../wallpapers"
+import { WallpaperCard } from "../WallpaperCard"
 
 const THEME_DESCRIPTIONS: Record<string, string> = {
   "cute-wallpaper-for-christmas":
@@ -96,6 +98,7 @@ export default function ChristmasThemePage({ params }: ThemePageProps) {
       <Header />
       <div className="flex-1 pt-20">
         <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10 md:px-6 md:py-14">
+          <WallpaperDeepLinker />
           <section className="space-y-4">
             <p className="inline-flex items-center gap-2 text-xs text-neutral-500">
               <Link href="/christmas-wallpaper" className="hover:text-[#FF6B35]">
@@ -146,34 +149,11 @@ export default function ChristmasThemePage({ params }: ThemePageProps) {
 
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
               {images.map((wallpaper) => (
-                <div
+                <WallpaperCard
                   key={wallpaper.id}
-                  className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white"
-                >
-                  <div className="relative">
-                    <Image
-                      src={wallpaper.thumbnailSrc || wallpaper.src}
-                      alt={wallpaper.alt}
-                      width={640}
-                      height={960}
-                      sizes="(min-width: 1280px) 20vw, (min-width: 768px) 33vw, 50vw"
-                      placeholder={wallpaper.blurDataURL ? "blur" : undefined}
-                      blurDataURL={wallpaper.blurDataURL || undefined}
-                      className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-                    />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition group-hover:opacity-100">
-                      <div className="absolute inset-x-0 bottom-3 flex justify-center px-2">
-                        <a
-                          href={wallpaper.src}
-                          download={wallpaper.downloadName}
-                          className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-white/95 px-4 py-2 text-xs font-semibold text-[#1a1a1a] shadow-md transition hover:bg-white"
-                        >
-                          Download
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  wallpaper={wallpaper}
+                  themeLabel={isCozy ? "Cute Christmas" : theme.name}
+                />
               ))}
             </div>
           </section>
@@ -209,6 +189,7 @@ export default function ChristmasThemePage({ params }: ThemePageProps) {
         </div>
       </div>
       <Footer />
+      <PreviewModal />
     </main>
   )
 }

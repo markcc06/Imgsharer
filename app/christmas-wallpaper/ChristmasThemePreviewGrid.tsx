@@ -40,10 +40,9 @@ function createInitialPreviews(): PreviewWithImage[] {
     const previewImage = resolvedOptions[0] ?? {
       id: `${theme.slug}-placeholder`,
       src: fallbackThumbnail,
+      highResSrc: fallbackThumbnail,
       thumbnailSrc: fallbackThumbnail,
-      blurDataURL: "",
       downloadName: `${theme.slug}.png`,
-      alt: `${theme.title} wallpaper`,
       themes: [theme.slug],
     }
 
@@ -89,7 +88,7 @@ export function ChristmasThemePreviewGrid() {
         {previews.map((theme) => (
           <Link
             key={theme.slug}
-            href={theme.href}
+            href={`${theme.href}#wallpaper-${theme.previewImage.id}`}
             className="group flex flex-col overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
             <div className="relative aspect-[9/16] w-full overflow-hidden bg-neutral-100">
@@ -99,22 +98,8 @@ export function ChristmasThemePreviewGrid() {
                 fill
                 loading="lazy"
                 sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                placeholder={theme.previewImage.blurDataURL ? "blur" : undefined}
-                blurDataURL={theme.previewImage.blurDataURL || undefined}
                 className="object-cover transition duration-300 group-hover:scale-[1.03]"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition group-hover:opacity-100">
-                <div className="absolute inset-x-0 bottom-3 flex justify-center">
-                  <a
-                    href={theme.previewImage.src}
-                    download={theme.previewImage.downloadName}
-                    onClick={(event) => event.stopPropagation()}
-                    className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-white/95 px-4 py-2 text-xs font-semibold text-[#1a1a1a] shadow-md transition hover:bg-white"
-                  >
-                    Download
-                  </a>
-                </div>
-              </div>
             </div>
 
             <div className="flex flex-1 flex-col gap-1 px-3 pb-3 pt-2">

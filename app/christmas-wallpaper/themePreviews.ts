@@ -100,22 +100,28 @@ export function getImageOptionsForTheme(slug: string, limit = 12): ChristmasWall
 export function getFallbackImages(slug: string): ChristmasWallpaper[] {
   const theme = THEME_PREVIEWS.find((preview) => preview.slug === slug)
   if (theme?.fallbackImages?.length) {
-      return theme.fallbackImages.map((src, index) => ({
+    return theme.fallbackImages.map((src, index) => {
+      const parts = src.split("/")
+      const fileName = parts[parts.length - 1] || `${slug}-${index + 1}.png`
+      return {
         id: `${slug}-fallback-${index}`,
         src,
+        highResSrc: src,
         thumbnailSrc: src,
-        blurDataURL: "",
-        alt: `${theme.title} wallpaper`,
+        downloadName: fileName,
         themes: [slug],
-      }))
+      }
+    })
   }
+  const defaultParts = DEFAULT_PREVIEW_IMAGE.split("/")
+  const defaultFileName = defaultParts[defaultParts.length - 1] || "christmas-wallpaper.png"
   return [
     {
       id: `${slug}-fallback-0`,
       src: DEFAULT_PREVIEW_IMAGE,
       thumbnailSrc: DEFAULT_PREVIEW_IMAGE,
-      blurDataURL: "",
-      alt: "Christmas wallpaper",
+      highResSrc: DEFAULT_PREVIEW_IMAGE,
+      downloadName: defaultFileName,
       themes: [slug],
     },
   ]
