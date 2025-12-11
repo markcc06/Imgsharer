@@ -35,7 +35,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-04",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-04.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 1.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/20251210_1504_Festive Space Cat_simple_compose_01kc3h3c9sexgv4p8j4afsn4p4.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-04.webp",
     downloadName: "cozy-christmas-04.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -43,7 +43,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-05",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-05.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 10.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/20251210_2030_Kawaii Ghost Christmas_simple_compose_01kc43ra7jf9bsbcvfp6dz1n54.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-05.webp",
     downloadName: "cozy-christmas-05.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -51,7 +51,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-06",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-06.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 11.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 1.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-06.webp",
     downloadName: "cozy-christmas-06.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -59,7 +59,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-07",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-07.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 14.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 10.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-07.webp",
     downloadName: "cozy-christmas-07.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -67,7 +67,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-08",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-08.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 17.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 11.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-08.webp",
     downloadName: "cozy-christmas-08.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -75,7 +75,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-09",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-09.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 2.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 14.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-09.webp",
     downloadName: "cozy-christmas-09.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -83,7 +83,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-10",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-10.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 20.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 17.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-10.webp",
     downloadName: "cozy-christmas-10.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -91,7 +91,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-11",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-11.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 21.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 2.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-11.webp",
     downloadName: "cozy-christmas-11.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -99,7 +99,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-12",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-12.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 23.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 20.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-12.webp",
     downloadName: "cozy-christmas-12.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -107,7 +107,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-13",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-13.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 29.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 21.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-13.webp",
     downloadName: "cozy-christmas-13.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -115,7 +115,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-14",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-14.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 30.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 23.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-14.webp",
     downloadName: "cozy-christmas-14.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -123,7 +123,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-15",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-15.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 32.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 29.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-15.webp",
     downloadName: "cozy-christmas-15.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -131,7 +131,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-16",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-16.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 5.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 30.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-16.webp",
     downloadName: "cozy-christmas-16.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -139,7 +139,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-17",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-17.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 6.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 32.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-17.webp",
     downloadName: "cozy-christmas-17.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -147,7 +147,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-18",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-18.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (1).png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 5.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-18.webp",
     downloadName: "cozy-christmas-18.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -155,7 +155,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-19",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-19.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (13).png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/new 6.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-19.webp",
     downloadName: "cozy-christmas-19.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -163,7 +163,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-20",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-20.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (20).png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (1).png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-20.webp",
     downloadName: "cozy-christmas-20.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -171,7 +171,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-21",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-21.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (21).png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (13).png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-21.webp",
     downloadName: "cozy-christmas-21.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -179,7 +179,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-22",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-22.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (22).png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (20).png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-22.webp",
     downloadName: "cozy-christmas-22.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -187,7 +187,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-23",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-23.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (23).png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (21).png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-23.webp",
     downloadName: "cozy-christmas-23.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -195,7 +195,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-24",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-24.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (24).png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (22).png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-24.webp",
     downloadName: "cozy-christmas-24.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -203,7 +203,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-25",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-25.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (3).png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (23).png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-25.webp",
     downloadName: "cozy-christmas-25.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -211,7 +211,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-26",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-26.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (7).png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (24).png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-26.webp",
     downloadName: "cozy-christmas-26.png",
     themes: ["cute-wallpaper-for-christmas"],
@@ -219,9 +219,25 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cozy-christmas-27",
     src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-27.png",
-    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (8).png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (3).png",
     thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-27.webp",
     downloadName: "cozy-christmas-27.png",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cozy-christmas-28",
+    src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-28.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (7).png",
+    thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-28.webp",
+    downloadName: "cozy-christmas-28.png",
+    themes: ["cute-wallpaper-for-christmas"],
+  },
+  {
+    id: "cozy-christmas-29",
+    src: "/wallpapers/Cozy Christmas wallpapers/preview/cozy-christmas-29.png",
+    highResSrc: "/wallpapers/Cozy Christmas wallpapers/out-0 (8).png",
+    thumbnailSrc: "/wallpapers/thumbnails/Cozy Christmas wallpapers/cozy-christmas-29.webp",
+    downloadName: "cozy-christmas-29.png",
     themes: ["cute-wallpaper-for-christmas"],
   },
   {
@@ -323,7 +339,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "christmas-tree-03",
     src: "/wallpapers/Christmas Tree wallpapers/preview/christmas-tree-03.png",
-    highResSrc: "/wallpapers/Christmas Tree wallpapers/new 15.png",
+    highResSrc: "/wallpapers/Christmas Tree wallpapers/20251210_1649_Glowing Tree Wonder_simple_compose_01kc3q6en4ft790ftp2tdm0gm9.png",
     thumbnailSrc: "/wallpapers/thumbnails/Christmas Tree wallpapers/christmas-tree-03.webp",
     downloadName: "christmas-tree-03.png",
     themes: ["christmas-tree-lights"],
@@ -331,7 +347,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "christmas-tree-04",
     src: "/wallpapers/Christmas Tree wallpapers/preview/christmas-tree-04.png",
-    highResSrc: "/wallpapers/Christmas Tree wallpapers/new 22.png",
+    highResSrc: "/wallpapers/Christmas Tree wallpapers/20251210_2036_Cosmic Christmas Night_simple_compose_01kc445k6geaqve9a155hhe0b6.png",
     thumbnailSrc: "/wallpapers/thumbnails/Christmas Tree wallpapers/christmas-tree-04.webp",
     downloadName: "christmas-tree-04.png",
     themes: ["christmas-tree-lights"],
@@ -339,7 +355,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "christmas-tree-05",
     src: "/wallpapers/Christmas Tree wallpapers/preview/christmas-tree-05.png",
-    highResSrc: "/wallpapers/Christmas Tree wallpapers/new 27.png",
+    highResSrc: "/wallpapers/Christmas Tree wallpapers/new 15.png",
     thumbnailSrc: "/wallpapers/thumbnails/Christmas Tree wallpapers/christmas-tree-05.webp",
     downloadName: "christmas-tree-05.png",
     themes: ["christmas-tree-lights"],
@@ -347,7 +363,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "christmas-tree-06",
     src: "/wallpapers/Christmas Tree wallpapers/preview/christmas-tree-06.png",
-    highResSrc: "/wallpapers/Christmas Tree wallpapers/new 3.png",
+    highResSrc: "/wallpapers/Christmas Tree wallpapers/new 22.png",
     thumbnailSrc: "/wallpapers/thumbnails/Christmas Tree wallpapers/christmas-tree-06.webp",
     downloadName: "christmas-tree-06.png",
     themes: ["christmas-tree-lights"],
@@ -355,7 +371,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "christmas-tree-07",
     src: "/wallpapers/Christmas Tree wallpapers/preview/christmas-tree-07.png",
-    highResSrc: "/wallpapers/Christmas Tree wallpapers/new 4.png",
+    highResSrc: "/wallpapers/Christmas Tree wallpapers/new 27.png",
     thumbnailSrc: "/wallpapers/thumbnails/Christmas Tree wallpapers/christmas-tree-07.webp",
     downloadName: "christmas-tree-07.png",
     themes: ["christmas-tree-lights"],
@@ -363,7 +379,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "christmas-tree-08",
     src: "/wallpapers/Christmas Tree wallpapers/preview/christmas-tree-08.png",
-    highResSrc: "/wallpapers/Christmas Tree wallpapers/new 40.png",
+    highResSrc: "/wallpapers/Christmas Tree wallpapers/new 3.png",
     thumbnailSrc: "/wallpapers/thumbnails/Christmas Tree wallpapers/christmas-tree-08.webp",
     downloadName: "christmas-tree-08.png",
     themes: ["christmas-tree-lights"],
@@ -371,7 +387,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "christmas-tree-09",
     src: "/wallpapers/Christmas Tree wallpapers/preview/christmas-tree-09.png",
-    highResSrc: "/wallpapers/Christmas Tree wallpapers/out-0 (36).png",
+    highResSrc: "/wallpapers/Christmas Tree wallpapers/new 4.png",
     thumbnailSrc: "/wallpapers/thumbnails/Christmas Tree wallpapers/christmas-tree-09.webp",
     downloadName: "christmas-tree-09.png",
     themes: ["christmas-tree-lights"],
@@ -379,7 +395,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "christmas-tree-10",
     src: "/wallpapers/Christmas Tree wallpapers/preview/christmas-tree-10.png",
-    highResSrc: "/wallpapers/Christmas Tree wallpapers/out-0 (37).png",
+    highResSrc: "/wallpapers/Christmas Tree wallpapers/new 40.png",
     thumbnailSrc: "/wallpapers/thumbnails/Christmas Tree wallpapers/christmas-tree-10.webp",
     downloadName: "christmas-tree-10.png",
     themes: ["christmas-tree-lights"],
@@ -387,7 +403,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "christmas-tree-11",
     src: "/wallpapers/Christmas Tree wallpapers/preview/christmas-tree-11.png",
-    highResSrc: "/wallpapers/Christmas Tree wallpapers/out-0 (4).png",
+    highResSrc: "/wallpapers/Christmas Tree wallpapers/out-0 (36).png",
     thumbnailSrc: "/wallpapers/thumbnails/Christmas Tree wallpapers/christmas-tree-11.webp",
     downloadName: "christmas-tree-11.png",
     themes: ["christmas-tree-lights"],
@@ -395,9 +411,25 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "christmas-tree-12",
     src: "/wallpapers/Christmas Tree wallpapers/preview/christmas-tree-12.png",
-    highResSrc: "/wallpapers/Christmas Tree wallpapers/out-0 (5).png",
+    highResSrc: "/wallpapers/Christmas Tree wallpapers/out-0 (37).png",
     thumbnailSrc: "/wallpapers/thumbnails/Christmas Tree wallpapers/christmas-tree-12.webp",
     downloadName: "christmas-tree-12.png",
+    themes: ["christmas-tree-lights"],
+  },
+  {
+    id: "christmas-tree-13",
+    src: "/wallpapers/Christmas Tree wallpapers/preview/christmas-tree-13.png",
+    highResSrc: "/wallpapers/Christmas Tree wallpapers/out-0 (4).png",
+    thumbnailSrc: "/wallpapers/thumbnails/Christmas Tree wallpapers/christmas-tree-13.webp",
+    downloadName: "christmas-tree-13.png",
+    themes: ["christmas-tree-lights"],
+  },
+  {
+    id: "christmas-tree-14",
+    src: "/wallpapers/Christmas Tree wallpapers/preview/christmas-tree-14.png",
+    highResSrc: "/wallpapers/Christmas Tree wallpapers/out-0 (5).png",
+    thumbnailSrc: "/wallpapers/thumbnails/Christmas Tree wallpapers/christmas-tree-14.webp",
+    downloadName: "christmas-tree-14.png",
     themes: ["christmas-tree-lights"],
   },
   {
@@ -419,7 +451,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-03",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-03.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 35.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/20251210_1703_Cyberpunk Horror Christmas_simple_compose_01kc3qx83neeavhjk0d05df0be.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-03.webp",
     downloadName: "horror-christmas-03.png",
     themes: ["ice-castle-queen"],
@@ -427,7 +459,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-04",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-04.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 37.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/20251210_2028_Neon Christmas Mystery_simple_compose_01kc43k20aeq7sb6bzz9cs53e8.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-04.webp",
     downloadName: "horror-christmas-04.png",
     themes: ["ice-castle-queen"],
@@ -435,7 +467,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-05",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-05.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 38.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 35.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-05.webp",
     downloadName: "horror-christmas-05.png",
     themes: ["ice-castle-queen"],
@@ -443,7 +475,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-06",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-06.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 39.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 37.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-06.webp",
     downloadName: "horror-christmas-06.png",
     themes: ["ice-castle-queen"],
@@ -451,7 +483,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-07",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-07.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 43.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 38.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-07.webp",
     downloadName: "horror-christmas-07.png",
     themes: ["ice-castle-queen"],
@@ -459,7 +491,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-08",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-08.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 46.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 39.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-08.webp",
     downloadName: "horror-christmas-08.png",
     themes: ["ice-castle-queen"],
@@ -467,7 +499,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-09",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-09.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 47.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 43.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-09.webp",
     downloadName: "horror-christmas-09.png",
     themes: ["ice-castle-queen"],
@@ -475,7 +507,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-10",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-10.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 48.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 46.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-10.webp",
     downloadName: "horror-christmas-10.png",
     themes: ["ice-castle-queen"],
@@ -483,7 +515,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-11",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-11.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 49.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 47.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-11.webp",
     downloadName: "horror-christmas-11.png",
     themes: ["ice-castle-queen"],
@@ -491,7 +523,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-12",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-12.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 51.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 48.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-12.webp",
     downloadName: "horror-christmas-12.png",
     themes: ["ice-castle-queen"],
@@ -499,7 +531,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-13",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-13.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 52.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 49.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-13.webp",
     downloadName: "horror-christmas-13.png",
     themes: ["ice-castle-queen"],
@@ -507,7 +539,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-14",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-14.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 53.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 51.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-14.webp",
     downloadName: "horror-christmas-14.png",
     themes: ["ice-castle-queen"],
@@ -515,7 +547,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-15",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-15.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 54.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 52.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-15.webp",
     downloadName: "horror-christmas-15.png",
     themes: ["ice-castle-queen"],
@@ -523,7 +555,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-16",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-16.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 55.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 53.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-16.webp",
     downloadName: "horror-christmas-16.png",
     themes: ["ice-castle-queen"],
@@ -531,7 +563,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-17",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-17.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 56.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 54.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-17.webp",
     downloadName: "horror-christmas-17.png",
     themes: ["ice-castle-queen"],
@@ -539,7 +571,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-18",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-18.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 57.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 55.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-18.webp",
     downloadName: "horror-christmas-18.png",
     themes: ["ice-castle-queen"],
@@ -547,7 +579,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-19",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-19.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 58.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 56.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-19.webp",
     downloadName: "horror-christmas-19.png",
     themes: ["ice-castle-queen"],
@@ -555,7 +587,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-20",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-20.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 60.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 57.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-20.webp",
     downloadName: "horror-christmas-20.png",
     themes: ["ice-castle-queen"],
@@ -563,7 +595,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-21",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-21.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 61.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 58.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-21.webp",
     downloadName: "horror-christmas-21.png",
     themes: ["ice-castle-queen"],
@@ -571,9 +603,25 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "horror-christmas-22",
     src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-22.png",
-    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 62.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 60.png",
     thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-22.webp",
     downloadName: "horror-christmas-22.png",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "horror-christmas-23",
+    src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-23.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 61.png",
+    thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-23.webp",
+    downloadName: "horror-christmas-23.png",
+    themes: ["ice-castle-queen"],
+  },
+  {
+    id: "horror-christmas-24",
+    src: "/wallpapers/Horror Christmas wallpapers/preview/horror-christmas-24.png",
+    highResSrc: "/wallpapers/Horror Christmas wallpapers/new 62.png",
+    thumbnailSrc: "/wallpapers/thumbnails/Horror Christmas wallpapers/horror-christmas-24.webp",
+    downloadName: "horror-christmas-24.png",
     themes: ["ice-castle-queen"],
   },
   {
@@ -619,7 +667,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cosmic-christmas-06",
     src: "/wallpapers/Cosmic Christmas wallpapers/preview/cosmic-christmas-06.png",
-    highResSrc: "/wallpapers/Cosmic Christmas wallpapers/new 19.png",
+    highResSrc: "/wallpapers/Cosmic Christmas wallpapers/20251210_1449_Magical Santa in Neon Galaxy_simple_compose_01kc3g75y7ev4rrngy1aphhwe2.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cosmic Christmas wallpapers/cosmic-christmas-06.webp",
     downloadName: "cosmic-christmas-06.png",
     themes: ["cosmic-space-christmas"],
@@ -627,9 +675,33 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cosmic-christmas-07",
     src: "/wallpapers/Cosmic Christmas wallpapers/preview/cosmic-christmas-07.png",
-    highResSrc: "/wallpapers/Cosmic Christmas wallpapers/out-0 (40).png",
+    highResSrc: "/wallpapers/Cosmic Christmas wallpapers/20251210_1514_Fantasy Christmas Wonderland_simple_compose_01kc3hp8w7ex4rhhrpqcnhpcnc.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cosmic Christmas wallpapers/cosmic-christmas-07.webp",
     downloadName: "cosmic-christmas-07.png",
+    themes: ["cosmic-space-christmas"],
+  },
+  {
+    id: "cosmic-christmas-08",
+    src: "/wallpapers/Cosmic Christmas wallpapers/preview/cosmic-christmas-08.png",
+    highResSrc: "/wallpapers/Cosmic Christmas wallpapers/20251210_1530_Fantasy Candy Christmas_simple_compose_01kc3jkn48en5r5na7x4m7d90n.png",
+    thumbnailSrc: "/wallpapers/thumbnails/Cosmic Christmas wallpapers/cosmic-christmas-08.webp",
+    downloadName: "cosmic-christmas-08.png",
+    themes: ["cosmic-space-christmas"],
+  },
+  {
+    id: "cosmic-christmas-09",
+    src: "/wallpapers/Cosmic Christmas wallpapers/preview/cosmic-christmas-09.png",
+    highResSrc: "/wallpapers/Cosmic Christmas wallpapers/new 19.png",
+    thumbnailSrc: "/wallpapers/thumbnails/Cosmic Christmas wallpapers/cosmic-christmas-09.webp",
+    downloadName: "cosmic-christmas-09.png",
+    themes: ["cosmic-space-christmas"],
+  },
+  {
+    id: "cosmic-christmas-10",
+    src: "/wallpapers/Cosmic Christmas wallpapers/preview/cosmic-christmas-10.png",
+    highResSrc: "/wallpapers/Cosmic Christmas wallpapers/out-0 (40).png",
+    thumbnailSrc: "/wallpapers/thumbnails/Cosmic Christmas wallpapers/cosmic-christmas-10.webp",
+    downloadName: "cosmic-christmas-10.png",
     themes: ["cosmic-space-christmas"],
   },
   {
@@ -683,7 +755,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cute-robots-07",
     src: "/wallpapers/Cute Robots wallpapers/preview/cute-robots-07.png",
-    highResSrc: "/wallpapers/Cute Robots wallpapers/new 16.png",
+    highResSrc: "/wallpapers/Cute Robots wallpapers/20251210_2033_Gingerbread Robot Christmas_simple_compose_01kc43wqxhepcswhjq88143vw8.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cute Robots wallpapers/cute-robots-07.webp",
     downloadName: "cute-robots-07.png",
     themes: ["cute-christmas-robots"],
@@ -691,7 +763,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cute-robots-08",
     src: "/wallpapers/Cute Robots wallpapers/preview/cute-robots-08.png",
-    highResSrc: "/wallpapers/Cute Robots wallpapers/new 31.png",
+    highResSrc: "/wallpapers/Cute Robots wallpapers/new 16.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cute Robots wallpapers/cute-robots-08.webp",
     downloadName: "cute-robots-08.png",
     themes: ["cute-christmas-robots"],
@@ -699,9 +771,17 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "cute-robots-09",
     src: "/wallpapers/Cute Robots wallpapers/preview/cute-robots-09.png",
-    highResSrc: "/wallpapers/Cute Robots wallpapers/out-0 (39).png",
+    highResSrc: "/wallpapers/Cute Robots wallpapers/new 31.png",
     thumbnailSrc: "/wallpapers/thumbnails/Cute Robots wallpapers/cute-robots-09.webp",
     downloadName: "cute-robots-09.png",
+    themes: ["cute-christmas-robots"],
+  },
+  {
+    id: "cute-robots-10",
+    src: "/wallpapers/Cute Robots wallpapers/preview/cute-robots-10.png",
+    highResSrc: "/wallpapers/Cute Robots wallpapers/out-0 (39).png",
+    thumbnailSrc: "/wallpapers/thumbnails/Cute Robots wallpapers/cute-robots-10.webp",
+    downloadName: "cute-robots-10.png",
     themes: ["cute-christmas-robots"],
   },
   {
@@ -715,7 +795,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "pastel-candy-02",
     src: "/wallpapers/Pastel Candy wallpapers/preview/pastel-candy-02.png",
-    highResSrc: "/wallpapers/Pastel Candy wallpapers/20251205_2032_Pastel Candy Christmas_simple_compose_01kbq7w8gyfxkt23cyy2djb7hv.png",
+    highResSrc: "/wallpapers/Pastel Candy wallpapers/20251205_2030_Miniature Christmas Wonderland_simple_compose_01kbq7qt24fp4rbksy4br6bckz.png",
     thumbnailSrc: "/wallpapers/thumbnails/Pastel Candy wallpapers/pastel-candy-02.webp",
     downloadName: "pastel-candy-02.png",
     themes: ["pastel-candy-christmas"],
@@ -723,7 +803,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "pastel-candy-03",
     src: "/wallpapers/Pastel Candy wallpapers/preview/pastel-candy-03.png",
-    highResSrc: "/wallpapers/Pastel Candy wallpapers/20251205_2035_Lollipop Forest Enchantment_simple_compose_01kbq82esnejfrhph5xpadr1hw.png",
+    highResSrc: "/wallpapers/Pastel Candy wallpapers/20251205_2032_Pastel Candy Christmas_simple_compose_01kbq7w8gyfxkt23cyy2djb7hv.png",
     thumbnailSrc: "/wallpapers/thumbnails/Pastel Candy wallpapers/pastel-candy-03.webp",
     downloadName: "pastel-candy-03.png",
     themes: ["pastel-candy-christmas"],
@@ -731,7 +811,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "pastel-candy-04",
     src: "/wallpapers/Pastel Candy wallpapers/preview/pastel-candy-04.png",
-    highResSrc: "/wallpapers/Pastel Candy wallpapers/20251205_2127_Candy Animal Winterland_simple_compose_01kbqb0494fw8btazcg3tk90sv.png",
+    highResSrc: "/wallpapers/Pastel Candy wallpapers/20251205_2035_Lollipop Forest Enchantment_simple_compose_01kbq82esnejfrhph5xpadr1hw.png",
     thumbnailSrc: "/wallpapers/thumbnails/Pastel Candy wallpapers/pastel-candy-04.webp",
     downloadName: "pastel-candy-04.png",
     themes: ["pastel-candy-christmas"],
@@ -739,7 +819,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "pastel-candy-05",
     src: "/wallpapers/Pastel Candy wallpapers/preview/pastel-candy-05.png",
-    highResSrc: "/wallpapers/Pastel Candy wallpapers/out-0 (29).png",
+    highResSrc: "/wallpapers/Pastel Candy wallpapers/20251205_2127_Candy Animal Winterland_simple_compose_01kbqb0494fw8btazcg3tk90sv.png",
     thumbnailSrc: "/wallpapers/thumbnails/Pastel Candy wallpapers/pastel-candy-05.webp",
     downloadName: "pastel-candy-05.png",
     themes: ["pastel-candy-christmas"],
@@ -747,7 +827,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "pastel-candy-06",
     src: "/wallpapers/Pastel Candy wallpapers/preview/pastel-candy-06.png",
-    highResSrc: "/wallpapers/Pastel Candy wallpapers/out-0 (30).png",
+    highResSrc: "/wallpapers/Pastel Candy wallpapers/out-0 (29).png",
     thumbnailSrc: "/wallpapers/thumbnails/Pastel Candy wallpapers/pastel-candy-06.webp",
     downloadName: "pastel-candy-06.png",
     themes: ["pastel-candy-christmas"],
@@ -755,9 +835,17 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "pastel-candy-07",
     src: "/wallpapers/Pastel Candy wallpapers/preview/pastel-candy-07.png",
-    highResSrc: "/wallpapers/Pastel Candy wallpapers/out-0 (31).png",
+    highResSrc: "/wallpapers/Pastel Candy wallpapers/out-0 (30).png",
     thumbnailSrc: "/wallpapers/thumbnails/Pastel Candy wallpapers/pastel-candy-07.webp",
     downloadName: "pastel-candy-07.png",
+    themes: ["pastel-candy-christmas"],
+  },
+  {
+    id: "pastel-candy-08",
+    src: "/wallpapers/Pastel Candy wallpapers/preview/pastel-candy-08.png",
+    highResSrc: "/wallpapers/Pastel Candy wallpapers/out-0 (31).png",
+    thumbnailSrc: "/wallpapers/thumbnails/Pastel Candy wallpapers/pastel-candy-08.webp",
+    downloadName: "pastel-candy-08.png",
     themes: ["pastel-candy-christmas"],
   },
   {
@@ -803,7 +891,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-06",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-06.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 12.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/20251210_1452_Aurora Snowy Forest_simple_compose_01kc3gd2tvehwsfcf4jxvpn38h.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-06.webp",
     downloadName: "snow-aesthetic-06.png",
     themes: ["snowy-forest-aesthetic"],
@@ -811,7 +899,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-07",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-07.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 13.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/20251210_1457_Fairy Tale Christmas Cabin_simple_compose_01kc3gp731fg9v9te92c6skgb4.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-07.webp",
     downloadName: "snow-aesthetic-07.png",
     themes: ["snowy-forest-aesthetic"],
@@ -819,7 +907,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-08",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-08.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 18.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 12.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-08.webp",
     downloadName: "snow-aesthetic-08.png",
     themes: ["snowy-forest-aesthetic"],
@@ -827,7 +915,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-09",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-09.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 33.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 13.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-09.webp",
     downloadName: "snow-aesthetic-09.png",
     themes: ["snowy-forest-aesthetic"],
@@ -835,7 +923,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-10",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-10.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 34.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 18.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-10.webp",
     downloadName: "snow-aesthetic-10.png",
     themes: ["snowy-forest-aesthetic"],
@@ -843,7 +931,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-11",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-11.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 36.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 33.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-11.webp",
     downloadName: "snow-aesthetic-11.png",
     themes: ["snowy-forest-aesthetic"],
@@ -851,7 +939,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-12",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-12.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 41.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 34.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-12.webp",
     downloadName: "snow-aesthetic-12.png",
     themes: ["snowy-forest-aesthetic"],
@@ -859,7 +947,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-13",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-13.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 42.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 36.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-13.webp",
     downloadName: "snow-aesthetic-13.png",
     themes: ["snowy-forest-aesthetic"],
@@ -867,7 +955,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-14",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-14.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 7.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 41.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-14.webp",
     downloadName: "snow-aesthetic-14.png",
     themes: ["snowy-forest-aesthetic"],
@@ -875,7 +963,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-15",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-15.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 8.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 42.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-15.webp",
     downloadName: "snow-aesthetic-15.png",
     themes: ["snowy-forest-aesthetic"],
@@ -883,7 +971,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-16",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-16.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 9.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 7.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-16.webp",
     downloadName: "snow-aesthetic-16.png",
     themes: ["snowy-forest-aesthetic"],
@@ -891,7 +979,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-17",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-17.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (10).png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 8.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-17.webp",
     downloadName: "snow-aesthetic-17.png",
     themes: ["snowy-forest-aesthetic"],
@@ -899,7 +987,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-18",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-18.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (16).png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/new 9.png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-18.webp",
     downloadName: "snow-aesthetic-18.png",
     themes: ["snowy-forest-aesthetic"],
@@ -907,7 +995,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-19",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-19.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (27).png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (10).png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-19.webp",
     downloadName: "snow-aesthetic-19.png",
     themes: ["snowy-forest-aesthetic"],
@@ -915,7 +1003,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-20",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-20.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (32).png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (16).png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-20.webp",
     downloadName: "snow-aesthetic-20.png",
     themes: ["snowy-forest-aesthetic"],
@@ -923,7 +1011,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-21",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-21.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (33).png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (27).png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-21.webp",
     downloadName: "snow-aesthetic-21.png",
     themes: ["snowy-forest-aesthetic"],
@@ -931,7 +1019,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-22",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-22.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (42).png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (32).png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-22.webp",
     downloadName: "snow-aesthetic-22.png",
     themes: ["snowy-forest-aesthetic"],
@@ -939,7 +1027,7 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-23",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-23.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (43).png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (33).png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-23.webp",
     downloadName: "snow-aesthetic-23.png",
     themes: ["snowy-forest-aesthetic"],
@@ -947,9 +1035,25 @@ export const CHRISTMAS_WALLPAPERS: ChristmasWallpaper[] = [
   {
     id: "snow-aesthetic-24",
     src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-24.png",
-    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (9).png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (42).png",
     thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-24.webp",
     downloadName: "snow-aesthetic-24.png",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snow-aesthetic-25",
+    src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-25.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (43).png",
+    thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-25.webp",
+    downloadName: "snow-aesthetic-25.png",
+    themes: ["snowy-forest-aesthetic"],
+  },
+  {
+    id: "snow-aesthetic-26",
+    src: "/wallpapers/Snow Aesthetic wallpapers/preview/snow-aesthetic-26.png",
+    highResSrc: "/wallpapers/Snow Aesthetic wallpapers/out-0 (9).png",
+    thumbnailSrc: "/wallpapers/thumbnails/Snow Aesthetic wallpapers/snow-aesthetic-26.webp",
+    downloadName: "snow-aesthetic-26.png",
     themes: ["snowy-forest-aesthetic"],
   }
 ]
