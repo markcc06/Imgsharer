@@ -82,13 +82,14 @@ export default function RootLayout({
   return (
     <html lang={(siteConfig.defaultLocale ?? "en-US").split("-")[0]} className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
       <head>
-        {/* AdSense base script for CMP auto-injection */}
+        {/* AdSense base script for CMP auto-injection (temporarily disabled during development)
         <script
           id="adsbygoogle-script"
           async
           crossOrigin="anonymous"
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
         ></script>
+        */}
         <meta name="robots" content="index, follow" />
         <meta name="theme-color" content="#ff5733" />
         <meta name="msapplication-TileColor" content="#ff5733" />

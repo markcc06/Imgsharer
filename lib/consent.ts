@@ -140,13 +140,15 @@ export const loadAdSenseIfAllowed = (pubId: string, state: ConsentState): void =
   if (typeof document === "undefined") return
   if (!pubId || !state.categories.ads) return
 
-  const scriptId = `adsense-${pubId}`
-  if (document.getElementById(scriptId)) return
-
-  const script = document.createElement("script")
-  script.id = scriptId
-  script.async = true
-  script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(pubId)}`
-  script.crossOrigin = "anonymous"
-  document.head.appendChild(script)
+  // AdSense loading is temporarily disabled during development to avoid noisy console errors and
+  // simplify debugging. The logic is preserved so it can be re-enabled later if needed.
+  // const scriptId = `adsense-${pubId}`
+  // if (document.getElementById(scriptId)) return
+  //
+  // const script = document.createElement("script")
+  // script.id = scriptId
+  // script.async = true
+  // script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(pubId)}`
+  // script.crossOrigin = "anonymous"
+  // document.head.appendChild(script)
 }

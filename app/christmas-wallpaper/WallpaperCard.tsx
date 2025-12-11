@@ -56,9 +56,11 @@ export function WallpaperCard({ wallpaper, themeLabel }: WallpaperCardProps) {
         <button
           type="button"
           onClick={handleUnlock4K}
-          className="inline-flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-3 py-1 text-[11px] font-medium text-neutral-800 shadow-sm transition hover:border-[#FF6B35]/60 hover:bg-[#FF6B35]/5"
+          className="group relative inline-flex items-center gap-1 overflow-hidden rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 px-4 py-2 text-sm font-bold text-white shadow-md shadow-yellow-500/20 border border-yellow-400/50 transition-all duration-300 hover:from-amber-400 hover:to-yellow-300 hover:shadow-lg hover:shadow-yellow-500/40 active:scale-95"
         >
-          <span>✨</span>
+          <span className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110">
+            ✨
+          </span>
           <span>Unlock 4K</span>
         </button>
       </div>
