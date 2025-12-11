@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
@@ -10,6 +9,7 @@ import { siteConfig } from "@/config/siteConfig"
 import { CHRISTMAS_THEMES, type ChristmasTheme } from "../../themes"
 import { CHRISTMAS_WALLPAPERS, type ChristmasWallpaper } from "../../wallpapers"
 import { WallpaperDetailActions } from "../../WallpaperDetailActions"
+import { WallpaperDetailImage } from "../../WallpaperDetailImage"
 
 type ImagePageParams = {
   themeSlug: string
@@ -130,18 +130,10 @@ export default function ChristmasWallpaperImagePage({ params }: { params: ImageP
 
           <section className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] items-start">
             <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white">
-              <div className="relative w-full bg-neutral-100">
-                <div className="relative mx-auto aspect-[9/16] w-full max-w-md md:max-w-none">
-                  <Image
-                    src={wallpaper.highResSrc || wallpaper.src}
-                    alt={`${themeLabel} Christmas wallpaper`}
-                    fill
-                    sizes="(min-width: 1024px) 55vw, 100vw"
-                    className="object-cover"
-                    priority
-                  />
-                </div>
-              </div>
+              <WallpaperDetailImage
+                wallpaper={wallpaper}
+                alt={`${themeLabel} Christmas wallpaper`}
+              />
             </div>
 
             <WallpaperDetailActions wallpaper={wallpaper} themeLabel={themeLabel} />
