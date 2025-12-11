@@ -153,6 +153,7 @@ export default function ChristmasThemePage({ params }: ThemePageProps) {
                   key={wallpaper.id}
                   wallpaper={wallpaper}
                   themeLabel={isCozy ? "Cute Christmas" : theme.name}
+                  themeSlug={theme.slug}
                 />
               ))}
             </div>

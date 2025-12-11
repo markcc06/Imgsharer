@@ -1,17 +1,23 @@
 "use client"
 
 import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { Share2 } from "lucide-react"
 
 import type { ChristmasWallpaper } from "./wallpapers"
 import { useUploadUI } from "@/lib/stores/upload-ui"
+import { useToast } from "@/hooks/use-toast"
 
 interface WallpaperCardProps {
   wallpaper: ChristmasWallpaper
   themeLabel: string
+  themeSlug: string
 }
 
-export function WallpaperCard({ wallpaper, themeLabel }: WallpaperCardProps) {
+export function WallpaperCard({ wallpaper, themeLabel, themeSlug }: WallpaperCardProps) {
   const { openWithWallpaper } = useUploadUI()
+  const { toast } = useToast()
+  const router = useRouter()
 
   const handleUnlock4K = () => {
     openWithWallpaper({
@@ -25,12 +31,51 @@ export function WallpaperCard({ wallpaper, themeLabel }: WallpaperCardProps) {
   const downloadHref = wallpaper.src || wallpaper.thumbnailSrc
   const altText = `${themeLabel} Christmas wallpaper`
 
+  const handleOpenDetail = () => {
+    router.push(`/christmas-wallpaper/${themeSlug}/${wallpaper.id}`)
+  }
+
+  const handleShare = async (event: React.MouseEvent) => {
+    event.stopPropagation()
+    const path = `/christmas-wallpaper/${themeSlug}/${wallpaper.id}`
+    const url =
+      typeof window !== "undefined" ? `${window.location.origin}${path}` : path
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url)
+        toast({
+          title: "Link copied",
+          description: "Wallpaper link is ready to share.",
+        })
+      } else {
+        throw new Error("Clipboard not available")
+      }
+    } catch {
+      toast({
+        title: "Unable to copy link",
+        description: url,
+      })
+    }
+  }
+
   return (
     <div
       id={`wallpaper-${wallpaper.id}`}
       className="group flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white"
     >
-      <div className="relative">
+      <div
+        className="relative cursor-pointer"
+        onClick={handleOpenDetail}
+      >
+        <button
+          type="button"
+          onClick={handleShare}
+          className="pointer-events-auto absolute right-2 top-2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-neutral-800 shadow-md transition-opacity duration-200 opacity-0 group-hover:opacity-100"
+          aria-label="Copy wallpaper link"
+        >
+          <Share2 className="h-4 w-4" />
+        </button>
         <Image
           src={wallpaper.thumbnailSrc || wallpaper.src}
           alt={altText}
