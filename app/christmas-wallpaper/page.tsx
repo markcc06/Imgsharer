@@ -152,40 +152,6 @@ export default function ChristmasWallpaperPage() {
                   <p className="text-xs text-neutral-500">Free personal use • Optimized for phone &amp; desktop</p>
                 </div>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-1 md:max-w-xs">
-                <div className="relative overflow-hidden rounded-2xl border border-white/70 bg-neutral-900 aspect-[4/3]">
-                  <Image
-                    src={wallpaperShowcase.desktop.src}
-                    alt={wallpaperShowcase.desktop.alt}
-                    fill
-                    sizes="(min-width: 1024px) 20rem, 50vw"
-                    className="object-cover"
-                    priority
-                  />
-                  <div className="absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-white">
-                    Desktop 4K
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {wallpaperShowcase.phones.map((sample) => (
-                    <div
-                      key={sample.src}
-                      className="relative overflow-hidden rounded-2xl border border-white/70 bg-neutral-900 aspect-[9/16]"
-                    >
-                      <Image
-                        src={sample.src}
-                        alt={sample.alt}
-                        fill
-                        sizes="(min-width: 768px) 10rem, 40vw"
-                        className="object-cover"
-                      />
-                      <div className="absolute left-2 top-2 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-white">
-                        Phone
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
           </section>
