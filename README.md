@@ -77,6 +77,12 @@ pnpm dev
 
 Create a .env.local file with your environment variables for image processing and deployment.
 
+```bash
+REPLICATE_API_TOKEN="your-token"
+REPLICATE_UPSCALE_MODEL="owner/model-name"
+REPLICATE_UPSCALE_VERSION="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
 ⸻
 
 📦 Deployment
