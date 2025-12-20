@@ -3,7 +3,7 @@ import Replicate from "replicate"
 import { NextRequest, NextResponse } from "next/server"
 
 import { ExtTokenError, verifyExtToken } from "@/lib/ext-jwt"
-import { checkRateLimit, getRateLimitIdentifier } from "@/lib/rate-limit"
+import { checkDailyRateLimit, checkRateLimit, getRateLimitIdentifier } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -12,6 +12,7 @@ export const maxDuration = 120
 const MAX_IMAGE_BYTES = 6_000_000 // ~6MB
 const VALID_SCALES = new Set([2, 4])
 const EXT_RATE_LIMIT_PER_MINUTE = 20
+const EXT_DAILY_LIMIT = 6
 
 class HttpError extends Error {
   status: number
@@ -56,12 +57,19 @@ function getReplicateClient() {
 export async function POST(request: NextRequest) {
   try {
     const token = extractBearerToken(request)
+    const installId = getInstallIdFromHeader(request)
+    if (!installId) {
+      throw new HttpError(400, "Missing installId. Provide X-Install-Id header.")
+    }
     try {
-      await verifyExtToken(token)
+      await verifyExtToken(token, { installId })
     } catch (error) {
       if (error instanceof ExtTokenError) {
         if (error.code === "INVALID_SCOPE" || error.code === "INVALID_AUDIENCE") {
           throw new HttpError(403, "Token does not have permission to use this endpoint.")
+        }
+        if (error.code === "INSTALL_ID_MISMATCH" || error.code === "MISSING_INSTALL_ID") {
+          throw new HttpError(403, "Token does not match this device. Request a new token.")
         }
         if (error.code === "EXPIRED") {
           throw new HttpError(401, "Token expired. Request a new token from /api/ext/token.")
@@ -71,10 +79,14 @@ export async function POST(request: NextRequest) {
       throw error
     }
 
-    const identifier = `${getRateLimitIdentifier(request)}:ext-upscale`
-    const limit = checkRateLimit(identifier, EXT_RATE_LIMIT_PER_MINUTE, 60 * 1000)
+    const identifierBase = `${getRateLimitIdentifier(request)}:${installId}`
+    const limit = checkRateLimit(`${identifierBase}:ext-upscale`, EXT_RATE_LIMIT_PER_MINUTE, 60 * 1000)
     if (!limit.allowed) {
       throw new HttpError(429, "Too many upscale requests. Please slow down.")
+    }
+    const daily = checkDailyRateLimit(`${identifierBase}:ext-upscale-daily`, EXT_DAILY_LIMIT)
+    if (!daily.allowed) {
+      throw new HttpError(429, "Daily free limit reached. Please try again tomorrow.")
     }
 
     const contentType = request.headers.get("content-type")?.toLowerCase() || ""
@@ -132,6 +144,11 @@ function extractBearerToken(request: NextRequest) {
     throw new HttpError(401, "Authorization header must be formatted as: Bearer <token>.")
   }
   return parts[1]
+}
+
+function getInstallIdFromHeader(request: NextRequest) {
+  const installId = request.headers.get("x-install-id")?.trim()
+  return installId || null
 }
 
 async function resolveImageInput(form: FormData): Promise<{ buffer: Buffer; mimeType: string }> {

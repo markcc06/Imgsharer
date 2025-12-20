@@ -10,7 +10,17 @@ const TOKEN_RATE_LIMIT_PER_MINUTE = 30
 
 export async function POST(request: NextRequest) {
   try {
-    const identifier = `${getRateLimitIdentifier(request)}:ext-token`
+    const installId = await getInstallId(request)
+    if (!installId) {
+      return NextResponse.json(
+        {
+          error: "Missing installId. Provide X-Install-Id header.",
+        },
+        { status: 400 },
+      )
+    }
+
+    const identifier = `${getRateLimitIdentifier(request)}:${installId}:ext-token`
     const minuteLimit = checkRateLimit(identifier, TOKEN_RATE_LIMIT_PER_MINUTE, 60 * 1000)
     if (!minuteLimit.allowed) {
       return NextResponse.json(
@@ -22,7 +32,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { token, expiresAt } = await issueExtToken()
+    const { token, expiresAt } = await issueExtToken(installId)
     return NextResponse.json({
       token,
       expiresAt,
@@ -47,3 +57,15 @@ export async function POST(request: NextRequest) {
   }
 }
 
+async function getInstallId(request: NextRequest) {
+  const headerValue = request.headers.get("x-install-id")?.trim()
+  if (headerValue) return headerValue
+
+  try {
+    const body = await request.json()
+    const installId = typeof body?.installId === "string" ? body.installId.trim() : ""
+    return installId || null
+  } catch {
+    return null
+  }
+}

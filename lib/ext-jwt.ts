@@ -9,6 +9,7 @@ export type ExtTokenClaims = {
   scope: string
   iat: number
   exp: number
+  installId?: string
 }
 
 export class ExtTokenError extends Error {
@@ -44,7 +45,7 @@ function createSignature(data: string, secret: string) {
   return createHmac("sha256", secret).update(data).digest()
 }
 
-export async function issueExtToken() {
+export async function issueExtToken(installId?: string) {
   const secret = getSecret()
   const header = { alg: "HS256", typ: "JWT" }
   const iat = Math.floor(Date.now() / 1000)
@@ -54,6 +55,7 @@ export async function issueExtToken() {
     scope: EXT_TOKEN_SCOPE,
     iat,
     exp,
+    installId,
   }
 
   const encodedHeader = base64UrlEncode(Buffer.from(JSON.stringify(header)))
@@ -68,7 +70,10 @@ export async function issueExtToken() {
   }
 }
 
-export async function verifyExtToken(token: string): Promise<ExtTokenClaims> {
+export async function verifyExtToken(
+  token: string,
+  options: { installId?: string } = {},
+): Promise<ExtTokenClaims> {
   const secret = getSecret()
   const parts = token.split(".")
   if (parts.length !== 3) {
@@ -112,6 +117,14 @@ export async function verifyExtToken(token: string): Promise<ExtTokenClaims> {
     throw new ExtTokenError("Insufficient scope", "INVALID_SCOPE")
   }
 
+  if (options.installId) {
+    if (!payload.installId) {
+      throw new ExtTokenError("Token missing installId", "MISSING_INSTALL_ID")
+    }
+    if (payload.installId !== options.installId) {
+      throw new ExtTokenError("Token installId mismatch", "INSTALL_ID_MISMATCH")
+    }
+  }
+
   return payload
 }
-
