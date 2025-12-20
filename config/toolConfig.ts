@@ -74,7 +74,7 @@ export const toolConfig: ToolConfig = {
     "Free AI image sharpener to enhance and restore photo clarity. Upload a picture, sharpen in seconds, then download crystal-clear results. Private and fast.",
   primaryCtaLabel: "Sharpen my image",
   apiEndpoint: "/api/sharpen",
-  maxFileSizeMb: 4,
+  maxFileSizeMb: 8,
   allowedMimeTypes: ["image/jpeg", "image/png", "image/webp"],
   relatedSection: {
     eyebrow: "More ways to use Imgsharer",

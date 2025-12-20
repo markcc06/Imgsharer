@@ -4,11 +4,11 @@ import { RATE_LIMIT_PER_MINUTE, RATE_LIMIT_PER_DAY } from "@/lib/constants"
 
 console.log("[SERVER] Sharpen route module loading...")
 
-export const runtime = "edge"
+export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 export const maxDuration = 60
 
-const MAX_UPLOAD = 4_500_000 // 4.5MB
+const MAX_UPLOAD = 8_000_000 // 8MB
 
 function arrayBufferToBase64(buffer: ArrayBuffer) {
   const bytes = new Uint8Array(buffer)
