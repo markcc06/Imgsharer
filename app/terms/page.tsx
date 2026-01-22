@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     canonical: `${siteConfig.siteUrl}/terms`,
   },
   robots: {
-    index: false,
+    index: true,
     follow: true,
   },
   openGraph: {
