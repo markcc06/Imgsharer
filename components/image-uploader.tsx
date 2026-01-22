@@ -217,6 +217,7 @@ export function ImageUploader({
   const [isProcessing, setIsProcessing] = useState(false)
   const [fileName, setFileName] = useState<string>("")
   const [progress, setProgress] = useState(0)
+  const [imageSizeKb, setImageSizeKb] = useState<number>(0)
   const abortControllerRef = useRef<AbortController | null>(null)
   const fakeIntervalRef = useRef<number | null>(null)
   const [isRateLimited, setIsRateLimited] = useState(false)
@@ -224,8 +225,67 @@ export function ImageUploader({
   const [scale, setScale] = useState<number>(4)
   const [faceEnhance, setFaceEnhance] = useState<boolean>(true)
   const [isFakeMode, setIsFakeMode] = useState(false)
+  const [userType, setUserType] = useState<"free" | "pro" | "unknown">("unknown")
+  const sessionIdRef = useRef<string | null>(null)
   const { toast } = useToast()
   const { close: closeModal, pendingWallpaper } = useUploadUI()
+
+  const getOrCreateSessionId = useCallback(() => {
+    if (typeof window === "undefined") return null
+    const KEY = "imgsharer_session_id"
+    const existing = window.sessionStorage?.getItem(KEY)
+    if (existing) return existing
+    const array = new Uint8Array(16)
+    if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+      crypto.getRandomValues(array)
+    } else {
+      for (let i = 0; i < array.length; i++) {
+        array[i] = Math.floor(Math.random() * 256)
+      }
+    }
+    const id = Array.from(array)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+    window.sessionStorage?.setItem(KEY, id)
+    return id
+  }, [])
+
+  useEffect(() => {
+    sessionIdRef.current = getOrCreateSessionId()
+    if (typeof window !== "undefined") {
+      const storedType = window.localStorage?.getItem("pro_status") || window.localStorage?.getItem("user_type")
+      if (storedType === "pro") {
+        setUserType("pro")
+      } else if (storedType === "free") {
+        setUserType("free")
+      } else {
+        setUserType("free")
+      }
+    }
+  }, [getOrCreateSessionId])
+
+  const trackUpscaleFactor = useCallback(
+    (nextScale: number) => {
+      try {
+        if (typeof window === "undefined") return
+        const gtagFn = (window as any).gtag
+        if (typeof gtagFn !== "function") return
+        const sessionId = sessionIdRef.current ?? getOrCreateSessionId()
+        sessionIdRef.current = sessionId
+        gtagFn("event", "upscale_factor_selected", {
+          factor: `${nextScale}x`,
+          user_type: userType,
+          enhance_faces: !!faceEnhance,
+          image_size_kb: imageSizeKb || 0,
+          session_id: sessionId || undefined,
+          timestamp: Date.now(),
+        })
+      } catch (error) {
+        console.warn("[tracking] upscale_factor_selected failed", error)
+      }
+    },
+    [faceEnhance, getOrCreateSessionId, imageSizeKb, userType],
+  )
 
   useEffect(() => {
     if (initialImage) {
@@ -235,6 +295,7 @@ export function ImageUploader({
       }
       setOriginalImage(initialImage.image)
       setFileName(initialImage.fileName)
+      setImageSizeKb(0)
       setSharpenedImage(null)
       setIsProcessing(false)
       setProgress(0)
@@ -245,6 +306,7 @@ export function ImageUploader({
       setOriginalImage(null)
       setSharpenedImage(null)
       setFileName("")
+      setImageSizeKb(0)
       setIsProcessing(false)
       setProgress(0)
     }
@@ -283,6 +345,7 @@ export function ImageUploader({
     setSharpenedImage(null)
     // Use the configured downloadName so filenames stay consistent (e.g. snow-aesthetic-01.png)
     setFileName(pendingWallpaper.downloadName || "wallpaper-4k.png")
+    setImageSizeKb(0)
     setProgress(0)
     setIsProcessing(true)
 
@@ -331,12 +394,13 @@ export function ImageUploader({
       const reader = new FileReader()
       reader.onload = (e) => {
         setOriginalImage(e.target?.result as string)
-        setSharpenedImage(null)
-      }
-      reader.readAsDataURL(file)
-    },
-    [toast],
-  )
+      setSharpenedImage(null)
+      setImageSizeKb(Math.round(file.size / 1024))
+    }
+    reader.readAsDataURL(file)
+  },
+  [toast],
+)
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -350,6 +414,11 @@ export function ImageUploader({
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) handleFileSelect(file)
+  }
+
+  const handleScaleSelect = (nextScale: number) => {
+    setScale(nextScale)
+    trackUpscaleFactor(nextScale)
   }
 
   const handleSharpen = async () => {
@@ -516,6 +585,7 @@ export function ImageUploader({
     setOriginalImage(null)
     setSharpenedImage(null)
     setFileName("")
+    setImageSizeKb(0)
     setProgress(0)
     setIsProcessing(false)
     setIsFakeMode(false)
@@ -637,7 +707,7 @@ export function ImageUploader({
                     {[2, 4, 6, 8].map((s) => (
                       <button
                         key={s}
-                        onClick={() => setScale(s)}
+                        onClick={() => handleScaleSelect(s)}
                         className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                           scale === s
                             ? "bg-gradient-to-r from-brand-primary to-brand-primary-light text-white shadow-md"
