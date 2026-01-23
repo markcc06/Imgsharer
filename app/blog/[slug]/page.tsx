@@ -18,14 +18,21 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     }
   }
 
+  const baseUrl = siteConfig.siteUrl.replace(/\/$/, "")
+  const canonicalUrl = `${baseUrl}/blog/${params.slug}`
+
   return {
     title: post.title.en,
     description: post.metaDescription.en,
     keywords: post.keywords.join(", "),
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title: post.title.en,
       description: post.metaDescription.en,
       type: "article",
+      url: canonicalUrl,
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt ?? post.publishedAt,
       authors: [siteConfig.brandName],
