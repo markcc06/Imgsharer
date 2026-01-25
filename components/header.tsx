@@ -30,6 +30,7 @@ function SparklesIcon() {
 const navLinks = [
   { href: "/faq", label: "FAQ" },
   { href: "/blog", label: "Blog" },
+  { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },
   { href: "/christmas-wallpaper", label: "Christmas Wallpaper" },
   { href: "/contact", label: "Contact" },

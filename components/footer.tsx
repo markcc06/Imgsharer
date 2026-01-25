@@ -46,6 +46,15 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li>
                 <Link
+                  href="/pricing"
+                  title="Pricing — plans and features"
+                  className="text-[#555555] hover:text-[#ff7959] hover:underline transition-colors"
+                >
+                  Pricing
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/faq"
                   title="FAQ — AI image sharpener help center"
                   className="text-[#555555] hover:text-[#ff7959] hover:underline transition-colors"

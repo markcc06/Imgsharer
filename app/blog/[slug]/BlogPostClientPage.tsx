@@ -4,7 +4,7 @@ import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
 import { ArticleLayout } from "@/components/ArticleLayout"
 import { buildArticleJsonLd } from "@/lib/seo"
-import type { BlogPost } from "@/lib/blog-data"
+import type { BlogPost, RawBlogPost } from "@/lib/blog-data"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
@@ -21,7 +21,18 @@ export default function BlogPostClientPage({ post, params, relatedPosts }: BlogP
 
   const publishedIso = post.publishedAt
   const updatedIso = post.updatedAt ?? post.publishedAt
-  const articleJsonLd = buildArticleJsonLd(post, publishedIso, updatedIso)
+  const seoPost: RawBlogPost = {
+    slug: post.slug,
+    title: post.title,
+    publishedAt: post.publishedAt,
+    updatedAt: post.updatedAt ?? undefined,
+    category: post.category,
+    keywords: post.keywords,
+    metaDescription: post.metaDescription,
+    body: post.body,
+    cta: post.cta,
+  }
+  const articleJsonLd = buildArticleJsonLd(seoPost, publishedIso, updatedIso)
 
   return (
     <main className="min-h-screen flex flex-col">

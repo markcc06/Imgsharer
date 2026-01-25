@@ -1,6 +1,9 @@
+import sharp from "sharp"
+import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 import { checkRateLimit, checkDailyRateLimit, getRateLimitIdentifier } from "@/lib/rate-limit"
 import { RATE_LIMIT_PER_MINUTE, RATE_LIMIT_PER_DAY } from "@/lib/constants"
+import { getEarlyBirdSold, getEntitlementByInstallId, getPriceConfig } from "@/lib/entitlements"
 
 console.log("[SERVER] Sharpen route module loading...")
 
@@ -9,6 +12,7 @@ export const dynamic = "force-dynamic"
 export const maxDuration = 60
 
 const MAX_UPLOAD = 8_000_000 // 8MB
+const INSTALL_COOKIE = "install_id"
 
 function arrayBufferToBase64(buffer: ArrayBuffer) {
   const bytes = new Uint8Array(buffer)
@@ -19,6 +23,38 @@ function arrayBufferToBase64(buffer: ArrayBuffer) {
     binary += String.fromCharCode(...chunk)
   }
   return btoa(binary)
+}
+
+function getInstallId(request: NextRequest) {
+  const header = request.headers.get("x-install-id")?.trim()
+  if (header) return header
+  const cookieStore = cookies()
+  const existing = cookieStore.get(INSTALL_COOKIE)?.value
+  if (existing) return existing
+  return null
+}
+
+async function addWatermark(buffer: Buffer) {
+  try {
+    const metadata = await sharp(buffer).metadata()
+    const width = metadata.width || 1200
+    const fontSize = Math.max(18, Math.round(width * 0.025))
+    const padding = Math.max(12, Math.round(width * 0.01))
+    const svg = Buffer.from(`
+      <svg width="${width}" height="${metadata.height || 800}" xmlns="http://www.w3.org/2000/svg">
+        <style>
+          .label { fill: rgba(255,255,255,0.9); font-size: ${fontSize}px; font-family: "Helvetica Neue", Arial, sans-serif; }
+          .bg { fill: rgba(0,0,0,0.35); }
+        </style>
+        <rect x="${width - 360 - padding}" y="${(metadata.height || 800) - fontSize - padding * 2}" rx="${padding}" ry="${padding}" width="360" height="${fontSize + padding * 2}" class="bg"/>
+        <text x="${width - 330}" y="${(metadata.height || 800) - padding - Math.round(fontSize * 0.2)}" class="label">Sharpened by Imgsharer</text>
+      </svg>
+    `)
+    return sharp(buffer).composite([{ input: svg, gravity: "southeast" }]).jpeg({ quality: 92 }).toBuffer()
+  } catch (error) {
+    console.warn("[SERVER] Watermark failed, returning original", error)
+    return buffer
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -35,30 +71,54 @@ export async function POST(request: NextRequest) {
     }
 
     const identifier = getRateLimitIdentifier(request)
-    console.log("[SERVER] Rate limit identifier:", identifier)
+    const installId = getInstallId(request)
+    const cookieStore = cookies()
+    const entitlement = installId ? await getEntitlementByInstallId(installId) : null
+
+    const attachInstallCookie = (res: NextResponse) => {
+      if (installId && !cookieStore.get(INSTALL_COOKIE)) {
+        res.cookies.set(INSTALL_COOKIE, installId, {
+          httpOnly: false,
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 365,
+        })
+      }
+      return res
+    }
+
+    console.log("[SERVER] Rate limit identifier:", identifier, "installId:", installId)
 
     const minuteLimit = checkRateLimit(identifier, RATE_LIMIT_PER_MINUTE, 60 * 1000)
     if (!minuteLimit.allowed) {
       console.log("[SERVER] Rate limit exceeded (per minute)")
-      return NextResponse.json(
-        {
-          error: "Rate limit exceeded. Please try again in a minute.",
-          resetAt: minuteLimit.resetAt,
-        },
-        { status: 429 },
+      return attachInstallCookie(
+        NextResponse.json(
+          {
+            error: "Rate limit exceeded. Please try again in a minute.",
+            resetAt: minuteLimit.resetAt,
+          },
+          { status: 429 },
+        ),
       )
     }
 
-    const dailyLimit = checkDailyRateLimit(identifier, RATE_LIMIT_PER_DAY)
-    if (!dailyLimit.allowed) {
-      console.log("[SERVER] Rate limit exceeded (daily)")
-      return NextResponse.json(
-        {
-          error: "Daily rate limit exceeded. Please try again tomorrow.",
-          resetAt: dailyLimit.resetAt,
-        },
-        { status: 429 },
-      )
+    let dailyLimit = { allowed: true, remaining: RATE_LIMIT_PER_DAY, resetAt: 0 }
+    if (!entitlement) {
+      dailyLimit = checkDailyRateLimit(identifier, RATE_LIMIT_PER_DAY)
+      if (!dailyLimit.allowed) {
+        console.log("[SERVER] Rate limit exceeded (daily)")
+        return attachInstallCookie(
+          NextResponse.json(
+            {
+              error: "Daily rate limit exceeded. Please try again tomorrow.",
+              resetAt: dailyLimit.resetAt,
+            },
+            { status: 429 },
+          ),
+        )
+      }
     }
 
     console.log("[SERVER] Parsing form data...")
@@ -72,17 +132,37 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       console.error("[SERVER] No image in request")
-      return NextResponse.json({ error: "No image" }, { status: 400 })
+      return attachInstallCookie(NextResponse.json({ error: "No image" }, { status: 400 }))
     }
 
     if (file.size > MAX_UPLOAD) {
       console.error("[SERVER] File too large:", file.size)
-      return NextResponse.json(
-        {
-          error: `Payload too large (${file.size} bytes > ${MAX_UPLOAD} bytes)`,
-        },
-        { status: 413 },
+      return attachInstallCookie(
+        NextResponse.json(
+          {
+            error: `Payload too large (${file.size} bytes > ${MAX_UPLOAD} bytes)`,
+          },
+          { status: 413 },
+        ),
       )
+    }
+
+    if (scale > 4) {
+      if (!entitlement) {
+        const priceConfig = getPriceConfig()
+        const earlyBirdSold = await getEarlyBirdSold().catch(() => 0)
+        return attachInstallCookie(
+          NextResponse.json(
+            {
+              error: "pro_required",
+              message: "6x/8x upscaling is available for Pro plans. Please upgrade to continue.",
+              prices: priceConfig,
+              earlyBirdSold,
+            },
+            { status: 402 },
+          ),
+        )
+      }
     }
 
     const arrayBuffer = await file.arrayBuffer()
@@ -114,7 +194,7 @@ export async function POST(request: NextRequest) {
     if (!createRes.ok) {
       const errorText = await createRes.text()
       console.error("[SERVER] Replicate create error:", errorText)
-      return NextResponse.json({ error: errorText }, { status: createRes.status })
+      return attachInstallCookie(NextResponse.json({ error: errorText }, { status: createRes.status }))
     }
 
     const prediction = await createRes.json()
@@ -137,7 +217,7 @@ export async function POST(request: NextRequest) {
       if (!pollRes.ok) {
         const errorText = await pollRes.text()
         console.error("[SERVER] Replicate poll error:", errorText)
-        return NextResponse.json({ error: errorText }, { status: pollRes.status })
+        return attachInstallCookie(NextResponse.json({ error: errorText }, { status: pollRes.status }))
       }
 
       finalPrediction = await pollRes.json()
@@ -146,12 +226,14 @@ export async function POST(request: NextRequest) {
 
     if (finalPrediction.status === "failed") {
       console.error("[SERVER] Prediction failed:", finalPrediction.error)
-      return NextResponse.json({ error: finalPrediction.error || "Prediction failed" }, { status: 500 })
+      return attachInstallCookie(
+        NextResponse.json({ error: finalPrediction.error || "Prediction failed" }, { status: 500 }),
+      )
     }
 
     if (finalPrediction.status !== "succeeded") {
       console.error("[SERVER] Prediction timeout")
-      return NextResponse.json({ error: "Processing timeout" }, { status: 504 })
+      return attachInstallCookie(NextResponse.json({ error: "Processing timeout" }, { status: 504 }))
     }
 
     const out = finalPrediction.output as any
@@ -163,7 +245,7 @@ export async function POST(request: NextRequest) {
 
     if (!imageUrl) {
       console.error("[SERVER] No image URL in prediction.output:", out)
-      return NextResponse.json({ error: "No output image URL" }, { status: 502 })
+      return attachInstallCookie(NextResponse.json({ error: "No output image URL" }, { status: 502 }))
     }
 
     console.log("[SERVER] Fetching image from Replicate URL:", imageUrl)
@@ -171,21 +253,25 @@ export async function POST(request: NextRequest) {
     const imageResponse = await fetch(imageUrl)
     if (!imageResponse.ok) {
       console.error("[SERVER] Failed to fetch image from Replicate:", imageResponse.status)
-      return NextResponse.json({ error: "Failed to download processed image" }, { status: 502 })
+      return attachInstallCookie(NextResponse.json({ error: "Failed to download processed image" }, { status: 502 }))
     }
 
-    const imageBuffer = await imageResponse.arrayBuffer()
-    const imageBase64 = arrayBufferToBase64(imageBuffer)
+    const downloaded = Buffer.from(await imageResponse.arrayBuffer())
+    const finalBuffer = entitlement ? downloaded : await addWatermark(downloaded)
+    const imageBase64 = finalBuffer.toString("base64")
     console.log("[SERVER] Image downloaded and converted to base64, size:", imageBase64.length, "chars")
 
-    return NextResponse.json({
-      imageBase64,
-      remaining: dailyLimit.remaining,
-    })
+    return attachInstallCookie(
+      NextResponse.json({
+        imageBase64,
+        remaining: entitlement ? null : dailyLimit.remaining,
+      }),
+    )
   } catch (err: any) {
     console.error("[SERVER] Caught error:", err?.message)
     console.error("[SERVER] Error stack:", err?.stack)
-    return NextResponse.json({ error: err?.message || "Internal server error" }, { status: 500 })
+    const response = NextResponse.json({ error: err?.message || "Internal server error" }, { status: 500 })
+    return response
   }
 }
 

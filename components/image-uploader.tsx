@@ -2,15 +2,18 @@
 
 import type React from "react"
 import { useState, useRef, useCallback, useEffect } from "react"
+import { initializePaddle, Paddle } from "@paddle/paddle-js"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { BeforeAfterSlider } from "@/components/before-after-slider"
 import { BlurPanel } from "@/components/blur-panel"
 import { Reveal } from "@/components/reveal"
+import { ToastAction } from "@/components/ui/toast"
 import { useUploadUI } from "@/lib/stores/upload-ui"
 import { REPLICATE_MAX_DIMENSION, REPLICATE_MAX_DIMENSION_PAID, STABILITY_DIM_MULTIPLE } from "@/lib/constants"
 import { publishHeroUpdate } from "@/lib/hero-bus"
 import { getToolUploadLimits, getToolApiEndpoint } from "@/lib/tool-pipeline"
+import { siteConfig } from "@/config/siteConfig"
 
 import Pica from "pica"
 
@@ -76,6 +79,9 @@ function DownloadIcon({ className }: { className?: string }) {
 
 const uploadLimits = getToolUploadLimits()
 const apiEndpoint = getToolApiEndpoint()
+const paddleEnv = (process.env.NEXT_PUBLIC_PADDLE_ENV as "sandbox" | "production" | undefined) ?? "production"
+const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
+const EARLY_BIRD_LIMIT = 50
 
 function Loader2Icon({ className }: { className?: string }) {
   return (
@@ -218,6 +224,10 @@ export function ImageUploader({
   const [fileName, setFileName] = useState<string>("")
   const [progress, setProgress] = useState(0)
   const [imageSizeKb, setImageSizeKb] = useState<number>(0)
+  const [entitlement, setEntitlement] = useState<any>(null)
+  const [earlyBirdSold, setEarlyBirdSold] = useState<number>(0)
+  const [priceIds, setPriceIds] = useState<{ earlyBirdPriceId?: string | null; standardPriceId?: string | null }>({})
+  const [paddle, setPaddle] = useState<Paddle | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const fakeIntervalRef = useRef<number | null>(null)
   const [isRateLimited, setIsRateLimited] = useState(false)
@@ -227,6 +237,7 @@ export function ImageUploader({
   const [isFakeMode, setIsFakeMode] = useState(false)
   const [userType, setUserType] = useState<"free" | "pro" | "unknown">("unknown")
   const sessionIdRef = useRef<string | null>(null)
+  const installIdRef = useRef<string | null>(null)
   const { toast } = useToast()
   const { close: closeModal, pendingWallpaper } = useUploadUI()
 
@@ -250,8 +261,30 @@ export function ImageUploader({
     return id
   }, [])
 
+  const getOrCreateInstallId = useCallback(() => {
+    if (typeof window === "undefined") return null
+    const KEY = "imgsharer_install_id"
+    const existing = window.localStorage?.getItem(KEY)
+    if (existing) return existing
+    const array = new Uint8Array(16)
+    if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+      crypto.getRandomValues(array)
+    } else {
+      for (let i = 0; i < array.length; i++) {
+        array[i] = Math.floor(Math.random() * 256)
+      }
+    }
+    const id = Array.from(array)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+    window.localStorage?.setItem(KEY, id)
+    return id
+  }, [])
+
   useEffect(() => {
     sessionIdRef.current = getOrCreateSessionId()
+    installIdRef.current = getOrCreateInstallId()
+
     if (typeof window !== "undefined") {
       const storedType = window.localStorage?.getItem("pro_status") || window.localStorage?.getItem("user_type")
       if (storedType === "pro") {
@@ -262,7 +295,59 @@ export function ImageUploader({
         setUserType("free")
       }
     }
-  }, [getOrCreateSessionId])
+
+    if (paddleToken) {
+      initializePaddle({
+        token: paddleToken,
+        environment: paddleEnv,
+      })
+        .then((instance) => {
+          setPaddle(instance ?? null)
+        })
+        .catch((error) => {
+          console.warn("[paddle] init failed", error)
+          setPaddle(null)
+        })
+    }
+  }, [getOrCreateInstallId, getOrCreateSessionId])
+
+  useEffect(() => {
+    const installId = installIdRef.current
+    if (!installId) return
+    const controller = new AbortController()
+
+    const load = async () => {
+      try {
+        const res = await fetch("/api/entitlement", {
+          headers: {
+            "x-install-id": installId,
+          },
+          signal: controller.signal,
+        })
+        if (!res.ok) return
+        const data = await res.json()
+        if (data?.entitlement) {
+          setEntitlement(data.entitlement)
+          setUserType("pro")
+        }
+        if (typeof data?.earlyBirdSold === "number") {
+          setEarlyBirdSold(data.earlyBirdSold)
+        }
+        if (data?.prices) {
+          setPriceIds({
+            earlyBirdPriceId: data.prices.earlyBirdPriceId,
+            standardPriceId: data.prices.standardPriceId,
+          })
+        }
+      } catch (error) {
+        if ((error as Error)?.name === "AbortError") return
+        console.warn("[entitlement] fetch failed", error)
+      }
+    }
+
+    load()
+    return () => controller.abort()
+  }, [])
 
   const trackUpscaleFactor = useCallback(
     (nextScale: number) => {
@@ -286,6 +371,68 @@ export function ImageUploader({
     },
     [faceEnhance, getOrCreateSessionId, imageSizeKb, userType],
   )
+
+  const isPro = !!entitlement || userType === "pro"
+
+  const earlyBirdAvailable = priceIds?.earlyBirdPriceId && earlyBirdSold < EARLY_BIRD_LIMIT
+
+  const openCheckout = useCallback(
+    (preferEarlyBird = true) => {
+      const installId = installIdRef.current || getOrCreateInstallId()
+      installIdRef.current = installId
+      const targetPriceId =
+        (preferEarlyBird && earlyBirdAvailable && priceIds?.earlyBirdPriceId) || priceIds?.standardPriceId
+
+      if (!targetPriceId) {
+        toast({
+          title: "Upgrade unavailable",
+          description: "Price configuration is missing. Please try again later.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      if (!paddle || !paddleToken) {
+        toast({
+          title: "Checkout not ready",
+          description: "Please wait a moment and try again.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      paddle.Checkout.open({
+        items: [
+          {
+            priceId: targetPriceId,
+            quantity: 1,
+          },
+        ],
+        customData: installId ? { installId } : undefined,
+        settings: {
+          displayMode: "overlay",
+          locale: "en",
+          theme: "light",
+          successUrl: siteConfig.siteUrl,
+        },
+      })
+    },
+    [earlyBirdAvailable, getOrCreateInstallId, paddle, priceIds?.earlyBirdPriceId, priceIds?.standardPriceId, toast],
+  )
+
+  const showPaywall = useCallback(() => {
+    toast({
+      title: "Upgrade for 6x/8x and no watermark",
+      description: earlyBirdAvailable
+        ? `Early Bird available (${EARLY_BIRD_LIMIT - earlyBirdSold} left). Unlock Pro now.`
+        : "Upgrade to Pro to unlock higher upscaling.",
+      action: (
+        <ToastAction altText="Upgrade" onClick={() => openCheckout(true)}>
+          Upgrade
+        </ToastAction>
+      ),
+    })
+  }, [earlyBirdAvailable, earlyBirdSold, openCheckout, toast])
 
   useEffect(() => {
     if (initialImage) {
@@ -417,6 +564,11 @@ export function ImageUploader({
   }
 
   const handleScaleSelect = (nextScale: number) => {
+    if (nextScale > 4 && !isPro) {
+      showPaywall()
+      trackUpscaleFactor(nextScale)
+      return
+    }
     setScale(nextScale)
     trackUpscaleFactor(nextScale)
   }
@@ -427,6 +579,11 @@ export function ImageUploader({
     }
 
     if (!originalImage) return
+
+    if (scale > 4 && !isPro) {
+      showPaywall()
+      return
+    }
 
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
@@ -466,10 +623,16 @@ export function ImageUploader({
       }, 1000)
 
       console.log("[v0] Calling fetch...")
+      const headers: Record<string, string> = {}
+      if (installIdRef.current) {
+        headers["x-install-id"] = installIdRef.current
+      }
+
       const apiResponse = await fetch(apiEndpoint, {
         method: "POST",
         body: formData,
         signal: controller.signal,
+        headers,
       })
 
       console.log("[v0] Fetch completed, status:", apiResponse.status)
@@ -499,6 +662,20 @@ export function ImageUploader({
       console.log("[v0] Parsing response JSON...")
       const data = await apiResponse.json()
       console.log("[v0] Response data:", data)
+
+      if (apiResponse.status === 402 && data?.error === "pro_required") {
+        if (typeof data?.earlyBirdSold === "number") {
+          setEarlyBirdSold(data.earlyBirdSold)
+        }
+        if (data?.prices) {
+          setPriceIds({
+            earlyBirdPriceId: data.prices.earlyBirdPriceId,
+            standardPriceId: data.prices.standardPriceId,
+          })
+        }
+        showPaywall()
+        return
+      }
 
       if (!apiResponse.ok) {
         const errorMessage = data?.error || `Sharpen failed: ${apiResponse.status}`
