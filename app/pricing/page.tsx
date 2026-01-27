@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 import { siteConfig } from "@/config/siteConfig"
 import PricingClientPage from "./pricing-client-page"
 
@@ -23,5 +24,9 @@ export const metadata: Metadata = {
 }
 
 export default function PricingPage() {
-  return <PricingClientPage />
+  return (
+    <Suspense fallback={null}>
+      <PricingClientPage />
+    </Suspense>
+  )
 }
