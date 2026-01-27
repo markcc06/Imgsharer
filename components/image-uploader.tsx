@@ -8,12 +8,20 @@ import { useToast } from "@/hooks/use-toast"
 import { BeforeAfterSlider } from "@/components/before-after-slider"
 import { BlurPanel } from "@/components/blur-panel"
 import { Reveal } from "@/components/reveal"
-import { ToastAction } from "@/components/ui/toast"
 import { useUploadUI } from "@/lib/stores/upload-ui"
 import { REPLICATE_MAX_DIMENSION, REPLICATE_MAX_DIMENSION_PAID, STABILITY_DIM_MULTIPLE } from "@/lib/constants"
 import { publishHeroUpdate } from "@/lib/hero-bus"
 import { getToolUploadLimits, getToolApiEndpoint } from "@/lib/tool-pipeline"
 import { siteConfig } from "@/config/siteConfig"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 import Pica from "pica"
 
@@ -81,6 +89,7 @@ const uploadLimits = getToolUploadLimits()
 const apiEndpoint = getToolApiEndpoint()
 const paddleEnv = (process.env.NEXT_PUBLIC_PADDLE_ENV as "sandbox" | "production" | undefined) ?? "production"
 const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
+const pricingToken = process.env.NEXT_PUBLIC_PRICING_TOKEN ?? "prc-9b8f4c1d"
 const EARLY_BIRD_LIMIT = 50
 
 function Loader2Icon({ className }: { className?: string }) {
@@ -233,9 +242,12 @@ export function ImageUploader({
   const [isRateLimited, setIsRateLimited] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [scale, setScale] = useState<number>(4)
+  const [blockedHighScale, setBlockedHighScale] = useState(false)
   const [faceEnhance, setFaceEnhance] = useState<boolean>(true)
   const [isFakeMode, setIsFakeMode] = useState(false)
   const [userType, setUserType] = useState<"free" | "pro" | "unknown">("unknown")
+  const [showPaywallModal, setShowPaywallModal] = useState(false)
+  const [hasPricingAccess, setHasPricingAccess] = useState(false)
   const sessionIdRef = useRef<string | null>(null)
   const installIdRef = useRef<string | null>(null)
   const { toast } = useToast()
@@ -284,6 +296,11 @@ export function ImageUploader({
   useEffect(() => {
     sessionIdRef.current = getOrCreateSessionId()
     installIdRef.current = getOrCreateInstallId()
+
+    if (typeof window !== "undefined") {
+      const storedToken = window.sessionStorage?.getItem("pricing_access_token")
+      setHasPricingAccess(!!storedToken && storedToken === pricingToken)
+    }
 
     if (typeof window !== "undefined") {
       const storedType = window.localStorage?.getItem("pro_status") || window.localStorage?.getItem("user_type")
@@ -378,6 +395,14 @@ export function ImageUploader({
 
   const openCheckout = useCallback(
     (preferEarlyBird = true) => {
+      if (!hasPricingAccess) {
+        toast({
+          title: "Upgrade restricted",
+          description: "Checkout is limited to authorized testing links.",
+          variant: "destructive",
+        })
+        return
+      }
       const installId = installIdRef.current || getOrCreateInstallId()
       installIdRef.current = installId
       const targetPriceId =
@@ -417,22 +442,26 @@ export function ImageUploader({
         },
       })
     },
-    [earlyBirdAvailable, getOrCreateInstallId, paddle, priceIds?.earlyBirdPriceId, priceIds?.standardPriceId, toast],
+    [earlyBirdAvailable, getOrCreateInstallId, hasPricingAccess, paddle, priceIds?.earlyBirdPriceId, priceIds?.standardPriceId, toast],
   )
 
-  const showPaywall = useCallback(() => {
-    toast({
-      title: "Upgrade for 6x/8x and no watermark",
-      description: earlyBirdAvailable
-        ? `Early Bird available (${EARLY_BIRD_LIMIT - earlyBirdSold} left). Unlock Pro now.`
-        : "Upgrade to Pro to unlock higher upscaling.",
-      action: (
-        <ToastAction altText="Upgrade" onClick={() => openCheckout(true)}>
-          Upgrade
-        </ToastAction>
-      ),
-    })
-  }, [earlyBirdAvailable, earlyBirdSold, openCheckout, toast])
+  const showPaywall = useCallback(
+    (options?: { blockHighScale?: boolean }) => {
+      if (!hasPricingAccess) {
+        toast({
+          title: "Upgrade unavailable",
+          description: "Access this feature via the authorized pricing link.",
+          variant: "destructive",
+        })
+        return
+      }
+      if (options?.blockHighScale) {
+        setBlockedHighScale(true)
+      }
+      setShowPaywallModal(true)
+    },
+    [hasPricingAccess, toast],
+  )
 
   useEffect(() => {
     if (initialImage) {
@@ -541,13 +570,13 @@ export function ImageUploader({
       const reader = new FileReader()
       reader.onload = (e) => {
         setOriginalImage(e.target?.result as string)
-      setSharpenedImage(null)
-      setImageSizeKb(Math.round(file.size / 1024))
-    }
-    reader.readAsDataURL(file)
-  },
-  [toast],
-)
+        setSharpenedImage(null)
+        setImageSizeKb(Math.round(file.size / 1024))
+      }
+      reader.readAsDataURL(file)
+    },
+    [toast],
+  )
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -565,10 +594,12 @@ export function ImageUploader({
 
   const handleScaleSelect = (nextScale: number) => {
     if (nextScale > 4 && !isPro) {
-      showPaywall()
+      setBlockedHighScale(true)
+      showPaywall({ blockHighScale: true })
       trackUpscaleFactor(nextScale)
       return
     }
+    setBlockedHighScale(false)
     setScale(nextScale)
     trackUpscaleFactor(nextScale)
   }
@@ -580,8 +611,8 @@ export function ImageUploader({
 
     if (!originalImage) return
 
-    if (scale > 4 && !isPro) {
-      showPaywall()
+    if (!isPro && (scale > 4 || blockedHighScale)) {
+      showPaywall({ blockHighScale: true })
       return
     }
 
@@ -773,176 +804,228 @@ export function ImageUploader({
   }
 
   return (
-    <Reveal>
-      <div className="space-y-8">
-        {!originalImage ? (
-          <BlurPanel className="p-8 lg:p-12 bg-white/40 backdrop-blur-md grain-texture border border-white/30">
-            <div
-              onDrop={handleDrop}
-              onDragOver={(e) => e.preventDefault()}
-              className="text-center cursor-pointer"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <div className="flex flex-col items-center gap-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-brand-primary/10 to-brand-primary-light/10 flex items-center justify-center border border-brand-primary/20 transition-transform hover:scale-105">
-                  <UploadIcon className="w-10 h-10 text-brand-primary" />
+    <>
+      <Reveal>
+        <div className="space-y-8">
+          {!originalImage ? (
+            <BlurPanel className="p-8 lg:p-12 bg-white/40 backdrop-blur-md grain-texture border border-white/30">
+              <div
+                onDrop={handleDrop}
+                onDragOver={(e) => e.preventDefault()}
+                className="text-center cursor-pointer"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <div className="flex flex-col items-center gap-6">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-brand-primary/10 to-brand-primary-light/10 flex items-center justify-center border border-brand-primary/20 transition-transform hover:scale-105">
+                    <UploadIcon className="w-10 h-10 text-brand-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xl font-semibold text-neutral-900 mb-2">
+                      Drop your image here, or click to browse
+                    </p>
+                    <p className="text-sm text-neutral-600">
+                      Supports {uploadLimits.allowedMimeTypes.map((type) => type.split("/")[1].toUpperCase()).join(", ")} up to{" "}
+                      {uploadLimits.maxFileSizeMb}MB
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xl font-semibold text-neutral-900 mb-2">
-                    Drop your image here, or click to browse
-                  </p>
-                  <p className="text-sm text-neutral-600">
-                    Supports {uploadLimits.allowedMimeTypes.map((type) => type.split("/")[1].toUpperCase()).join(", ")} up to{" "}
-                    {uploadLimits.maxFileSizeMb}MB
-                  </p>
-                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept={uploadLimits.allowedMimeTypes.join(",")}
+                  onChange={handleFileInput}
+                  className="hidden"
+                />
               </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept={uploadLimits.allowedMimeTypes.join(",")}
-                onChange={handleFileInput}
-                className="hidden"
-              />
-            </div>
-          </BlurPanel>
-        ) : (
-          <div className="space-y-6">
-            {sharpenedImage ? (
-              <BlurPanel className="p-8 lg:p-12 bg-white/40 backdrop-blur-md grain-texture border border-white/30">
-                <div className="mb-8">
-                  <h3 className="text-3xl font-bold text-neutral-900">Before & After</h3>
-                </div>
-                <BeforeAfterSlider beforeImage={originalImage} afterImage={sharpenedImage} />
-                <div
-                  className={
-                    isFakeMode
-                      ? "mt-8 flex justify-center"
-                      : "flex gap-3 mt-8"
-                  }
-                >
-                  <Button
-                    onClick={handleDownload}
-                    className="flex-1 md:flex-none min-w-[12rem] bg-gradient-to-r from-brand-primary to-brand-primary-light hover:from-brand-primary/90 hover:to-brand-primary-light/90 text-white rounded-full py-6 font-medium shadow-lg shadow-brand-primary/25"
+            </BlurPanel>
+          ) : (
+            <div className="space-y-6">
+              {sharpenedImage ? (
+                <BlurPanel className="p-8 lg:p-12 bg-white/40 backdrop-blur-md grain-texture border border-white/30">
+                  <div className="mb-8">
+                    <h3 className="text-3xl font-bold text-neutral-900">Before & After</h3>
+                  </div>
+                  <BeforeAfterSlider beforeImage={originalImage} afterImage={sharpenedImage} />
+                  <div
+                    className={
+                      isFakeMode
+                        ? "mt-8 flex justify-center"
+                        : "flex gap-3 mt-8"
+                    }
                   >
-                    <DownloadIcon className="w-4 h-4 mr-2" />
-                    {isFakeMode ? "Download 4K" : "Download Sharpened"}
-                  </Button>
-                  {!isFakeMode && (
                     <Button
-                      onClick={handleReset}
-                      variant="outline"
-                      className="rounded-full px-8 py-6 border-neutral-300 hover:bg-neutral-900/5 bg-white/60 backdrop-blur-sm"
+                      onClick={handleDownload}
+                      className="flex-1 md:flex-none min-w-[12rem] bg-gradient-to-r from-brand-primary to-brand-primary-light hover:from-brand-primary/90 hover:to-brand-primary-light/90 text-white rounded-full py-6 font-medium shadow-lg shadow-brand-primary/25"
                     >
-                      Upload New
+                      <DownloadIcon className="w-4 h-4 mr-2" />
+                      {isFakeMode ? "Download 4K" : "Download Sharpened"}
                     </Button>
-                  )}
-                </div>
-              </BlurPanel>
-            ) : isFakeMode ? (
-              <BlurPanel className="p-8 lg:p-12 bg-white/40 backdrop-blur-md grain-texture border border-white/30">
-                <div className="mb-6">
-                  <h3 className="text-3xl font-bold text-neutral-900">Upscaling to 4K...</h3>
-                  <p className="mt-2 text-sm text-neutral-600">
-                    We’re preparing a high-resolution version of this wallpaper.
-                  </p>
-                </div>
-                <div className="relative aspect-video rounded-xl overflow-hidden bg-neutral-100 mb-6">
-                  <img
-                    src={originalImage || "/placeholder.svg"}
-                    alt="Original preview"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                {isProcessing && progress > 0 && (
-                  <div className="mt-2">
-                    <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-brand-primary to-brand-primary-light transition-all duration-300"
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-              </BlurPanel>
-            ) : (
-              <BlurPanel className="p-8 lg:p-12 bg-white/40 backdrop-blur-md grain-texture border border-white/30">
-                <div className="mb-8">
-                  <h3 className="text-3xl font-bold text-neutral-900">Preview</h3>
-                </div>
-                <div className="relative aspect-video rounded-xl overflow-hidden bg-neutral-100 mb-6">
-                  <img
-                    src={originalImage || "/placeholder.svg"}
-                    alt="Original"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-
-                <div className="mb-6 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-neutral-200">
-                  <label className="block text-sm font-medium text-neutral-700 mb-3">Upscale Factor</label>
-                  <div className="flex gap-2">
-                    {[2, 4, 6, 8].map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => handleScaleSelect(s)}
-                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                          scale === s
-                            ? "bg-gradient-to-r from-brand-primary to-brand-primary-light text-white shadow-md"
-                            : "bg-white/80 text-neutral-700 hover:bg-white border border-neutral-200"
-                        }`}
+                    {!isFakeMode && (
+                      <Button
+                        onClick={handleReset}
+                        variant="outline"
+                        className="rounded-full px-8 py-6 border-neutral-300 hover:bg-neutral-900/5 bg-white/60 backdrop-blur-sm"
                       >
-                        {s}x
-                      </button>
-                    ))}
+                        Upload New
+                      </Button>
+                    )}
                   </div>
-                </div>
-
-                <div className="mb-6 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-neutral-200">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={faceEnhance}
-                      onChange={(e) => setFaceEnhance(e.target.checked)}
-                      className="w-4 h-4 rounded border-neutral-300 text-brand-primary focus:ring-brand-primary"
+                </BlurPanel>
+              ) : isFakeMode ? (
+                <BlurPanel className="p-8 lg:p-12 bg-white/40 backdrop-blur-md grain-texture border border-white/30">
+                  <div className="mb-6">
+                    <h3 className="text-3xl font-bold text-neutral-900">Upscaling to 4K...</h3>
+                    <p className="mt-2 text-sm text-neutral-600">
+                      We’re preparing a high-resolution version of this wallpaper.
+                    </p>
+                  </div>
+                  <div className="relative aspect-video rounded-xl overflow-hidden bg-neutral-100 mb-6">
+                    <img
+                      src={originalImage || "/placeholder.svg"}
+                      alt="Original preview"
+                      className="w-full h-full object-contain"
                     />
-                    <div>
-                      <span className="text-sm font-medium text-neutral-900">Enhance faces</span>
-                      <p className="text-xs text-neutral-600">Improves facial details in photos with people</p>
+                  </div>
+                  {isProcessing && progress > 0 && (
+                    <div className="mt-2">
+                      <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-brand-primary to-brand-primary-light transition-all duration-300"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
                     </div>
-                  </label>
-                </div>
+                  )}
+                </BlurPanel>
+              ) : (
+                <BlurPanel className="p-8 lg:p-12 bg-white/40 backdrop-blur-md grain-texture border border-white/30">
+                  <div className="mb-8">
+                    <h3 className="text-3xl font-bold text-neutral-900">Preview</h3>
+                  </div>
+                  <div className="relative aspect-video rounded-xl overflow-hidden bg-neutral-100 mb-6">
+                    <img
+                      src={originalImage || "/placeholder.svg"}
+                      alt="Original"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
 
-                {isProcessing && progress > 0 && (
-                  <div className="mb-4">
-                    <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-brand-primary to-brand-primary-light transition-all duration-300"
-                        style={{ width: `${progress}%` }}
-                      />
+                  <div className="mb-6 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-neutral-200">
+                    <label className="block text-sm font-medium text-neutral-700 mb-3">Upscale Factor</label>
+                    <div className="flex gap-2">
+                      {[2, 4, 6, 8].map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => handleScaleSelect(s)}
+                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            scale === s
+                              ? "bg-gradient-to-r from-brand-primary to-brand-primary-light text-white shadow-md"
+                              : "bg-white/80 text-neutral-700 hover:bg-white border border-neutral-200"
+                          }`}
+                        >
+                          {s}x
+                        </button>
+                      ))}
                     </div>
                   </div>
-                )}
-                <Button
-                  onClick={handleSharpen}
-                  disabled={isProcessing || isRateLimited}
-                  className="w-full bg-gradient-to-r from-brand-primary to-brand-primary-light hover:from-brand-primary/90 hover:to-brand-primary-light/90 text-white rounded-full py-6 font-medium shadow-lg shadow-brand-primary/25 disabled:opacity-50"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />
-                      Upscaling...
-                    </>
-                  ) : isRateLimited ? (
-                    "Rate Limited (wait 10s)"
-                  ) : (
-                    "Sharpen Image"
+
+                  <div className="mb-6 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-neutral-200">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={faceEnhance}
+                        onChange={(e) => setFaceEnhance(e.target.checked)}
+                        className="w-4 h-4 rounded border-neutral-300 text-brand-primary focus:ring-brand-primary"
+                      />
+                      <div>
+                        <span className="text-sm font-medium text-neutral-900">Enhance faces</span>
+                        <p className="text-xs text-neutral-600">Improves facial details in photos with people</p>
+                      </div>
+                    </label>
+                  </div>
+
+                  {isProcessing && progress > 0 && (
+                    <div className="mb-4">
+                      <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-brand-primary to-brand-primary-light transition-all duration-300"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
                   )}
-                </Button>
-              </BlurPanel>
-            )}
-          </div>
-        )}
-      </div>
-    </Reveal>
+                  <Button
+                    onClick={handleSharpen}
+                    disabled={isProcessing || isRateLimited}
+                    className="w-full bg-gradient-to-r from-brand-primary to-brand-primary-light hover:from-brand-primary/90 hover:to-brand-primary-light/90 text-white rounded-full py-6 font-medium shadow-lg shadow-brand-primary/25 disabled:opacity-50"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />
+                        Upscaling...
+                      </>
+                    ) : isRateLimited ? (
+                      "Rate Limited (wait 10s)"
+                    ) : (
+                      "Sharpen Image"
+                    )}
+                  </Button>
+                </BlurPanel>
+              )}
+            </div>
+          )}
+        </div>
+      </Reveal>
+
+      <Dialog open={showPaywallModal} onOpenChange={setShowPaywallModal}>
+        <DialogPortal>
+          <DialogOverlay className="!z-[130] bg-black/70 backdrop-blur-sm" />
+          <DialogContent className="!z-[140] sm:max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl">
+            <DialogHeader className="text-left">
+              <DialogTitle className="text-2xl font-display text-neutral-900">Unlock 6x / 8x upscaling</DialogTitle>
+              <DialogDescription className="text-neutral-600">
+                Upgrade to remove the watermark and unlock higher scales. Early Bird pricing is available while supplies last.
+              </DialogDescription>
+            </DialogHeader>
+
+            <ul className="mt-4 space-y-2 text-sm text-neutral-700">
+              <li>• 6x / 8x upscaling</li>
+              <li>• Watermark-free downloads</li>
+              <li>• Unlimited daily usage</li>
+            </ul>
+
+            <div className="mt-6 space-y-3">
+              <Button
+                className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] disabled:bg-[#ff5733]/60 rounded-full"
+                disabled={!earlyBirdAvailable || !paddle}
+                onClick={() => {
+                  setShowPaywallModal(false)
+                  openCheckout(true)
+                }}
+              >
+                {earlyBirdAvailable
+                  ? `Claim Early Bird (${Math.max(0, EARLY_BIRD_LIMIT - earlyBirdSold)} left)`
+                  : "Early Bird sold out"}
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full rounded-full border-[#ff7959] text-[#ff5733] hover:bg-[#ff5733]/10 hover:border-[#ff5733]"
+                    disabled={!priceIds?.standardPriceId || !paddle}
+                onClick={() => {
+                  setShowPaywallModal(false)
+                  openCheckout(false)
+                }}
+              >
+                Upgrade (Standard)
+              </Button>
+            </div>
+
+            <p className="mt-4 text-xs text-neutral-500">
+              Secure Paddle checkout. Your Pro access is tied to this device (install ID) after purchase.
+            </p>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
+    </>
   )
 }

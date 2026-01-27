@@ -38,19 +38,26 @@ async function addWatermark(buffer: Buffer) {
   try {
     const metadata = await sharp(buffer).metadata()
     const width = metadata.width || 1200
-    const fontSize = Math.max(18, Math.round(width * 0.025))
-    const padding = Math.max(12, Math.round(width * 0.01))
+    const height = metadata.height || 800
+
+    const brandColor = "#ff5733"
+    const iconSize = Math.max(48, Math.min(120, Math.round(Math.min(width, height) * 0.08)))
+    const padding = Math.max(12, Math.round(iconSize * 0.45))
+    const x = Math.max(padding, width - iconSize - padding)
+    const y = Math.max(padding, height - iconSize - padding)
+    const ringStroke = Math.max(2, Math.round(iconSize * 0.08))
     const svg = Buffer.from(`
-      <svg width="${width}" height="${metadata.height || 800}" xmlns="http://www.w3.org/2000/svg">
-        <style>
-          .label { fill: rgba(255,255,255,0.9); font-size: ${fontSize}px; font-family: "Helvetica Neue", Arial, sans-serif; }
-          .bg { fill: rgba(0,0,0,0.35); }
-        </style>
-        <rect x="${width - 360 - padding}" y="${(metadata.height || 800) - fontSize - padding * 2}" rx="${padding}" ry="${padding}" width="360" height="${fontSize + padding * 2}" class="bg"/>
-        <text x="${width - 330}" y="${(metadata.height || 800) - padding - Math.round(fontSize * 0.2)}" class="label">Sharpened by Imgsharer</text>
+      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(${x}, ${y})" opacity="0.85">
+          <circle cx="${iconSize / 2}" cy="${iconSize / 2}" r="${iconSize / 2}" fill="${brandColor}" fill-opacity="0.28" />
+          <circle cx="${iconSize / 2}" cy="${iconSize / 2}" r="${iconSize / 2 - ringStroke}" fill="none" stroke="${brandColor}" stroke-opacity="0.45" stroke-width="${ringStroke}" />
+          <g transform="translate(${iconSize / 2 - 12}, ${iconSize / 2 - 12}) scale(${iconSize / 24})" fill="white" fill-opacity="0.9">
+            <path d="M12 2 9.6 8.6 2.6 9.4 8 13.9 6.6 21 12 17.5 17.4 21 16 13.9 21.4 9.4 14.4 8.6z"/>
+          </g>
+        </g>
       </svg>
     `)
-    return sharp(buffer).composite([{ input: svg, gravity: "southeast" }]).jpeg({ quality: 92 }).toBuffer()
+    return sharp(buffer).composite([{ input: svg, gravity: "southeast" }]).jpeg({ quality: 94 }).toBuffer()
   } catch (error) {
     console.warn("[SERVER] Watermark failed, returning original", error)
     return buffer

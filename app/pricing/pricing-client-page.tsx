@@ -1,8 +1,9 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { initializePaddle, type Paddle } from "@paddle/paddle-js"
+import { useSearchParams } from "next/navigation"
 
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -28,6 +29,7 @@ type PriceConfig = {
 const EARLY_BIRD_LIMIT = 50
 const paddleEnv = (process.env.NEXT_PUBLIC_PADDLE_ENV as "sandbox" | "production" | undefined) ?? "production"
 const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
+const pricingToken = process.env.NEXT_PUBLIC_PRICING_TOKEN ?? "prc-9b8f4c1d"
 
 function formatRemaining(n: number) {
   if (n <= 0) return "Sold out"
@@ -37,11 +39,17 @@ function formatRemaining(n: number) {
 
 export default function PricingClientPage() {
   const { toast } = useToast()
+  const searchParams = useSearchParams()
   const [paddle, setPaddle] = useState<Paddle | null>(null)
   const [entitlement, setEntitlement] = useState<Entitlement | null>(null)
   const [prices, setPrices] = useState<PriceConfig>({ earlyBirdPriceId: null, standardPriceId: null })
   const [earlyBirdSold, setEarlyBirdSold] = useState(0)
   const [loading, setLoading] = useState(true)
+
+  const hasAccess = useMemo(() => {
+    const tokenParam = searchParams?.get("token")?.trim() || ""
+    return tokenParam.length > 0 && tokenParam === pricingToken
+  }, [searchParams])
 
   const earlyBirdRemaining = Math.max(0, EARLY_BIRD_LIMIT - earlyBirdSold)
   const earlyBirdAvailable = !!prices.earlyBirdPriceId && earlyBirdRemaining > 0
@@ -74,6 +82,10 @@ export default function PricingClientPage() {
   }, [])
 
   useEffect(() => {
+    if (!hasAccess) {
+      setPaddle(null)
+      return
+    }
     if (!paddleToken) return
     initializePaddle({ token: paddleToken, environment: paddleEnv })
       .then((instance) => setPaddle(instance ?? null))
@@ -81,11 +93,18 @@ export default function PricingClientPage() {
         console.warn("[pricing] paddle init failed", error)
         setPaddle(null)
       })
-  }, [])
+  }, [hasAccess])
 
   useEffect(() => {
-    loadEntitlement()
-  }, [loadEntitlement])
+    if (hasAccess) {
+      loadEntitlement()
+      if (typeof window !== "undefined") {
+        window.sessionStorage?.setItem("pricing_access_token", pricingToken)
+      }
+    } else {
+      setEntitlement(null)
+    }
+  }, [hasAccess, loadEntitlement])
 
   useEffect(() => {
     const onFocus = () => loadEntitlement()
@@ -95,6 +114,14 @@ export default function PricingClientPage() {
 
   const openCheckout = useCallback(
     (preferEarlyBird: boolean) => {
+      if (!hasAccess) {
+        toast({
+          title: "Access required",
+          description: "Upgrade checkout is limited to authorized testing links.",
+          variant: "destructive",
+        })
+        return
+      }
       if (!paddle) {
         const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost"
         toast({
@@ -135,8 +162,28 @@ export default function PricingClientPage() {
         },
       })
     },
-    [earlyBirdAvailable, paddle, prices.earlyBirdPriceId, prices.standardPriceId, toast],
+    [earlyBirdAvailable, hasAccess, paddle, prices.earlyBirdPriceId, prices.standardPriceId, toast],
   )
+
+  if (!hasAccess) {
+    return (
+      <main className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 pt-24 pb-16 px-4">
+          <div className="max-w-3xl mx-auto text-center space-y-4">
+            <h1 className="text-3xl font-display font-bold text-neutral-900">Pricing is restricted</h1>
+            <p className="text-neutral-600">
+              This page is available for testing only. Add the correct token to the URL to continue.
+            </p>
+            <p className="text-sm text-neutral-500">
+              Example: <code className="bg-neutral-100 px-2 py-1 rounded">?token={pricingToken}</code>
+            </p>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen flex flex-col">
