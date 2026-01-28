@@ -110,8 +110,8 @@ export default function TermsPage() {
 
             <h3 className="text-xl font-semibold text-neutral-900 mb-3">8.2 Payment Processing</h3>
             <p className="text-neutral-600 leading-relaxed mb-4">
-              All payments are processed by Paddle.com Market Limited ("Paddle"), our authorized payment service
-              provider. By purchasing a subscription, you agree to Paddle&apos;s Terms of Service and Privacy Policy.
+              All payments are processed by Creem, our authorized payment service provider. By purchasing a subscription,
+              you agree to Creem&apos;s Terms of Service and Privacy Policy.
             </p>
 
             <h3 className="text-xl font-semibold text-neutral-900 mb-3">8.3 Subscription Terms</h3>

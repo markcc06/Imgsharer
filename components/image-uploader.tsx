@@ -90,6 +90,7 @@ const apiEndpoint = getToolApiEndpoint()
 const paddleEnv = (process.env.NEXT_PUBLIC_PADDLE_ENV as "sandbox" | "production" | undefined) ?? "production"
 const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
 const pricingToken = process.env.NEXT_PUBLIC_PRICING_TOKEN ?? "prc-9b8f4c1d"
+const paymentProvider = (process.env.NEXT_PUBLIC_PAYMENT_PROVIDER as "creem" | "paddle" | undefined) ?? "paddle"
 const EARLY_BIRD_LIMIT = 50
 
 function Loader2Icon({ className }: { className?: string }) {
@@ -313,7 +314,7 @@ export function ImageUploader({
       }
     }
 
-    if (paddleToken) {
+    if (paymentProvider === "paddle" && paddleToken) {
       initializePaddle({
         token: paddleToken,
         environment: paddleEnv,
@@ -391,10 +392,11 @@ export function ImageUploader({
 
   const isPro = !!entitlement || userType === "pro"
 
-  const earlyBirdAvailable = priceIds?.earlyBirdPriceId && earlyBirdSold < EARLY_BIRD_LIMIT
+  const earlyBirdAvailable =
+    paymentProvider === "creem" ? earlyBirdSold < EARLY_BIRD_LIMIT : priceIds?.earlyBirdPriceId && earlyBirdSold < EARLY_BIRD_LIMIT
 
   const openCheckout = useCallback(
-    (preferEarlyBird = true) => {
+    async (preferEarlyBird = true) => {
       if (!hasPricingAccess) {
         toast({
           title: "Upgrade restricted",
@@ -405,6 +407,37 @@ export function ImageUploader({
       }
       const installId = installIdRef.current || getOrCreateInstallId()
       installIdRef.current = installId
+      if (!installId) {
+        toast({
+          title: "Missing device ID",
+          description: "Please refresh and try again.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      if (paymentProvider === "creem") {
+        const tier = preferEarlyBird && earlyBirdAvailable ? "early_bird" : "standard"
+        try {
+          const res = await fetch("/api/creem/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tier, installId }),
+          })
+          const data = await res.json().catch(() => ({}))
+          if (!res.ok || !data?.checkoutUrl) {
+            throw new Error(data?.error || `Creem checkout failed (${res.status})`)
+          }
+          window.location.href = data.checkoutUrl
+        } catch (error) {
+          toast({
+            title: "Checkout failed",
+            description: error instanceof Error ? error.message : "Please try again later.",
+            variant: "destructive",
+          })
+        }
+        return
+      }
       const targetPriceId =
         (preferEarlyBird && earlyBirdAvailable && priceIds?.earlyBirdPriceId) || priceIds?.standardPriceId
 
@@ -997,7 +1030,10 @@ export function ImageUploader({
             <div className="mt-6 space-y-3">
               <Button
                 className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] disabled:bg-[#ff5733]/60 rounded-full"
-                disabled={!earlyBirdAvailable || !paddle}
+                disabled={
+                  !earlyBirdAvailable ||
+                  (paymentProvider === "paddle" && (!earlyBirdAvailable || !paddle))
+                }
                 onClick={() => {
                   setShowPaywallModal(false)
                   openCheckout(true)
@@ -1010,7 +1046,7 @@ export function ImageUploader({
               <Button
                 variant="outline"
                 className="w-full rounded-full border-[#ff7959] text-[#ff5733] hover:bg-[#ff5733]/10 hover:border-[#ff5733]"
-                    disabled={!priceIds?.standardPriceId || !paddle}
+                disabled={paymentProvider === "paddle" ? !priceIds?.standardPriceId || !paddle : false}
                 onClick={() => {
                   setShowPaywallModal(false)
                   openCheckout(false)
@@ -1021,7 +1057,7 @@ export function ImageUploader({
             </div>
 
             <p className="mt-4 text-xs text-neutral-500">
-              Secure Paddle checkout. Your Pro access is tied to this device (install ID) after purchase.
+              Secure checkout. Your Pro access is tied to this device (install ID) after purchase.
             </p>
           </DialogContent>
         </DialogPortal>

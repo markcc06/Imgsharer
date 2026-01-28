@@ -81,17 +81,17 @@ export default function PrivacyPage() {
             <h3 className="text-xl font-semibold text-neutral-900 mb-3">3.2 Payment Processing</h3>
             <ul className="list-disc pl-6 text-neutral-600 space-y-2 mb-4">
               <li>
-                <strong>Paddle:</strong> Handles all payment transactions, billing information, and subscription
+                <strong>Creem:</strong> Handles all payment transactions, billing information, and subscription
                 management for paid features
               </li>
               <li>
                 <strong>Data collected:</strong> Email address, payment method, billing address (collected and stored by
-                Paddle, not ImgSharer)
+                Creem, not ImgSharer)
               </li>
               <li>
                 <strong>Privacy policy:</strong>{" "}
-                <a href="https://www.paddle.com/legal/privacy" className="text-coral hover:underline">
-                  https://www.paddle.com/legal/privacy
+                <a href="https://www.creem.io/privacy" className="text-coral hover:underline">
+                  https://www.creem.io/privacy
                 </a>
               </li>
             </ul>

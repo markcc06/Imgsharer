@@ -30,6 +30,7 @@ const EARLY_BIRD_LIMIT = 50
 const paddleEnv = (process.env.NEXT_PUBLIC_PADDLE_ENV as "sandbox" | "production" | undefined) ?? "production"
 const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
 const pricingToken = process.env.NEXT_PUBLIC_PRICING_TOKEN ?? "prc-9b8f4c1d"
+const paymentProvider = (process.env.NEXT_PUBLIC_PAYMENT_PROVIDER as "creem" | "paddle" | undefined) ?? "paddle"
 
 function formatRemaining(n: number) {
   if (n <= 0) return "Sold out"
@@ -52,7 +53,7 @@ export default function PricingClientPage() {
   }, [searchParams])
 
   const earlyBirdRemaining = Math.max(0, EARLY_BIRD_LIMIT - earlyBirdSold)
-  const earlyBirdAvailable = !!prices.earlyBirdPriceId && earlyBirdRemaining > 0
+  const earlyBirdAvailable = paymentProvider === "creem" ? earlyBirdRemaining > 0 : !!prices.earlyBirdPriceId && earlyBirdRemaining > 0
   const isPro = !!entitlement
 
   const loadEntitlement = useCallback(async () => {
@@ -86,6 +87,10 @@ export default function PricingClientPage() {
       setPaddle(null)
       return
     }
+    if (paymentProvider !== "paddle") {
+      setPaddle(null)
+      return
+    }
     if (!paddleToken) return
     initializePaddle({ token: paddleToken, environment: paddleEnv })
       .then((instance) => setPaddle(instance ?? null))
@@ -113,7 +118,7 @@ export default function PricingClientPage() {
   }, [loadEntitlement])
 
   const openCheckout = useCallback(
-    (preferEarlyBird: boolean) => {
+    async (preferEarlyBird: boolean) => {
       if (!hasAccess) {
         toast({
           title: "Access required",
@@ -122,6 +127,43 @@ export default function PricingClientPage() {
         })
         return
       }
+
+      let installId: string | null = null
+      if (typeof window !== "undefined") {
+        installId = window.localStorage?.getItem("imgsharer_install_id")
+      }
+      if (!installId) {
+        toast({
+          title: "Missing device ID",
+          description: "Please refresh and try again.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      if (paymentProvider === "creem") {
+        const tier = preferEarlyBird && earlyBirdAvailable ? "early_bird" : "standard"
+        try {
+          const res = await fetch("/api/creem/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tier, installId }),
+          })
+          const data = await res.json().catch(() => ({}))
+          if (!res.ok || !data?.checkoutUrl) {
+            throw new Error(data?.error || `Creem checkout failed (${res.status})`)
+          }
+          window.location.href = data.checkoutUrl
+        } catch (error) {
+          toast({
+            title: "Checkout failed",
+            description: error instanceof Error ? error.message : "Please try again later.",
+            variant: "destructive",
+          })
+        }
+        return
+      }
+
       if (!paddle) {
         const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost"
         toast({
@@ -146,14 +188,9 @@ export default function PricingClientPage() {
         return
       }
 
-      let installId: string | null = null
-      if (typeof window !== "undefined") {
-        installId = window.localStorage?.getItem("imgsharer_install_id")
-      }
-
       paddle.Checkout.open({
         items: [{ priceId: selected, quantity: 1 }],
-        customData: installId ? { installId } : undefined,
+        customData: { installId },
         settings: {
           displayMode: "overlay",
           locale: "en",
@@ -263,12 +300,12 @@ export default function PricingClientPage() {
               </ul>
               <Button
                 className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] disabled:bg-[#ff5733]/60 disabled:text-white rounded-full"
-                disabled={!earlyBirdAvailable || !paddle || isPro}
+                disabled={!earlyBirdAvailable || (paymentProvider === "paddle" && !paddle) || isPro}
                 onClick={() => openCheckout(true)}
               >
                 {isPro ? "Already Pro" : earlyBirdAvailable ? "Claim Early Bird" : "Sold out"}
               </Button>
-              {!prices.earlyBirdPriceId ? (
+              {paymentProvider === "paddle" && !prices.earlyBirdPriceId ? (
                 <p className="mt-3 text-xs text-neutral-500">Early Bird price is not configured yet.</p>
               ) : null}
             </Card>
@@ -292,12 +329,16 @@ export default function PricingClientPage() {
               </ul>
               <Button
                 className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] disabled:bg-[#ff5733]/60 disabled:text-white rounded-full"
-                disabled={!prices.standardPriceId || !paddle || isPro}
+                disabled={
+                  (paymentProvider === "paddle" && (!prices.standardPriceId || !paddle)) ||
+                  (paymentProvider !== "paddle" && !hasAccess) ||
+                  isPro
+                }
                 onClick={() => openCheckout(false)}
               >
                 {isPro ? "Already Pro" : "Upgrade"}
               </Button>
-              {!prices.standardPriceId ? (
+              {paymentProvider === "paddle" && !prices.standardPriceId ? (
                 <p className="mt-3 text-xs text-neutral-500">Standard price is not configured yet.</p>
               ) : null}
             </Card>
