@@ -58,8 +58,16 @@ export async function incrementEarlyBirdSold(amount = 1) {
 }
 
 export async function getEarlyBirdSold() {
-  const current = await kvGetJSON<number>(EARLY_BIRD_KEY)
-  return typeof current === "number" ? current : 0
+  const current = await kvGetJSON<number | string>(EARLY_BIRD_KEY)
+
+  const parsed =
+    typeof current === "number"
+      ? current
+      : typeof current === "string" && current.trim().length > 0
+        ? Number(current)
+        : NaN
+
+  return Number.isFinite(parsed) ? parsed : 0
 }
 
 export function getPriceConfig() {

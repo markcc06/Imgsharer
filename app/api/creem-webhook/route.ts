@@ -126,9 +126,11 @@ export async function POST(request: NextRequest) {
   })
 
   if (tier === "early_bird") {
-    await incrementEarlyBirdSold(1).catch(() => null)
+    await incrementEarlyBirdSold(1).catch((err) => {
+      console.error("[creem] increment early bird failed", err)
+      throw err
+    })
   }
 
   return NextResponse.json({ ok: true })
 }
-
