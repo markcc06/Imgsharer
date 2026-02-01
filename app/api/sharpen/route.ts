@@ -1,13 +1,13 @@
 import sharp from "sharp"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
-import { auth, currentUser } from "@clerk/nextjs/server"
+import { getAuth, clerkClient } from "@clerk/nextjs/server"
 import {
   RATE_LIMIT_PER_DAY_FREE,
   RATE_LIMIT_PER_DAY_PRO,
   RATE_LIMIT_PER_HOUR_PRO,
 } from "@/lib/constants"
-import { getEarlyBirdSold, getEntitlementByEmail, getEntitlementByInstallId, getPriceConfig } from "@/lib/entitlements"
+import { getEarlyBirdSold, getEntitlementByEmail, getPriceConfig } from "@/lib/entitlements"
 import { kvGetJSON, kvIncrBy } from "@/lib/kv"
 
 console.log("[SERVER] Sharpen route module loading...")
@@ -84,11 +84,18 @@ export async function POST(request: NextRequest) {
 
     const installId = getInstallId(request)
     const cookieStore = cookies()
-    const { userId } = auth()
-    const user = userId ? await currentUser().catch(() => null) : null
-    const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
+    const { userId } = getAuth(request)
+    let email: string | null = null
+    if (userId) {
+      try {
+        const user = await clerkClient.users.getUser(userId)
+        email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
+      } catch (err) {
+        console.warn("[SERVER] clerk getUser failed", err)
+      }
+    }
     const entitlementByEmail = email ? await getEntitlementByEmail(email) : null
-    const entitlement = entitlementByEmail || (installId ? await getEntitlementByInstallId(installId) : null)
+    const entitlement = entitlementByEmail
     const identifier = email || installId || "anonymous"
     const freeIdentifier = installId || email || identifier
 
