@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useRef, useCallback, useEffect } from "react"
 import { initializePaddle, Paddle } from "@paddle/paddle-js"
+import { useAuth } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { BeforeAfterSlider } from "@/components/before-after-slider"
@@ -254,6 +255,7 @@ export function ImageUploader({
   const installIdRef = useRef<string | null>(null)
   const { toast } = useToast()
   const { close: closeModal, pendingWallpaper } = useUploadUI()
+  const { isSignedIn, userId } = useAuth()
 
   const getOrCreateSessionId = useCallback(() => {
     if (typeof window === "undefined") return null
@@ -300,17 +302,7 @@ export function ImageUploader({
     installIdRef.current = getOrCreateInstallId()
 
     setHasPricingAccess(true)
-
-    if (typeof window !== "undefined") {
-      const storedType = window.localStorage?.getItem("pro_status") || window.localStorage?.getItem("user_type")
-      if (storedType === "pro") {
-        setUserType("pro")
-      } else if (storedType === "free") {
-        setUserType("free")
-      } else {
-        setUserType("free")
-      }
-    }
+    setUserType("free")
 
     if (paymentProvider === "paddle" && paddleToken) {
       initializePaddle({
@@ -328,22 +320,29 @@ export function ImageUploader({
   }, [getOrCreateInstallId, getOrCreateSessionId])
 
   useEffect(() => {
+    if (isSignedIn === undefined) return
+    if (!isSignedIn || !userId) {
+      setEntitlement(null)
+      setUserType("free")
+      return
+    }
     const installId = installIdRef.current
     if (!installId) return
     let active = true
 
     const load = async () => {
       try {
+        if (typeof window !== "undefined") {
+          window.localStorage?.removeItem("pro_status")
+          window.localStorage?.removeItem("user_type")
+        }
         const res = await fetch("/api/entitlement", {
           headers: { "x-install-id": installId },
         })
         if (!res.ok) return
         const data = await res.json()
         if (!active) return
-        if (data?.entitlement) {
-          setEntitlement(data.entitlement)
-          setUserType("pro")
-        }
+        if (data?.entitlement) setEntitlement(data.entitlement)
         if (typeof data?.earlyBirdSold === "number") {
           setEarlyBirdSold(data.earlyBirdSold)
         }
@@ -362,7 +361,11 @@ export function ImageUploader({
     return () => {
       active = false
     }
-  }, [])
+  }, [isSignedIn, userId])
+
+  useEffect(() => {
+    setUserType(entitlement ? "pro" : "free")
+  }, [entitlement])
 
   const trackUpscaleFactor = useCallback(
     (nextScale: number) => {
@@ -387,7 +390,7 @@ export function ImageUploader({
     [faceEnhance, getOrCreateSessionId, imageSizeKb, userType],
   )
 
-  const isPro = !!entitlement || userType === "pro"
+  const isPro = !!entitlement
 
   const earlyBirdAvailable =
     paymentProvider === "creem" ? earlyBirdSold < EARLY_BIRD_LIMIT : priceIds?.earlyBirdPriceId && earlyBirdSold < EARLY_BIRD_LIMIT
