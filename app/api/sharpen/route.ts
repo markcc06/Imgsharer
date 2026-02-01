@@ -88,7 +88,8 @@ export async function POST(request: NextRequest) {
     let email: string | null = null
     if (userId) {
       try {
-        const user = await clerkClient.users.getUser(userId)
+        const client = await clerkClient()
+        const user = await client.users.getUser(userId)
         email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
       } catch (err) {
         console.warn("[SERVER] clerk getUser failed", err)
