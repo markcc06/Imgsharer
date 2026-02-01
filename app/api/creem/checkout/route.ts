@@ -1,5 +1,6 @@
 import crypto from "crypto"
 import { NextRequest, NextResponse } from "next/server"
+import { currentUser, getAuth } from "@clerk/nextjs/server"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -28,6 +29,18 @@ function getPricingToken() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Use getAuth(request) so the session is parsed from this request, avoiding
+    // cases where auth() loses context in route handlers.
+    const { userId } = getAuth(request)
+    const user = userId ? await currentUser().catch(() => null) : null
+    const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
+
+    // Must be signed in before starting checkout, but do not hard-require fetching user profile/email here.
+    // (In some dev setups/extensions, the profile fetch can fail even when the session is valid.)
+    if (!userId) {
+      return NextResponse.json({ error: "login_required" }, { status: 401 })
+    }
+
     const provider = process.env.PAYMENT_PROVIDER ?? process.env.NEXT_PUBLIC_PAYMENT_PROVIDER ?? "paddle"
     if (provider !== "creem") {
       return NextResponse.json({ error: "creem_not_enabled" }, { status: 400 })
@@ -69,6 +82,7 @@ export async function POST(request: NextRequest) {
         metadata: {
           installId,
           tier,
+          ...(email ? { email } : {}),
         },
       }),
     })
@@ -90,4 +104,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "internal_error" }, { status: 500 })
   }
 }
-

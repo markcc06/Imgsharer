@@ -32,9 +32,52 @@ export function resolveTierFromPriceId(priceId?: string | null): EntitlementTier
   return null
 }
 
+function isValidEntitlementRecord(record: EntitlementRecord) {
+  // For Creem, only treat first successful payment as a valid grant.
+  // Older test data may have been written on `checkout.completed`; we must ignore it.
+  if (record.sourceEvent?.startsWith("creem:")) {
+    return record.sourceEvent === "creem:subscription.paid"
+  }
+
+  // Paddle/other sources: accept as-is.
+  return true
+}
+
+function parseEntitlement(value: unknown): EntitlementRecord | null {
+  if (!value) return null
+
+  const parsed =
+    typeof value === "string"
+      ? (() => {
+          try {
+            return JSON.parse(value) as unknown
+          } catch {
+            return null
+          }
+        })()
+      : value
+
+  if (!parsed || typeof parsed !== "object") return null
+
+  const record = parsed as Partial<EntitlementRecord>
+  if (record.tier !== "early_bird" && record.tier !== "standard") return null
+  if (typeof record.priceId !== "string" || record.priceId.length === 0) return null
+  if (typeof record.updatedAt !== "number" || !Number.isFinite(record.updatedAt)) return null
+
+  // optional fields are not strictly validated
+  return isValidEntitlementRecord(record as EntitlementRecord) ? (record as EntitlementRecord) : null
+}
+
 export async function getEntitlementByInstallId(installId?: string | null) {
   if (!installId) return null
-  return kvGetJSON<EntitlementRecord>(`entitlement:${installId}`)
+  const value = await kvGetJSON<unknown>(`entitlement:${installId}`)
+  return parseEntitlement(value)
+}
+
+export async function getEntitlementByEmail(email?: string | null) {
+  if (!email) return null
+  const value = await kvGetJSON<unknown>(`entitlement:email:${email.toLowerCase()}`)
+  return parseEntitlement(value)
 }
 
 export async function saveEntitlement(record: EntitlementRecord) {

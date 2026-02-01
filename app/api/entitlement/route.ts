@@ -1,7 +1,9 @@
 import crypto from "crypto"
 import { NextRequest, NextResponse } from "next/server"
 
-import { getEarlyBirdSold, getEntitlementByInstallId, getPriceConfig } from "@/lib/entitlements"
+import { currentUser, getAuth } from "@clerk/nextjs/server"
+
+import { getEarlyBirdSold, getEntitlementByEmail, getEntitlementByInstallId, getPriceConfig } from "@/lib/entitlements"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -15,8 +17,13 @@ function getOrCreateInstallId(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const { userId } = getAuth(request)
+  const user = userId ? await currentUser().catch(() => null) : null
+  const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
+
   const installId = getOrCreateInstallId(request)
-  const entitlement = installId ? await getEntitlementByInstallId(installId) : null
+  const entitlementByEmail = email ? await getEntitlementByEmail(email) : null
+  const entitlement = entitlementByEmail || (installId ? await getEntitlementByInstallId(installId) : null)
   const earlyBirdSold = await getEarlyBirdSold().catch(() => 0)
   const prices = getPriceConfig()
 

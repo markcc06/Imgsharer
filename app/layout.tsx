@@ -5,6 +5,7 @@ import Script from "next/script"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { siteConfig } from "@/config/siteConfig"
+import { ClerkProvider } from "@clerk/nextjs"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -80,47 +81,49 @@ export default function RootLayout({
       : "ca-pub-6728061725805697"
 
   return (
-    <html lang={(siteConfig.defaultLocale ?? "en-US").split("-")[0]} className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
-      <head>
-        {/* AdSense base script for CMP auto-injection (temporarily disabled during development)
-        <script
-          id="adsbygoogle-script"
-          async
-          crossOrigin="anonymous"
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-        ></script>
-        */}
-        <meta name="robots" content="index, follow" />
-        <meta name="theme-color" content="#ff5733" />
-        <meta name="msapplication-TileColor" content="#ff5733" />
-        {process.env.NODE_ENV === "production"
-          ? (() => {
-              const GA_ID = siteConfig.gaMeasurementId ?? process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-VZXMJJJQD5"
-              if (!GA_ID) return null
-              return (
-                <>
-                  <Script
-                    id="ga4-src"
-                    src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-                    strategy="afterInteractive"
-                  />
-                  <Script id="ga4-init" strategy="afterInteractive">
-                    {`
-                      window.dataLayer = window.dataLayer || [];
-                      function gtag(){dataLayer.push(arguments);}
-                      gtag('js', new Date());
-                      gtag('config', '${GA_ID}', { anonymize_ip: true });
-                    `}
-                  </Script>
-                </>
-              )
-            })()
-          : null}
-      </head>
-      <body className="font-sans bg-neutral-50 text-neutral-900 overflow-x-hidden">
-        {children}
-        <Toaster />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang={(siteConfig.defaultLocale ?? "en-US").split("-")[0]} className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
+        <head>
+          {/* AdSense base script for CMP auto-injection (temporarily disabled during development)
+          <script
+            id="adsbygoogle-script"
+            async
+            crossOrigin="anonymous"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+          ></script>
+          */}
+          <meta name="robots" content="index, follow" />
+          <meta name="theme-color" content="#ff5733" />
+          <meta name="msapplication-TileColor" content="#ff5733" />
+          {process.env.NODE_ENV === "production"
+            ? (() => {
+                const GA_ID = siteConfig.gaMeasurementId ?? process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-VZXMJJJQD5"
+                if (!GA_ID) return null
+                return (
+                  <>
+                    <Script
+                      id="ga4-src"
+                      src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+                      strategy="afterInteractive"
+                    />
+                    <Script id="ga4-init" strategy="afterInteractive">
+                      {`
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', '${GA_ID}', { anonymize_ip: true });
+                      `}
+                    </Script>
+                  </>
+                )
+              })()
+            : null}
+        </head>
+        <body className="font-sans bg-neutral-50 text-neutral-900 overflow-x-hidden">
+          {children}
+          <Toaster />
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }

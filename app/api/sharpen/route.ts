@@ -1,9 +1,14 @@
 import sharp from "sharp"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
-import { checkRateLimit, checkDailyRateLimit, getRateLimitIdentifier } from "@/lib/rate-limit"
-import { RATE_LIMIT_PER_MINUTE, RATE_LIMIT_PER_DAY } from "@/lib/constants"
-import { getEarlyBirdSold, getEntitlementByInstallId, getPriceConfig } from "@/lib/entitlements"
+import { auth, currentUser } from "@clerk/nextjs/server"
+import {
+  RATE_LIMIT_PER_DAY_FREE,
+  RATE_LIMIT_PER_DAY_PRO,
+  RATE_LIMIT_PER_HOUR_PRO,
+} from "@/lib/constants"
+import { getEarlyBirdSold, getEntitlementByEmail, getEntitlementByInstallId, getPriceConfig } from "@/lib/entitlements"
+import { kvGetJSON, kvIncrBy } from "@/lib/kv"
 
 console.log("[SERVER] Sharpen route module loading...")
 
@@ -77,10 +82,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing REPLICATE_API_TOKEN" }, { status: 500 })
     }
 
-    const identifier = getRateLimitIdentifier(request)
     const installId = getInstallId(request)
     const cookieStore = cookies()
-    const entitlement = installId ? await getEntitlementByInstallId(installId) : null
+    const { userId } = auth()
+    const user = userId ? await currentUser().catch(() => null) : null
+    const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
+    const entitlementByEmail = email ? await getEntitlementByEmail(email) : null
+    const entitlement = entitlementByEmail || (installId ? await getEntitlementByInstallId(installId) : null)
+    const identifier = email || installId || "anonymous"
+    const freeIdentifier = installId || email || identifier
+
+    const now = new Date()
+    const utcDay = now.toISOString().slice(0, 10) // YYYY-MM-DD UTC
+    const utcHour = `${utcDay}-${now.getUTCHours().toString().padStart(2, "0")}` // hour bucket in UTC
+
+    const checkAndIncr = async (key: string, limit: number) => {
+      const current = await kvGetJSON<number>(key).catch(() => null)
+      const count = typeof current === "number" ? current : 0
+      if (count >= limit) return { allowed: false, count }
+      const next = await kvIncrBy(key, 1).catch(() => limit + 1)
+      return { allowed: next <= limit, count: next }
+    }
 
     const attachInstallCookie = (res: NextResponse) => {
       if (installId && !cookieStore.get(INSTALL_COOKIE)) {
@@ -97,35 +119,60 @@ export async function POST(request: NextRequest) {
 
     console.log("[SERVER] Rate limit identifier:", identifier, "installId:", installId)
 
-    const minuteLimit = checkRateLimit(identifier, RATE_LIMIT_PER_MINUTE, 60 * 1000)
-    if (!minuteLimit.allowed) {
-      console.log("[SERVER] Rate limit exceeded (per minute)")
-      return attachInstallCookie(
-        NextResponse.json(
-          {
-            error: "Rate limit exceeded. Please try again in a minute.",
-            resetAt: minuteLimit.resetAt,
-          },
-          { status: 429 },
-        ),
-      )
-    }
+    let remaining: number | null = null
 
-    let dailyLimit = { allowed: true, remaining: RATE_LIMIT_PER_DAY, resetAt: 0 }
-    if (!entitlement) {
-      dailyLimit = checkDailyRateLimit(identifier, RATE_LIMIT_PER_DAY)
-      if (!dailyLimit.allowed) {
-        console.log("[SERVER] Rate limit exceeded (daily)")
+    // Pro limits (hour + day) using KV (UTC buckets)
+    if (entitlement) {
+      const hourKey = `usage:pro:${identifier}:hour:${utcHour}`
+      const hourLimit = await checkAndIncr(hourKey, RATE_LIMIT_PER_HOUR_PRO)
+      if (!hourLimit.allowed) {
+        console.log("[SERVER] Rate limit exceeded (pro per hour)")
         return attachInstallCookie(
           NextResponse.json(
             {
-              error: "Daily rate limit exceeded. Please try again tomorrow.",
-              resetAt: dailyLimit.resetAt,
+              error: "Usage limit exceeded. Please try again later.",
+              limit: "pro_hour",
+              resetAt: null,
             },
             { status: 429 },
           ),
         )
       }
+
+      const dayKey = `usage:pro:${identifier}:day:${utcDay}`
+      const proDaily = await checkAndIncr(dayKey, RATE_LIMIT_PER_DAY_PRO)
+      if (!proDaily.allowed) {
+        console.log("[SERVER] Rate limit exceeded (pro daily)")
+        return attachInstallCookie(
+          NextResponse.json(
+            {
+              error: "Usage limit exceeded. Please try again later.",
+              limit: "pro_daily",
+              resetAt: null,
+            },
+            { status: 429 },
+          ),
+        )
+      }
+    } else {
+      // Free daily limit only
+      const dayKey = `usage:free:${freeIdentifier}:day:${utcDay}`
+      const dailyLimit = await checkAndIncr(dayKey, RATE_LIMIT_PER_DAY_FREE)
+      if (!dailyLimit.allowed) {
+        console.log("[SERVER] Rate limit exceeded (free daily)")
+        return attachInstallCookie(
+          NextResponse.json(
+            {
+              error: "Usage limit exceeded. Please try again tomorrow.",
+              limit: "free_daily",
+              dailyLimit: RATE_LIMIT_PER_DAY_FREE,
+              resetAt: null,
+            },
+            { status: 429 },
+          ),
+        )
+      }
+      remaining = Math.max(0, RATE_LIMIT_PER_DAY_FREE - (dailyLimit.count ?? 0))
     }
 
     console.log("[SERVER] Parsing form data...")
@@ -154,22 +201,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (scale > 4) {
-      if (!entitlement) {
-        const priceConfig = getPriceConfig()
-        const earlyBirdSold = await getEarlyBirdSold().catch(() => 0)
-        return attachInstallCookie(
-          NextResponse.json(
-            {
-              error: "pro_required",
-              message: "6x/8x upscaling is available for Pro plans. Please upgrade to continue.",
-              prices: priceConfig,
-              earlyBirdSold,
-            },
-            { status: 402 },
-          ),
-        )
-      }
+    if (scale > 4 && !entitlement) {
+      const priceConfig = getPriceConfig()
+      const earlyBirdSold = await getEarlyBirdSold().catch(() => 0)
+      return attachInstallCookie(
+        NextResponse.json(
+          {
+            error: "pro_required",
+            message: "6x/8x upscaling is available for Pro plans. Please upgrade to continue.",
+            prices: priceConfig,
+            earlyBirdSold,
+          },
+          { status: 402 },
+        ),
+      )
     }
 
     const arrayBuffer = await file.arrayBuffer()
@@ -271,7 +316,7 @@ export async function POST(request: NextRequest) {
     return attachInstallCookie(
       NextResponse.json({
         imageBase64,
-        remaining: entitlement ? null : dailyLimit.remaining,
+        remaining: entitlement ? null : remaining,
       }),
     )
   } catch (err: any) {

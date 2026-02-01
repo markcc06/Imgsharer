@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { siteConfig } from "@/config/siteConfig"
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs"
 
 function SparklesIcon() {
   return (
@@ -31,6 +32,7 @@ const navLinks = [
   { href: "/faq", label: "FAQ" },
   { href: "/blog", label: "Blog" },
   { href: "/about", label: "About" },
+  { href: "/pricing", label: "Pricing" },
   { href: "/christmas-wallpaper", label: "Christmas Wallpaper" },
   { href: "/contact", label: "Contact" },
 ]
@@ -88,7 +90,7 @@ export function Header() {
           </Link>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-7">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -99,6 +101,16 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
+            <SignedOut>
+              <SignInButton mode="modal" redirectUrl={typeof window !== "undefined" ? window.location.href : "/"}>
+                <button className="ml-2 rounded-full border border-[#ff5733] px-4 py-2 text-sm font-semibold text-[#ff5733] bg-white/80 hover:bg-[#ff5733]/10 transition-colors shadow-sm">
+                  Sign in / Get Pro
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
           </nav>
 
           <button

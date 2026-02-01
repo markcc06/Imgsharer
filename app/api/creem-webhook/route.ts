@@ -1,7 +1,7 @@
 import crypto from "crypto"
 import { NextRequest, NextResponse } from "next/server"
 
-import { kvGetJSON, kvSetJSON } from "@/lib/kv"
+import { kvGetJSON, kvIncrBy, kvSetJSON } from "@/lib/kv"
 import { incrementEarlyBirdSold, saveEntitlement } from "@/lib/entitlements"
 
 export const runtime = "nodejs"
@@ -59,7 +59,12 @@ function extractEmail(payload: any) {
 }
 
 function extractSubscriptionId(payload: any) {
-  return extractString(payload?.object?.subscription?.id) || extractString(payload?.object?.subscription) || null
+  return (
+    extractString(payload?.object?.id) ||
+    extractString(payload?.object?.subscription?.id) ||
+    extractString(payload?.object?.subscription) ||
+    null
+  )
 }
 
 function extractOrderId(payload: any) {
@@ -67,7 +72,10 @@ function extractOrderId(payload: any) {
 }
 
 function isGrantEvent(eventType: string) {
-  return eventType === "checkout.completed" || eventType === "subscription.paid" || eventType === "subscription.active"
+  // For our recurring plans, grant entitlement only on the first successful payment.
+  // Other events like checkout.completed/subscription.active can fire multiple times (or before payment),
+  // which would incorrectly decrement Early Bird multiple times.
+  return eventType === "subscription.paid"
 }
 
 export async function POST(request: NextRequest) {
@@ -113,6 +121,21 @@ export async function POST(request: NextRequest) {
   const email = extractEmail(payload)
   const subscriptionId = extractSubscriptionId(payload)
   const orderId = extractOrderId(payload)
+
+  // Idempotency: only grant once per subscription (subscription.paid also fires on renewals).
+  // Use an atomic KV incr to avoid race conditions when multiple deliveries land at the same time.
+  const grantKey = subscriptionId
+    ? `creem:grant:subscription:${subscriptionId}`
+    : orderId
+      ? `creem:grant:order:${orderId}`
+      : null
+
+  if (grantKey) {
+    const attempt = await kvIncrBy(grantKey, 1).catch(() => 0)
+    if (attempt !== 1) {
+      return NextResponse.json({ ok: true, deduped: true })
+    }
+  }
 
   await saveEntitlement({
     tier,

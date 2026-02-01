@@ -241,6 +241,7 @@ export function ImageUploader({
   const abortControllerRef = useRef<AbortController | null>(null)
   const fakeIntervalRef = useRef<number | null>(null)
   const [isRateLimited, setIsRateLimited] = useState(false)
+  const [rateLimitLabel, setRateLimitLabel] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [scale, setScale] = useState<number>(4)
   const [blockedHighScale, setBlockedHighScale] = useState(false)
@@ -298,10 +299,7 @@ export function ImageUploader({
     sessionIdRef.current = getOrCreateSessionId()
     installIdRef.current = getOrCreateInstallId()
 
-    if (typeof window !== "undefined") {
-      const storedToken = window.sessionStorage?.getItem("pricing_access_token")
-      setHasPricingAccess(!!storedToken && storedToken === pricingToken)
-    }
+    setHasPricingAccess(true)
 
     if (typeof window !== "undefined") {
       const storedType = window.localStorage?.getItem("pro_status") || window.localStorage?.getItem("user_type")
@@ -332,18 +330,16 @@ export function ImageUploader({
   useEffect(() => {
     const installId = installIdRef.current
     if (!installId) return
-    const controller = new AbortController()
+    let active = true
 
     const load = async () => {
       try {
         const res = await fetch("/api/entitlement", {
-          headers: {
-            "x-install-id": installId,
-          },
-          signal: controller.signal,
+          headers: { "x-install-id": installId },
         })
         if (!res.ok) return
         const data = await res.json()
+        if (!active) return
         if (data?.entitlement) {
           setEntitlement(data.entitlement)
           setUserType("pro")
@@ -358,13 +354,14 @@ export function ImageUploader({
           })
         }
       } catch (error) {
-        if ((error as Error)?.name === "AbortError") return
         console.warn("[entitlement] fetch failed", error)
       }
     }
 
     load()
-    return () => controller.abort()
+    return () => {
+      active = false
+    }
   }, [])
 
   const trackUpscaleFactor = useCallback(
@@ -424,6 +421,10 @@ export function ImageUploader({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ tier, installId }),
           })
+          if (res.status === 401) {
+            window.location.href = `/sign-in?redirect_url=${encodeURIComponent(window.location.href)}`
+            return
+          }
           const data = await res.json().catch(() => ({}))
           if (!res.ok || !data?.checkoutUrl) {
             throw new Error(data?.error || `Creem checkout failed (${res.status})`)
@@ -480,20 +481,12 @@ export function ImageUploader({
 
   const showPaywall = useCallback(
     (options?: { blockHighScale?: boolean }) => {
-      if (!hasPricingAccess) {
-        toast({
-          title: "Upgrade unavailable",
-          description: "Access this feature via the authorized pricing link.",
-          variant: "destructive",
-        })
-        return
-      }
       if (options?.blockHighScale) {
         setBlockedHighScale(true)
       }
       setShowPaywallModal(true)
     },
-    [hasPricingAccess, toast],
+    [toast],
   )
 
   useEffect(() => {
@@ -706,20 +699,47 @@ export function ImageUploader({
       setProgress(100)
 
       if (apiResponse.status === 429) {
-        let errorMessage = "Rate limited, please try again in a moment"
+        let errorMessage = "Usage limit exceeded. Please try again later."
+        let limitType: string | null = null
+        let resetAt: number | null = null
+        let dailyLimit: number | null = null
         try {
           const errorData = await apiResponse.json()
           errorMessage = errorData.error || errorMessage
+          limitType = typeof errorData?.limit === "string" ? errorData.limit : null
+          resetAt = typeof errorData?.resetAt === "number" ? errorData.resetAt : null
+          dailyLimit = typeof errorData?.dailyLimit === "number" ? errorData.dailyLimit : null
         } catch {}
 
+        const label =
+          limitType === "free_daily"
+            ? `Daily limit reached (${dailyLimit ?? 5}/day)`
+            : limitType === "pro_hour"
+              ? "Hourly limit reached"
+              : limitType === "pro_daily"
+                ? "Daily limit reached"
+                : "Usage limit reached"
+
+        const description =
+          limitType === "free_daily"
+            ? `Free users can process up to ${dailyLimit ?? 5} images per day. Please try again tomorrow or upgrade.`
+            : errorMessage
+
         toast({
-          title: "Rate Limited",
-          description: errorMessage,
-          variant: "destructive",
+          title: label,
+          description,
         })
 
         setIsRateLimited(true)
-        setTimeout(() => setIsRateLimited(false), 10000)
+        setRateLimitLabel(label)
+
+        if (limitType !== "free_daily" && resetAt && resetAt > Date.now()) {
+          const ms = Math.min(Math.max(1000, resetAt - Date.now()), 60 * 60 * 1000)
+          window.setTimeout(() => {
+            setIsRateLimited(false)
+            setRateLimitLabel(null)
+          }, ms)
+        }
         return
       }
 
@@ -998,7 +1018,7 @@ export function ImageUploader({
                         Upscaling...
                       </>
                     ) : isRateLimited ? (
-                      "Rate Limited (wait 10s)"
+                      rateLimitLabel ?? "Usage limit reached"
                     ) : (
                       "Sharpen Image"
                     )}
@@ -1057,7 +1077,7 @@ export function ImageUploader({
             </div>
 
             <p className="mt-4 text-xs text-neutral-500">
-              Secure checkout. Your Pro access is tied to this device (install ID) after purchase.
+              Secure checkout. Your Pro access is tied to your signed-in email.
             </p>
           </DialogContent>
         </DialogPortal>

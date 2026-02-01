@@ -11,6 +11,7 @@
     "wallpapers:sync": "node scripts/prepare-gallery.mjs"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.37.0",
     "@emotion/is-prop-valid": "latest",
     "@hookform/resolvers": "^3.10.0",
     "@img/sharp-wasm32": "0.34.4",

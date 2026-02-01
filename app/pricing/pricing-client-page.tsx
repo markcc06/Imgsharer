@@ -29,7 +29,6 @@ type PriceConfig = {
 const EARLY_BIRD_LIMIT = 50
 const paddleEnv = (process.env.NEXT_PUBLIC_PADDLE_ENV as "sandbox" | "production" | undefined) ?? "production"
 const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
-const pricingToken = process.env.NEXT_PUBLIC_PRICING_TOKEN ?? "prc-9b8f4c1d"
 const paymentProvider = (process.env.NEXT_PUBLIC_PAYMENT_PROVIDER as "creem" | "paddle" | undefined) ?? "paddle"
 
 function formatRemaining(n: number) {
@@ -46,20 +45,44 @@ export default function PricingClientPage() {
   const [prices, setPrices] = useState<PriceConfig>({ earlyBirdPriceId: null, standardPriceId: null })
   const [earlyBirdSold, setEarlyBirdSold] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [checkoutPolling, setCheckoutPolling] = useState(false)
+  const [checkoutStarting, setCheckoutStarting] = useState(false)
 
-  const hasAccess = useMemo(() => {
-    const tokenParam = searchParams?.get("token")?.trim() || ""
-    return tokenParam.length > 0 && tokenParam === pricingToken
-  }, [searchParams])
+  const hasAccess = true
 
   const earlyBirdRemaining = Math.max(0, EARLY_BIRD_LIMIT - earlyBirdSold)
   const earlyBirdAvailable = paymentProvider === "creem" ? earlyBirdRemaining > 0 : !!prices.earlyBirdPriceId && earlyBirdRemaining > 0
   const isPro = !!entitlement
+  const hasCheckoutReturn = useMemo(() => {
+    if (!searchParams) return false
+    return (
+      searchParams.has("checkout_id") ||
+      searchParams.has("order_id") ||
+      searchParams.has("customer_id") ||
+      searchParams.has("subscription_id")
+    )
+  }, [searchParams])
+
+  const getOrCreateInstallId = useCallback(() => {
+    if (typeof window === "undefined") return null
+    const KEY = "imgsharer_install_id"
+    const existing = window.localStorage?.getItem(KEY)
+    if (existing) return existing
+    const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`
+    window.localStorage?.setItem(KEY, id)
+    return id
+  }, [])
 
   const loadEntitlement = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch("/api/entitlement", { cache: "no-store" })
+      const installId =
+        typeof window !== "undefined" ? window.localStorage?.getItem("imgsharer_install_id") ?? null : null
+
+      const res = await fetch("/api/entitlement", {
+        cache: "no-store",
+        headers: installId ? { "x-install-id": installId } : undefined,
+      })
       if (!res.ok) throw new Error(`Failed to load entitlement: ${res.status}`)
       const data = await res.json()
 
@@ -75,12 +98,18 @@ export default function PricingClientPage() {
         earlyBirdPriceId: data?.prices?.earlyBirdPriceId ?? null,
         standardPriceId: data?.prices?.standardPriceId ?? null,
       })
+      return data?.entitlement ?? null
     } catch (error) {
       console.warn("[pricing] entitlement fetch failed", error)
+      return null
     } finally {
       setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    getOrCreateInstallId()
+  }, [getOrCreateInstallId])
 
   useEffect(() => {
     if (!hasAccess) {
@@ -101,15 +130,35 @@ export default function PricingClientPage() {
   }, [hasAccess])
 
   useEffect(() => {
-    if (hasAccess) {
-      loadEntitlement()
-      if (typeof window !== "undefined") {
-        window.sessionStorage?.setItem("pricing_access_token", pricingToken)
+    loadEntitlement()
+  }, [loadEntitlement])
+
+  useEffect(() => {
+    if (!hasCheckoutReturn) return
+    if (isPro) return
+    if (checkoutPolling) return
+
+    setCheckoutPolling(true)
+    toast({
+      title: "Processing payment",
+      description: "This can take a few seconds. Your Pro status will update automatically.",
+    })
+
+    let cancelled = false
+    ;(async () => {
+      for (let i = 0; i < 15; i++) {
+        if (cancelled) return
+        const ent = await loadEntitlement()
+        if (ent) break
+        await new Promise((r) => setTimeout(r, 2000))
       }
-    } else {
-      setEntitlement(null)
+      if (!cancelled) setCheckoutPolling(false)
+    })()
+
+    return () => {
+      cancelled = true
     }
-  }, [hasAccess, loadEntitlement])
+  }, [checkoutPolling, hasCheckoutReturn, isPro, loadEntitlement, toast])
 
   useEffect(() => {
     const onFocus = () => loadEntitlement()
@@ -133,15 +182,16 @@ export default function PricingClientPage() {
         installId = window.localStorage?.getItem("imgsharer_install_id")
       }
       if (!installId) {
-        toast({
-          title: "Missing device ID",
-          description: "Please refresh and try again.",
-          variant: "destructive",
-        })
+        installId = getOrCreateInstallId()
+      }
+      if (!installId) {
+        toast({ title: "Missing device ID", description: "Please refresh and try again.", variant: "destructive" })
         return
       }
 
       if (paymentProvider === "creem") {
+        if (checkoutStarting) return
+        setCheckoutStarting(true)
         const tier = preferEarlyBird && earlyBirdAvailable ? "early_bird" : "standard"
         try {
           const res = await fetch("/api/creem/checkout", {
@@ -149,6 +199,10 @@ export default function PricingClientPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ tier, installId }),
           })
+          if (res.status === 401) {
+            window.location.href = `/sign-in?redirect_url=${encodeURIComponent(window.location.href)}`
+            return
+          }
           const data = await res.json().catch(() => ({}))
           if (!res.ok || !data?.checkoutUrl) {
             throw new Error(data?.error || `Creem checkout failed (${res.status})`)
@@ -160,6 +214,8 @@ export default function PricingClientPage() {
             description: error instanceof Error ? error.message : "Please try again later.",
             variant: "destructive",
           })
+        } finally {
+          setCheckoutStarting(false)
         }
         return
       }
@@ -199,7 +255,7 @@ export default function PricingClientPage() {
         },
       })
     },
-    [earlyBirdAvailable, hasAccess, paddle, prices.earlyBirdPriceId, prices.standardPriceId, toast],
+    [earlyBirdAvailable, getOrCreateInstallId, hasAccess, paddle, prices.earlyBirdPriceId, prices.standardPriceId, toast],
   )
 
   if (!hasAccess) {
@@ -243,9 +299,7 @@ export default function PricingClientPage() {
                       <Badge className="bg-coral text-white">Pro Active</Badge>
                       <span className="text-sm text-neutral-500">Tier: {entitlement.tier}</span>
                     </div>
-                    <p className="text-neutral-700">
-                      Your Pro features are unlocked on this device (install ID based).
-                    </p>
+                    <p className="text-neutral-700">Your Pro features are unlocked on your signed-in email.</p>
                   </div>
                   <Button asChild className="bg-coral text-white hover:bg-coral/90 rounded-full">
                     <Link href="/">Use the tool</Link>
@@ -262,14 +316,14 @@ export default function PricingClientPage() {
                 <Badge variant="secondary">Forever</Badge>
               </div>
               <div className="mb-4">
-                <div className="text-3xl font-display font-bold text-neutral-900">$0</div>
-                <div className="text-sm text-neutral-500">For casual use</div>
-              </div>
-              <ul className="text-sm text-neutral-700 space-y-2 mb-6">
-                <li>2x / 4x upscaling</li>
-                <li>12 images per day</li>
-                <li>Watermarked downloads</li>
-              </ul>
+                  <div className="text-3xl font-display font-bold text-neutral-900">$0</div>
+                  <div className="text-sm text-neutral-500">For casual use</div>
+                </div>
+                <ul className="text-sm text-neutral-700 space-y-2 mb-6">
+                  <li>2x / 4x upscaling</li>
+                  <li>5 images per day</li>
+                  <li>Watermarked downloads</li>
+                </ul>
               <Button
                 asChild
                 variant="outline"
@@ -285,10 +339,10 @@ export default function PricingClientPage() {
                 <Badge className="bg-coral text-white">Limited</Badge>
               </div>
               <div className="mb-4">
-                <div className="flex items-end gap-2">
-                  <div className="text-3xl font-display font-bold text-neutral-900">$2.99</div>
-                  <div className="text-sm text-neutral-500">/ year</div>
-                </div>
+                  <div className="flex items-end gap-2">
+                    <div className="text-3xl font-display font-bold text-neutral-900">$2.99</div>
+                    <div className="text-sm text-neutral-500">/ month</div>
+                  </div>
                 <div className="text-sm text-neutral-500">
                   {loading ? "Checking availability..." : formatRemaining(earlyBirdRemaining)}
                 </div>
@@ -300,10 +354,20 @@ export default function PricingClientPage() {
               </ul>
               <Button
                 className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] disabled:bg-[#ff5733]/60 disabled:text-white rounded-full"
-                disabled={!earlyBirdAvailable || (paymentProvider === "paddle" && !paddle) || isPro}
+                disabled={
+                  !earlyBirdAvailable || (paymentProvider === "paddle" && !paddle) || isPro || checkoutPolling || checkoutStarting
+                }
                 onClick={() => openCheckout(true)}
               >
-                {isPro ? "Already Pro" : earlyBirdAvailable ? "Claim Early Bird" : "Sold out"}
+                {isPro
+                  ? "Already Pro"
+                  : checkoutStarting
+                    ? "Redirecting..."
+                    : checkoutPolling
+                      ? "Processing..."
+                      : earlyBirdAvailable
+                        ? "Claim Early Bird"
+                        : "Sold out"}
               </Button>
               {paymentProvider === "paddle" && !prices.earlyBirdPriceId ? (
                 <p className="mt-3 text-xs text-neutral-500">Early Bird price is not configured yet.</p>
@@ -316,11 +380,11 @@ export default function PricingClientPage() {
                 <Badge variant="secondary">Pro</Badge>
               </div>
               <div className="mb-4">
-                <div className="flex items-end gap-2">
-                  <div className="text-3xl font-display font-bold text-neutral-900">$9.99</div>
-                  <div className="text-sm text-neutral-500">/ year</div>
-                </div>
-                <div className="text-sm text-neutral-500">Same Pro features</div>
+                  <div className="flex items-end gap-2">
+                    <div className="text-3xl font-display font-bold text-neutral-900">$4.99</div>
+                    <div className="text-sm text-neutral-500">/ month</div>
+                  </div>
+                  <div className="text-sm text-neutral-500">Same Pro features</div>
               </div>
               <ul className="text-sm text-neutral-700 space-y-2 mb-6">
                 <li>Unlock 6x / 8x upscaling</li>
@@ -332,11 +396,13 @@ export default function PricingClientPage() {
                 disabled={
                   (paymentProvider === "paddle" && (!prices.standardPriceId || !paddle)) ||
                   (paymentProvider !== "paddle" && !hasAccess) ||
-                  isPro
+                  isPro ||
+                  checkoutPolling ||
+                  checkoutStarting
                 }
                 onClick={() => openCheckout(false)}
               >
-                {isPro ? "Already Pro" : "Upgrade"}
+                {isPro ? "Already Pro" : checkoutStarting ? "Redirecting..." : checkoutPolling ? "Processing..." : "Upgrade"}
               </Button>
               {paymentProvider === "paddle" && !prices.standardPriceId ? (
                 <p className="mt-3 text-xs text-neutral-500">Standard price is not configured yet.</p>
@@ -350,10 +416,10 @@ export default function PricingClientPage() {
               <Accordion type="single" collapsible>
                 <AccordionItem value="q1">
                   <AccordionTrigger>How does Pro unlock work?</AccordionTrigger>
-                  <AccordionContent>
-                    Pro is unlocked for your current device using an install ID. After checkout, return here and the
-                    page will refresh your status automatically (or just refresh the page).
-                  </AccordionContent>
+                    <AccordionContent>
+                      Pro is tied to your signed-in email. After checkout, return here and your status will refresh
+                      automatically (or just refresh the page). Your access follows your email across browsers/devices.
+                    </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="q2">
                   <AccordionTrigger>Where do I use Pro features?</AccordionTrigger>
