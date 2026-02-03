@@ -323,7 +323,7 @@ export default function PricingClientPage() {
                 </div>
                 <ul className="text-sm text-neutral-700 space-y-2 mb-6">
                   <li>2x / 4x upscaling</li>
-                  <li>5 images per day</li>
+                  <li>3 images per day</li>
                   <li>Watermarked downloads</li>
                 </ul>
               <Button

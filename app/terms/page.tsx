@@ -127,7 +127,7 @@ export default function TermsPage() {
 
             <h3 className="text-xl font-semibold text-neutral-900 mb-3">8.4 Feature Access</h3>
             <ul className="list-disc pl-6 text-neutral-600 space-y-2 mb-4">
-              <li>Free users: 2x/4x upscaling, 5 images per day, watermarked output</li>
+              <li>Free users: 2x/4x upscaling, 3 images per day, watermarked output</li>
               <li>Pro users: 6x/8x upscaling, unlimited images, no watermark, priority processing</li>
             </ul>
 

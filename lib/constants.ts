@@ -1,5 +1,5 @@
 export const MAX_DIMENSION = 4096
-export const RATE_LIMIT_PER_DAY_FREE = 5
+export const RATE_LIMIT_PER_DAY_FREE = 3
 export const RATE_LIMIT_PER_HOUR_PRO = 50
 export const RATE_LIMIT_PER_DAY_PRO = 200
 

@@ -792,7 +792,7 @@ export function ImageUploader({
 
         const label =
           limitType === "free_daily"
-            ? `Daily limit reached (${dailyLimit ?? 5}/day)`
+            ? `Daily limit reached (${dailyLimit ?? 3}/day)`
             : limitType === "pro_hour"
               ? "Hourly limit reached"
               : limitType === "pro_daily"
@@ -801,7 +801,7 @@ export function ImageUploader({
 
         const description =
           limitType === "free_daily"
-            ? `Free users can process up to ${dailyLimit ?? 5} images per day. Please try again tomorrow or upgrade.`
+            ? `Free users can process up to ${dailyLimit ?? 3} images per day. Please try again tomorrow or upgrade.`
             : errorMessage
 
         toast({
