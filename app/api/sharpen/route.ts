@@ -48,6 +48,14 @@ function extractOutputUrl(output: any): string | null {
   return null
 }
 
+function safeOutputUrl(raw: string | null): string | null {
+  if (!raw) return null
+  if (raw.startsWith("http://") || raw.startsWith("https://")) {
+    return raw.length <= 4096 ? raw : null
+  }
+  return null
+}
+
 function getInstallId(request: NextRequest) {
   const header = request.headers.get("x-install-id")?.trim()
   if (header) return header
@@ -296,7 +304,7 @@ export async function POST(request: NextRequest) {
         return attachInstallCookie(NextResponse.json({ error: "Missing prediction id" }, { status: 502 }))
       }
 
-      const outputUrl = extractOutputUrl(prediction?.output)
+      const outputUrl = safeOutputUrl(extractOutputUrl(prediction?.output))
       const now = Date.now()
       const job: SharpenJob = {
         jobId,

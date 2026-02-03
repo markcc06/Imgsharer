@@ -50,6 +50,14 @@ function extractOutputUrl(output: any): string | null {
   return null
 }
 
+function safeOutputUrl(raw: string | null): string | null {
+  if (!raw) return null
+  if (raw.startsWith("http://") || raw.startsWith("https://")) {
+    return raw.length <= 4096 ? raw : null
+  }
+  return null
+}
+
 export async function GET(request: NextRequest) {
   try {
     const apiToken = process.env.REPLICATE_API_TOKEN
@@ -109,7 +117,7 @@ export async function GET(request: NextRequest) {
 
     const prediction = await pollRes.json()
     const status = prediction?.status || "processing"
-    const outputUrl = extractOutputUrl(prediction?.output)
+    const outputUrl = safeOutputUrl(extractOutputUrl(prediction?.output))
     const effectiveEmail = normalizeEmail(job.email) ?? (installMatch ? normalizeEmail(email) : null)
     const entitlementNow =
       !job.isPro && effectiveEmail ? await getEntitlementByEmail(effectiveEmail).catch(() => null) : null
@@ -134,9 +142,6 @@ export async function GET(request: NextRequest) {
     }
 
     if (status === "succeeded") {
-      if (!updated.outputUrl) {
-        return NextResponse.json({ error: "No output image URL" }, { status: 502 })
-      }
       return NextResponse.json(
         {
           jobId,

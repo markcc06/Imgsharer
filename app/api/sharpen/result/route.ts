@@ -55,6 +55,26 @@ function normalizeEmail(email: string | null) {
   return typeof email === "string" && email.trim().length > 0 ? email.trim().toLowerCase() : null
 }
 
+function safeOutputUrl(raw: string | null): string | null {
+  if (!raw) return null
+  if (raw.startsWith("http://") || raw.startsWith("https://")) {
+    return raw.length <= 4096 ? raw : null
+  }
+  return null
+}
+
+function parseDataUriImage(dataUri: string): { buffer: Buffer; mimeType: string } | null {
+  const match = /^data:([^;]+);base64,(.+)$/i.exec(dataUri)
+  if (!match) return null
+  const [, mimeTypeRaw, base64Data] = match
+  try {
+    const buffer = Buffer.from(base64Data, "base64")
+    return { buffer, mimeType: mimeTypeRaw || "image/png" }
+  } catch {
+    return null
+  }
+}
+
 async function addWatermark(buffer: Buffer) {
   try {
     const metadata = await sharp(buffer).metadata()
@@ -144,7 +164,8 @@ export async function GET(request: NextRequest) {
 
       const prediction = await pollRes.json()
       const status = prediction?.status || "processing"
-      const extracted = extractOutputUrl(prediction?.output)
+      const extractedRaw = extractOutputUrl(prediction?.output)
+      const extracted = safeOutputUrl(extractedRaw)
       const updated: SharpenJob = {
         ...job,
         status,
@@ -155,22 +176,36 @@ export async function GET(request: NextRequest) {
       await kvSetJSON(jobKey, updated)
       await kvExpire(jobKey, SHARPEN_JOB_TTL_SECONDS)
 
-      if (status !== "succeeded" || !updated.outputUrl) {
+      if (status !== "succeeded") {
         return NextResponse.json({ error: "job_not_ready" }, { status: 409 })
       }
-      outputUrl = updated.outputUrl
+      if (updated.outputUrl) {
+        outputUrl = updated.outputUrl
+      } else if (typeof extractedRaw === "string" && extractedRaw.startsWith("data:")) {
+        outputUrl = extractedRaw
+      }
     }
 
-    const imageResponse = await fetch(outputUrl)
-    if (!imageResponse.ok) {
-      return NextResponse.json({ error: "Failed to download processed image" }, { status: 502 })
+    let downloaded: Buffer
+    let sourceMime = "image/png"
+    if (outputUrl.startsWith("data:")) {
+      const parsed = parseDataUriImage(outputUrl)
+      if (!parsed) {
+        return NextResponse.json({ error: "Invalid output data" }, { status: 502 })
+      }
+      downloaded = parsed.buffer
+      sourceMime = parsed.mimeType
+    } else {
+      const imageResponse = await fetch(outputUrl)
+      if (!imageResponse.ok) {
+        return NextResponse.json({ error: "Failed to download processed image" }, { status: 502 })
+      }
+      downloaded = Buffer.from(await imageResponse.arrayBuffer())
+      sourceMime = imageResponse.headers.get("content-type")?.split(";")[0] || "image/png"
     }
 
-    const downloaded = Buffer.from(await imageResponse.arrayBuffer())
     const finalBuffer = effectiveIsPro ? downloaded : await addWatermark(downloaded)
-    const outputMime = effectiveIsPro
-      ? imageResponse.headers.get("content-type")?.split(";")[0] || "image/png"
-      : "image/jpeg"
+    const outputMime = effectiveIsPro ? sourceMime : "image/jpeg"
 
     return new NextResponse(finalBuffer, {
       status: 200,
