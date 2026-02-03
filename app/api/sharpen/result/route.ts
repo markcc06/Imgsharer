@@ -5,7 +5,7 @@ import { currentUser, getAuth, clerkClient } from "@clerk/nextjs/server"
 
 import { kvExpire, kvGetJSON, kvSetJSON } from "@/lib/kv"
 import { SHARPEN_JOB_TTL_SECONDS, type SharpenJob } from "@/lib/sharpen-job"
-import { getEntitlementByEmail } from "@/lib/entitlements"
+import { getEntitlementByEmail, getEntitlementByInstallId } from "@/lib/entitlements"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -22,16 +22,21 @@ function getInstallId(request: NextRequest) {
 
 async function getEmail(request: NextRequest) {
   const { userId } = getAuth(request)
-  if (!userId) return null
+  let email: string | null = null
   try {
-    const client = await clerkClient()
-    const user = await client.users.getUser(userId)
-    return user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
+    if (userId) {
+      const client = await clerkClient()
+      const user = await client.users.getUser(userId)
+      email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
+    }
   } catch (err) {
     console.warn("[SERVER] clerk getUser failed", err)
   }
-  const user = await currentUser().catch(() => null)
-  return user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
+  if (!email) {
+    const user = await currentUser().catch(() => null)
+    email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
+  }
+  return email
 }
 
 function extractOutputUrl(output: any): string | null {
@@ -125,6 +130,7 @@ export async function GET(request: NextRequest) {
     }
 
     const installId = getInstallId(request)
+    const { userId } = getAuth(request)
     const email = await getEmail(request)
     const installMatch = job.installId && installId && job.installId === installId
     const emailMatch = job.email && email && job.email === email
@@ -132,22 +138,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 })
     }
 
-    const effectiveEmail = normalizeEmail(job.email) ?? (installMatch ? normalizeEmail(email) : null)
-    let effectiveIsPro = job.isPro
-    if (!effectiveIsPro && effectiveEmail) {
-      const entitlementNow = await getEntitlementByEmail(effectiveEmail).catch(() => null)
-      if (entitlementNow) {
-        effectiveIsPro = true
-        try {
-          await kvSetJSON(jobKey, {
-            ...job,
-            isPro: true,
-            email: job.email ?? (installMatch ? normalizeEmail(email) : job.email),
-            updatedAt: Date.now(),
-          })
-          await kvExpire(jobKey, SHARPEN_JOB_TTL_SECONDS)
-        } catch {}
-      }
+    const requestEmail = normalizeEmail(email)
+    const jobEmail = normalizeEmail(job.email)
+    const entitlementByRequest = requestEmail ? await getEntitlementByEmail(requestEmail).catch(() => null) : null
+    const entitlementByJob =
+      !entitlementByRequest && jobEmail && jobEmail !== requestEmail
+        ? await getEntitlementByEmail(jobEmail).catch(() => null)
+        : null
+    const entitlementByInstall =
+      !entitlementByRequest && !entitlementByJob && userId && installId
+        ? await getEntitlementByInstallId(installId).catch(() => null)
+        : null
+
+    const effectiveIsPro = job.isPro || !!entitlementByRequest || !!entitlementByJob || !!entitlementByInstall
+
+    if (effectiveIsPro && (!job.isPro || (!job.email && requestEmail))) {
+      try {
+        await kvSetJSON(jobKey, {
+          ...job,
+          isPro: true,
+          email: job.email ?? (installMatch || !job.installId ? requestEmail : job.email),
+          updatedAt: Date.now(),
+        })
+        await kvExpire(jobKey, SHARPEN_JOB_TTL_SECONDS)
+      } catch {}
     }
 
     let outputUrl = job.outputUrl
