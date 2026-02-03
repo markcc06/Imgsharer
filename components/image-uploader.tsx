@@ -242,6 +242,8 @@ export function ImageUploader({
   const abortControllerRef = useRef<AbortController | null>(null)
   const fakeIntervalRef = useRef<number | null>(null)
   const objectUrlRef = useRef<string | null>(null)
+  const pollTimeoutRef = useRef<number | null>(null)
+  const pollAbortRef = useRef<AbortController | null>(null)
   const [isRateLimited, setIsRateLimited] = useState(false)
   const [rateLimitLabel, setRateLimitLabel] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -527,6 +529,14 @@ export function ImageUploader({
         window.clearInterval(fakeIntervalRef.current)
         fakeIntervalRef.current = null
       }
+      if (pollAbortRef.current) {
+        pollAbortRef.current.abort()
+        pollAbortRef.current = null
+      }
+      if (pollTimeoutRef.current !== null) {
+        window.clearTimeout(pollTimeoutRef.current)
+        pollTimeoutRef.current = null
+      }
       if (objectUrlRef.current) {
         URL.revokeObjectURL(objectUrlRef.current)
         objectUrlRef.current = null
@@ -548,6 +558,14 @@ export function ImageUploader({
     if (fakeIntervalRef.current !== null) {
       window.clearInterval(fakeIntervalRef.current)
       fakeIntervalRef.current = null
+    }
+    if (pollAbortRef.current) {
+      pollAbortRef.current.abort()
+      pollAbortRef.current = null
+    }
+    if (pollTimeoutRef.current !== null) {
+      window.clearTimeout(pollTimeoutRef.current)
+      pollTimeoutRef.current = null
     }
 
     setIsFakeMode(true)
@@ -653,12 +671,28 @@ export function ImageUploader({
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
+    if (pollAbortRef.current) {
+      pollAbortRef.current.abort()
+      pollAbortRef.current = null
+    }
+    if (pollTimeoutRef.current !== null) {
+      window.clearTimeout(pollTimeoutRef.current)
+      pollTimeoutRef.current = null
+    }
 
     const controller = new AbortController()
     abortControllerRef.current = controller
 
     setIsProcessing(true)
     setProgress(0)
+
+    let progressInterval: number | null = null
+    const stopProgress = () => {
+      if (progressInterval !== null) {
+        window.clearInterval(progressInterval)
+        progressInterval = null
+      }
+    }
 
     try {
       const response = await fetch(originalImage)
@@ -676,6 +710,7 @@ export function ImageUploader({
       formData.append("scale", scale.toString())
       formData.append("face_enhance", faceEnhance.toString())
       formData.append("response_format", "image")
+      formData.append("async", "true")
 
       console.log("[v0] Sending request to", apiEndpoint)
       console.log("[v0] FormData contents:", {
@@ -684,7 +719,7 @@ export function ImageUploader({
         faceEnhance,
       })
 
-      const progressInterval = setInterval(() => {
+      progressInterval = window.setInterval(() => {
         setProgress((prev) => Math.min(prev + 5, 90))
       }, 1000)
 
@@ -703,9 +738,6 @@ export function ImageUploader({
 
       console.log("[v0] Fetch completed, status:", apiResponse.status)
       console.log("[v0] Response headers:", Object.fromEntries(apiResponse.headers.entries()))
-
-      clearInterval(progressInterval)
-      setProgress(100)
 
       const responseContentType = apiResponse.headers.get("content-type") || ""
 
@@ -729,6 +761,8 @@ export function ImageUploader({
           })
         }
 
+        stopProgress()
+        setProgress(100)
         toast({
           title: "Success!",
           description: "Your image has been sharpened.",
@@ -785,6 +819,7 @@ export function ImageUploader({
             setRateLimitLabel(null)
           }, ms)
         }
+        stopProgress()
         return
       }
 
@@ -801,6 +836,7 @@ export function ImageUploader({
           })
         }
         showPaywall()
+        stopProgress()
         return
       }
 
@@ -810,7 +846,114 @@ export function ImageUploader({
         throw new Error(errorMessage)
       }
 
+      const pollForResult = async (jobId: string) => {
+        if (pollAbortRef.current) {
+          pollAbortRef.current.abort()
+        }
+        if (pollTimeoutRef.current !== null) {
+          window.clearTimeout(pollTimeoutRef.current)
+          pollTimeoutRef.current = null
+        }
+
+        const pollController = new AbortController()
+        pollAbortRef.current = pollController
+        const startedAt = Date.now()
+        let warned = false
+
+        return new Promise<void>((resolve, reject) => {
+          const pollOnce = async () => {
+            if (pollController.signal.aborted) {
+              resolve()
+              return
+            }
+            try {
+              const headers: Record<string, string> = {}
+              if (installIdRef.current) {
+                headers["x-install-id"] = installIdRef.current
+              }
+              const statusRes = await fetch(`/api/sharpen/status?jobId=${encodeURIComponent(jobId)}`, {
+                headers,
+                signal: pollController.signal,
+              })
+              if (!statusRes.ok) {
+                const errorData = await statusRes.json().catch(() => ({}))
+                throw new Error(errorData?.error || `Status check failed (${statusRes.status})`)
+              }
+              const statusData = await statusRes.json()
+              if (statusData?.status === "failed") {
+                throw new Error(statusData?.error || "Prediction failed")
+              }
+
+              if (statusData?.status === "succeeded" && statusData?.resultUrl) {
+                const resultRes = await fetch(statusData.resultUrl, {
+                  headers,
+                  signal: pollController.signal,
+                })
+                if (!resultRes.ok) {
+                  const errorData = await resultRes.json().catch(() => ({}))
+                  throw new Error(errorData?.error || `Failed to download result (${resultRes.status})`)
+                }
+                const resultType = resultRes.headers.get("content-type") || ""
+                if (!resultType.startsWith("image/")) {
+                  throw new Error("Invalid image response")
+                }
+                const blob = await resultRes.blob()
+                const nextUrl = URL.createObjectURL(blob)
+                if (objectUrlRef.current) {
+                  URL.revokeObjectURL(objectUrlRef.current)
+                }
+                objectUrlRef.current = nextUrl
+                setSharpenedImage(nextUrl)
+
+                if (onSharpenComplete) {
+                  onSharpenComplete(nextUrl)
+                }
+
+                if (originalImage) {
+                  publishHeroUpdate({
+                    originalUrl: originalImage,
+                    resultUrl: nextUrl,
+                  })
+                }
+
+                stopProgress()
+                setProgress(100)
+                toast({
+                  title: "Success!",
+                  description: "Your image has been sharpened.",
+                })
+                resolve()
+                return
+              }
+
+              if (!warned && Date.now() - startedAt > 90_000) {
+                warned = true
+                toast({
+                  title: "Still processing",
+                  description: "This is taking longer than usual. You can keep this tab open or check back soon.",
+                })
+              }
+
+              pollTimeoutRef.current = window.setTimeout(pollOnce, 2000)
+            } catch (err) {
+              if (pollController.signal.aborted) {
+                resolve()
+                return
+              }
+              reject(err)
+            }
+          }
+
+          pollOnce()
+        })
+      }
+
       let resultUrl: string | null = null
+
+      if (data?.jobId) {
+        await pollForResult(data.jobId)
+        return
+      }
 
       if (data?.imageUrl) {
         console.log("[v0] Got imageUrl:", data.imageUrl)
@@ -849,6 +992,8 @@ export function ImageUploader({
         })
       }
 
+      stopProgress()
+      setProgress(100)
       toast({
         title: "Success!",
         description: "Your image has been sharpened.",
@@ -869,9 +1014,18 @@ export function ImageUploader({
         variant: "destructive",
       })
     } finally {
+      stopProgress()
       setIsProcessing(false)
       setProgress(0)
       abortControllerRef.current = null
+      if (pollAbortRef.current) {
+        pollAbortRef.current.abort()
+        pollAbortRef.current = null
+      }
+      if (pollTimeoutRef.current !== null) {
+        window.clearTimeout(pollTimeoutRef.current)
+        pollTimeoutRef.current = null
+      }
     }
   }
 

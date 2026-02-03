@@ -1,0 +1,161 @@
+import sharp from "sharp"
+import { cookies } from "next/headers"
+import { type NextRequest, NextResponse } from "next/server"
+import { getAuth, clerkClient } from "@clerk/nextjs/server"
+
+import { kvExpire, kvGetJSON, kvSetJSON } from "@/lib/kv"
+import { SHARPEN_JOB_TTL_SECONDS, type SharpenJob } from "@/lib/sharpen-job"
+
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+export const maxDuration = 60
+
+function getInstallId(request: NextRequest) {
+  const header = request.headers.get("x-install-id")?.trim()
+  if (header) return header
+  const cookieStore = cookies()
+  const existing = cookieStore.get("install_id")?.value
+  if (existing) return existing
+  return null
+}
+
+async function getEmail(request: NextRequest) {
+  const { userId } = getAuth(request)
+  if (!userId) return null
+  try {
+    const client = await clerkClient()
+    const user = await client.users.getUser(userId)
+    return user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
+  } catch (err) {
+    console.warn("[SERVER] clerk getUser failed", err)
+    return null
+  }
+}
+
+function extractOutputUrl(output: any): string | null {
+  if (!output) return null
+  if (typeof output === "string") return output
+  if (Array.isArray(output)) {
+    const first = output[0]
+    return typeof first === "string" ? first : first?.image ?? null
+  }
+  if (typeof output === "object") {
+    if (typeof output.image === "string") return output.image
+    if (output.image && typeof output.image === "object") {
+      const nested = (output.image as any).url
+      if (typeof nested === "string") return nested
+    }
+  }
+  return null
+}
+
+async function addWatermark(buffer: Buffer) {
+  try {
+    const metadata = await sharp(buffer).metadata()
+    const width = metadata.width || 1200
+    const height = metadata.height || 800
+
+    const brandColor = "#ff5733"
+    const iconSize = Math.max(48, Math.min(120, Math.round(Math.min(width, height) * 0.08)))
+    const padding = Math.max(12, Math.round(iconSize * 0.45))
+    const x = Math.max(padding, width - iconSize - padding)
+    const y = Math.max(padding, height - iconSize - padding)
+    const ringStroke = Math.max(2, Math.round(iconSize * 0.08))
+    const svg = Buffer.from(`
+      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(${x}, ${y})" opacity="0.85">
+          <circle cx="${iconSize / 2}" cy="${iconSize / 2}" r="${iconSize / 2}" fill="${brandColor}" fill-opacity="0.28" />
+          <circle cx="${iconSize / 2}" cy="${iconSize / 2}" r="${iconSize / 2 - ringStroke}" fill="none" stroke="${brandColor}" stroke-opacity="0.45" stroke-width="${ringStroke}" />
+          <g transform="translate(${iconSize / 2 - 12}, ${iconSize / 2 - 12}) scale(${iconSize / 24})" fill="white" fill-opacity="0.9">
+            <path d="M12 2 9.6 8.6 2.6 9.4 8 13.9 6.6 21 12 17.5 17.4 21 16 13.9 21.4 9.4 14.4 8.6z"/>
+          </g>
+        </g>
+      </svg>
+    `)
+    return sharp(buffer).composite([{ input: svg, gravity: "southeast" }]).jpeg({ quality: 94 }).toBuffer()
+  } catch (error) {
+    console.warn("[SERVER] Watermark failed, returning original", error)
+    return buffer
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const apiToken = process.env.REPLICATE_API_TOKEN
+    if (!apiToken) {
+      return NextResponse.json({ error: "Missing REPLICATE_API_TOKEN" }, { status: 500 })
+    }
+
+    const { searchParams } = new URL(request.url)
+    const jobId = searchParams.get("jobId")?.trim()
+    if (!jobId) {
+      return NextResponse.json({ error: "missing_job_id" }, { status: 400 })
+    }
+
+    const jobKey = `sharpen:job:${jobId}`
+    const job = await kvGetJSON<SharpenJob>(jobKey)
+    if (!job) {
+      return NextResponse.json({ error: "job_not_found" }, { status: 404 })
+    }
+
+    const installId = getInstallId(request)
+    const email = await getEmail(request)
+    const installMatch = job.installId && installId && job.installId === installId
+    const emailMatch = job.email && email && job.email === email
+    if ((job.installId || job.email) && !installMatch && !emailMatch) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403 })
+    }
+
+    let outputUrl = job.outputUrl
+    if (!outputUrl) {
+      const pollRes = await fetch(`https://api.replicate.com/v1/predictions/${jobId}`, {
+        headers: {
+          Authorization: `Token ${apiToken}`,
+        },
+      })
+      if (!pollRes.ok) {
+        const errorText = await pollRes.text()
+        return NextResponse.json({ error: errorText }, { status: pollRes.status })
+      }
+
+      const prediction = await pollRes.json()
+      const status = prediction?.status || "processing"
+      const extracted = extractOutputUrl(prediction?.output)
+      const updated: SharpenJob = {
+        ...job,
+        status,
+        updatedAt: Date.now(),
+        outputUrl: extracted ?? job.outputUrl ?? null,
+        error: prediction?.error ?? null,
+      }
+      await kvSetJSON(jobKey, updated)
+      await kvExpire(jobKey, SHARPEN_JOB_TTL_SECONDS)
+
+      if (status !== "succeeded" || !updated.outputUrl) {
+        return NextResponse.json({ error: "job_not_ready" }, { status: 409 })
+      }
+      outputUrl = updated.outputUrl
+    }
+
+    const imageResponse = await fetch(outputUrl)
+    if (!imageResponse.ok) {
+      return NextResponse.json({ error: "Failed to download processed image" }, { status: 502 })
+    }
+
+    const downloaded = Buffer.from(await imageResponse.arrayBuffer())
+    const finalBuffer = job.isPro ? downloaded : await addWatermark(downloaded)
+    const outputMime = job.isPro
+      ? imageResponse.headers.get("content-type")?.split(";")[0] || "image/png"
+      : "image/jpeg"
+
+    return new NextResponse(finalBuffer, {
+      status: 200,
+      headers: {
+        "Content-Type": outputMime,
+        "Cache-Control": "no-store",
+      },
+    })
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message || "Internal server error" }, { status: 500 })
+  }
+}

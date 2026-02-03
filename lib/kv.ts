@@ -54,3 +54,10 @@ export async function kvIncrBy(key: string, amount = 1): Promise<number> {
   const res = await kvFetch<number>(`/incrby/${encodeURIComponent(key)}/${amount}`)
   return typeof res === "number" ? res : 0
 }
+
+export async function kvExpire(key: string, seconds: number): Promise<boolean> {
+  const res = await kvFetch(`/expire/${encodeURIComponent(key)}/${seconds}`, {
+    method: "POST",
+  })
+  return res === "OK" || res === true || res === 1
+}

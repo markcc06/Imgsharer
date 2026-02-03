@@ -8,7 +8,8 @@ import {
   RATE_LIMIT_PER_HOUR_PRO,
 } from "@/lib/constants"
 import { getEarlyBirdSold, getEntitlementByEmail, getPriceConfig } from "@/lib/entitlements"
-import { kvGetJSON, kvIncrBy } from "@/lib/kv"
+import { kvExpire, kvGetJSON, kvIncrBy, kvSetJSON } from "@/lib/kv"
+import { SHARPEN_JOB_TTL_SECONDS, type SharpenJob } from "@/lib/sharpen-job"
 
 console.log("[SERVER] Sharpen route module loading...")
 
@@ -28,6 +29,23 @@ function arrayBufferToBase64(buffer: ArrayBuffer) {
     binary += String.fromCharCode(...chunk)
   }
   return btoa(binary)
+}
+
+function extractOutputUrl(output: any): string | null {
+  if (!output) return null
+  if (typeof output === "string") return output
+  if (Array.isArray(output)) {
+    const first = output[0]
+    return typeof first === "string" ? first : first?.image ?? null
+  }
+  if (typeof output === "object") {
+    if (typeof output.image === "string") return output.image
+    if (output.image && typeof output.image === "object") {
+      const nested = (output.image as any).url
+      if (typeof nested === "string") return nested
+    }
+  }
+  return null
 }
 
 function getInstallId(request: NextRequest) {
@@ -192,6 +210,10 @@ export async function POST(request: NextRequest) {
       (form.get("response_format") as string | null)?.trim().toLowerCase() ||
       request.headers.get("x-response-format")?.trim().toLowerCase()
     const wantsBinary = responseFormatRaw === "image" || responseFormatRaw === "binary" || responseFormatRaw === "blob"
+    const asyncRaw =
+      (form.get("async") as string | null)?.trim().toLowerCase() ||
+      request.headers.get("x-async")?.trim().toLowerCase()
+    const wantsAsync = asyncRaw === "1" || asyncRaw === "true" || asyncRaw === "yes"
 
     console.log("[SERVER] File received:", !!file, "Size:", file?.size)
     console.log("[SERVER] Scale:", scale, "Face enhance:", faceEnhance)
@@ -263,6 +285,45 @@ export async function POST(request: NextRequest) {
 
     const prediction = await createRes.json()
     console.log("[SERVER] Prediction created:", prediction.id, "Status:", prediction.status)
+
+    if (wantsAsync) {
+      const jobId = prediction?.id as string | undefined
+      if (!jobId) {
+        return attachInstallCookie(NextResponse.json({ error: "Missing prediction id" }, { status: 502 }))
+      }
+
+      const outputUrl = extractOutputUrl(prediction?.output)
+      const now = Date.now()
+      const job: SharpenJob = {
+        jobId,
+        status: prediction?.status || "starting",
+        createdAt: now,
+        updatedAt: now,
+        installId: installId ?? null,
+        email: email ?? null,
+        isPro: !!entitlement,
+        scale,
+        faceEnhance,
+        remaining: entitlement ? null : remaining,
+        outputUrl: outputUrl ?? null,
+        error: prediction?.error ?? null,
+      }
+      const jobKey = `sharpen:job:${jobId}`
+      try {
+        await kvSetJSON(jobKey, job)
+        await kvExpire(jobKey, SHARPEN_JOB_TTL_SECONDS)
+      } catch (err) {
+        console.warn("[SERVER] Failed to persist job to KV", err)
+      }
+
+      return attachInstallCookie(
+        NextResponse.json({
+          jobId,
+          status: job.status,
+          remaining: job.remaining,
+        }),
+      )
+    }
 
     let pollCount = 0
     const maxPolls = 60 // 60 seconds max
