@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { initializePaddle, type Paddle } from "@paddle/paddle-js"
 import { useSearchParams } from "next/navigation"
+import { useAuth } from "@clerk/nextjs"
 
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -40,6 +41,7 @@ function formatRemaining(n: number) {
 export default function PricingClientPage() {
   const { toast } = useToast()
   const searchParams = useSearchParams()
+  const { isSignedIn } = useAuth()
   const [paddle, setPaddle] = useState<Paddle | null>(null)
   const [entitlement, setEntitlement] = useState<Entitlement | null>(null)
   const [prices, setPrices] = useState<PriceConfig>({ earlyBirdPriceId: null, standardPriceId: null })
@@ -92,7 +94,7 @@ export default function PricingClientPage() {
         if (!existing) window.localStorage?.setItem(KEY, data.installId)
       }
 
-      setEntitlement(data?.entitlement ?? null)
+      setEntitlement(isSignedIn ? data?.entitlement ?? null : null)
       setEarlyBirdSold(typeof data?.earlyBirdSold === "number" ? data.earlyBirdSold : 0)
       setPrices({
         earlyBirdPriceId: data?.prices?.earlyBirdPriceId ?? null,
@@ -105,7 +107,7 @@ export default function PricingClientPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [isSignedIn])
 
   useEffect(() => {
     getOrCreateInstallId()

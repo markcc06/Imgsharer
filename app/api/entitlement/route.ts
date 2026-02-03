@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 import { currentUser, getAuth } from "@clerk/nextjs/server"
 
-import { getEarlyBirdSold, getEntitlementByEmail, getEntitlementByInstallId, getPriceConfig } from "@/lib/entitlements"
+import { getEarlyBirdSold, getEntitlementByEmail, getPriceConfig } from "@/lib/entitlements"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
   const installId = getOrCreateInstallId(request)
   const entitlementByEmail = email ? await getEntitlementByEmail(email) : null
-  const entitlement = entitlementByEmail || (installId ? await getEntitlementByInstallId(installId) : null)
+  const entitlement = entitlementByEmail
   const earlyBirdSold = await getEarlyBirdSold().catch(() => 0)
   const prices = getPriceConfig()
 

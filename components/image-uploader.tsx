@@ -241,6 +241,7 @@ export function ImageUploader({
   const [paddle, setPaddle] = useState<Paddle | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const fakeIntervalRef = useRef<number | null>(null)
+  const objectUrlRef = useRef<string | null>(null)
   const [isRateLimited, setIsRateLimited] = useState(false)
   const [rateLimitLabel, setRateLimitLabel] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -526,6 +527,10 @@ export function ImageUploader({
         window.clearInterval(fakeIntervalRef.current)
         fakeIntervalRef.current = null
       }
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current)
+        objectUrlRef.current = null
+      }
     }
   }, [])
 
@@ -670,6 +675,7 @@ export function ImageUploader({
       formData.append("image", processedBlob, "processed.jpg")
       formData.append("scale", scale.toString())
       formData.append("face_enhance", faceEnhance.toString())
+      formData.append("response_format", "image")
 
       console.log("[v0] Sending request to", apiEndpoint)
       console.log("[v0] FormData contents:", {
@@ -701,13 +707,49 @@ export function ImageUploader({
       clearInterval(progressInterval)
       setProgress(100)
 
+      const responseContentType = apiResponse.headers.get("content-type") || ""
+
+      if (apiResponse.ok && responseContentType.startsWith("image/")) {
+        const blob = await apiResponse.blob()
+        const nextUrl = URL.createObjectURL(blob)
+        if (objectUrlRef.current) {
+          URL.revokeObjectURL(objectUrlRef.current)
+        }
+        objectUrlRef.current = nextUrl
+        setSharpenedImage(nextUrl)
+
+        if (onSharpenComplete) {
+          onSharpenComplete(nextUrl)
+        }
+
+        if (originalImage) {
+          publishHeroUpdate({
+            originalUrl: originalImage,
+            resultUrl: nextUrl,
+          })
+        }
+
+        toast({
+          title: "Success!",
+          description: "Your image has been sharpened.",
+        })
+        return
+      }
+
+      let data: any = null
+      if (apiResponse.status !== 204) {
+        try {
+          data = await apiResponse.json()
+        } catch {}
+      }
+
       if (apiResponse.status === 429) {
         let errorMessage = "Usage limit exceeded. Please try again later."
         let limitType: string | null = null
         let resetAt: number | null = null
         let dailyLimit: number | null = null
         try {
-          const errorData = await apiResponse.json()
+          const errorData = data ?? {}
           errorMessage = errorData.error || errorMessage
           limitType = typeof errorData?.limit === "string" ? errorData.limit : null
           resetAt = typeof errorData?.resetAt === "number" ? errorData.resetAt : null
@@ -746,8 +788,6 @@ export function ImageUploader({
         return
       }
 
-      console.log("[v0] Parsing response JSON...")
-      const data = await apiResponse.json()
       console.log("[v0] Response data:", data)
 
       if (apiResponse.status === 402 && data?.error === "pro_required") {
@@ -775,6 +815,10 @@ export function ImageUploader({
       if (data?.imageUrl) {
         console.log("[v0] Got imageUrl:", data.imageUrl)
         resultUrl = data.imageUrl
+        if (objectUrlRef.current) {
+          URL.revokeObjectURL(objectUrlRef.current)
+          objectUrlRef.current = null
+        }
         setSharpenedImage(data.imageUrl)
 
         if (onSharpenComplete) {
@@ -782,8 +826,13 @@ export function ImageUploader({
         }
       } else if (data?.imageBase64) {
         console.log("[v0] Got imageBase64, length:", data.imageBase64.length)
-        const imageUrl = `data:image/png;base64,${data.imageBase64}`
+        const mime = typeof data?.imageMime === "string" ? data.imageMime : "image/png"
+        const imageUrl = `data:${mime};base64,${data.imageBase64}`
         resultUrl = imageUrl
+        if (objectUrlRef.current) {
+          URL.revokeObjectURL(objectUrlRef.current)
+          objectUrlRef.current = null
+        }
         setSharpenedImage(imageUrl)
 
         if (onSharpenComplete) {
@@ -853,6 +902,10 @@ export function ImageUploader({
     setProgress(0)
     setIsProcessing(false)
     setIsFakeMode(false)
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current)
+      objectUrlRef.current = null
+    }
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }

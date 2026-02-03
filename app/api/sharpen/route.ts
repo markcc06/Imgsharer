@@ -188,6 +188,10 @@ export async function POST(request: NextRequest) {
     const file = form.get("image") as File | null
     const scale = Number.parseInt((form.get("scale") as string) || "4", 10)
     const faceEnhance = (form.get("face_enhance") as string) === "true"
+    const responseFormatRaw =
+      (form.get("response_format") as string | null)?.trim().toLowerCase() ||
+      request.headers.get("x-response-format")?.trim().toLowerCase()
+    const wantsBinary = responseFormatRaw === "image" || responseFormatRaw === "binary" || responseFormatRaw === "blob"
 
     console.log("[SERVER] File received:", !!file, "Size:", file?.size)
     console.log("[SERVER] Scale:", scale, "Face enhance:", faceEnhance)
@@ -318,12 +322,32 @@ export async function POST(request: NextRequest) {
 
     const downloaded = Buffer.from(await imageResponse.arrayBuffer())
     const finalBuffer = entitlement ? downloaded : await addWatermark(downloaded)
+    const outputMime =
+      entitlement
+        ? imageResponse.headers.get("content-type")?.split(";")[0] || "image/png"
+        : "image/jpeg"
+
+    if (wantsBinary) {
+      const binaryResponse = new NextResponse(finalBuffer, {
+        status: 200,
+        headers: {
+          "Content-Type": outputMime,
+          "Cache-Control": "no-store",
+        },
+      })
+      if (!entitlement && typeof remaining === "number") {
+        binaryResponse.headers.set("x-remaining", String(remaining))
+      }
+      return attachInstallCookie(binaryResponse)
+    }
+
     const imageBase64 = finalBuffer.toString("base64")
     console.log("[SERVER] Image downloaded and converted to base64, size:", imageBase64.length, "chars")
 
     return attachInstallCookie(
       NextResponse.json({
         imageBase64,
+        imageMime: outputMime,
         remaining: entitlement ? null : remaining,
       }),
     )
