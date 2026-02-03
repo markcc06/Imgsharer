@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState, useRef, useCallback, useEffect } from "react"
+import Link from "next/link"
 import { initializePaddle, Paddle } from "@paddle/paddle-js"
 import { useAuth } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
@@ -246,6 +247,8 @@ export function ImageUploader({
   const pollAbortRef = useRef<AbortController | null>(null)
   const [isRateLimited, setIsRateLimited] = useState(false)
   const [rateLimitLabel, setRateLimitLabel] = useState<string | null>(null)
+  const [showRateLimitModal, setShowRateLimitModal] = useState(false)
+  const [rateLimitDailyLimit, setRateLimitDailyLimit] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [scale, setScale] = useState<number>(4)
   const [blockedHighScale, setBlockedHighScale] = useState(false)
@@ -811,6 +814,10 @@ export function ImageUploader({
 
         setIsRateLimited(true)
         setRateLimitLabel(label)
+        if (limitType === "free_daily") {
+          setRateLimitDailyLimit(dailyLimit ?? 3)
+          setShowRateLimitModal(true)
+        }
 
         if (limitType !== "free_daily" && resetAt && resetAt > Date.now()) {
           const ms = Math.min(Math.max(1000, resetAt - Date.now()), 60 * 60 * 1000)
@@ -1289,6 +1296,40 @@ export function ImageUploader({
             <p className="mt-4 text-xs text-neutral-500">
               Secure checkout. Your Pro access is tied to your signed-in email.
             </p>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
+
+      <Dialog open={showRateLimitModal} onOpenChange={setShowRateLimitModal}>
+        <DialogPortal>
+          <DialogOverlay className="!z-[150] bg-black/70 backdrop-blur-sm" />
+          <DialogContent className="!z-[160] sm:max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl">
+            <DialogHeader className="text-left">
+              <DialogTitle className="text-2xl font-display text-neutral-900">Daily limit reached</DialogTitle>
+              <DialogDescription className="text-neutral-600">
+                Free users can process {rateLimitDailyLimit ?? 3} images per day. Unlock Pro for unlimited daily usage and
+                watermark-free downloads.
+              </DialogDescription>
+            </DialogHeader>
+
+            <ul className="mt-4 space-y-2 text-sm text-neutral-700">
+              <li>• Unlimited daily usage</li>
+              <li>• 6x / 8x upscaling</li>
+              <li>• Watermark-free downloads</li>
+            </ul>
+
+            <div className="mt-6 space-y-3">
+              <Button asChild className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] rounded-full">
+                <Link href="/pricing">Unlock Pro</Link>
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full rounded-full border-[#ff7959] text-[#ff5733] hover:bg-[#ff5733]/10 hover:border-[#ff5733]"
+                onClick={() => setShowRateLimitModal(false)}
+              >
+                Maybe later
+              </Button>
+            </div>
           </DialogContent>
         </DialogPortal>
       </Dialog>
