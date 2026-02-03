@@ -1,7 +1,7 @@
 import sharp from "sharp"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
-import { getAuth, clerkClient } from "@clerk/nextjs/server"
+import { currentUser, getAuth, clerkClient } from "@clerk/nextjs/server"
 import {
   RATE_LIMIT_PER_DAY_FREE,
   RATE_LIMIT_PER_DAY_PRO,
@@ -112,6 +112,10 @@ export async function POST(request: NextRequest) {
       } catch (err) {
         console.warn("[SERVER] clerk getUser failed", err)
       }
+    }
+    if (!email && userId) {
+      const user = await currentUser().catch(() => null)
+      email = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
     }
     const entitlementByEmail = email ? await getEntitlementByEmail(email) : null
     const entitlement = entitlementByEmail

@@ -1,10 +1,11 @@
 import sharp from "sharp"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
-import { getAuth, clerkClient } from "@clerk/nextjs/server"
+import { currentUser, getAuth, clerkClient } from "@clerk/nextjs/server"
 
 import { kvExpire, kvGetJSON, kvSetJSON } from "@/lib/kv"
 import { SHARPEN_JOB_TTL_SECONDS, type SharpenJob } from "@/lib/sharpen-job"
+import { getEntitlementByEmail } from "@/lib/entitlements"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -28,8 +29,9 @@ async function getEmail(request: NextRequest) {
     return user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
   } catch (err) {
     console.warn("[SERVER] clerk getUser failed", err)
-    return null
   }
+  const user = await currentUser().catch(() => null)
+  return user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
 }
 
 function extractOutputUrl(output: any): string | null {
@@ -47,6 +49,10 @@ function extractOutputUrl(output: any): string | null {
     }
   }
   return null
+}
+
+function normalizeEmail(email: string | null) {
+  return typeof email === "string" && email.trim().length > 0 ? email.trim().toLowerCase() : null
 }
 
 async function addWatermark(buffer: Buffer) {
@@ -106,6 +112,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 })
     }
 
+    const effectiveEmail = normalizeEmail(job.email) ?? (installMatch ? normalizeEmail(email) : null)
+    let effectiveIsPro = job.isPro
+    if (!effectiveIsPro && effectiveEmail) {
+      const entitlementNow = await getEntitlementByEmail(effectiveEmail).catch(() => null)
+      if (entitlementNow) {
+        effectiveIsPro = true
+        try {
+          await kvSetJSON(jobKey, {
+            ...job,
+            isPro: true,
+            email: job.email ?? (installMatch ? normalizeEmail(email) : job.email),
+            updatedAt: Date.now(),
+          })
+          await kvExpire(jobKey, SHARPEN_JOB_TTL_SECONDS)
+        } catch {}
+      }
+    }
+
     let outputUrl = job.outputUrl
     if (!outputUrl) {
       const pollRes = await fetch(`https://api.replicate.com/v1/predictions/${jobId}`, {
@@ -143,8 +167,8 @@ export async function GET(request: NextRequest) {
     }
 
     const downloaded = Buffer.from(await imageResponse.arrayBuffer())
-    const finalBuffer = job.isPro ? downloaded : await addWatermark(downloaded)
-    const outputMime = job.isPro
+    const finalBuffer = effectiveIsPro ? downloaded : await addWatermark(downloaded)
+    const outputMime = effectiveIsPro
       ? imageResponse.headers.get("content-type")?.split(";")[0] || "image/png"
       : "image/jpeg"
 

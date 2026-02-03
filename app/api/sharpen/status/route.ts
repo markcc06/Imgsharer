@@ -1,9 +1,10 @@
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
-import { getAuth, clerkClient } from "@clerk/nextjs/server"
+import { currentUser, getAuth, clerkClient } from "@clerk/nextjs/server"
 
 import { kvExpire, kvGetJSON, kvSetJSON } from "@/lib/kv"
 import { SHARPEN_JOB_TTL_SECONDS, type SharpenJob } from "@/lib/sharpen-job"
+import { getEntitlementByEmail } from "@/lib/entitlements"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -27,8 +28,9 @@ async function getEmail(request: NextRequest) {
     return user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
   } catch (err) {
     console.warn("[SERVER] clerk getUser failed", err)
-    return null
   }
+  const user = await currentUser().catch(() => null)
+  return user?.primaryEmailAddress?.emailAddress?.toLowerCase() || null
 }
 
 function extractOutputUrl(output: any): string | null {
@@ -108,11 +110,16 @@ export async function GET(request: NextRequest) {
     const prediction = await pollRes.json()
     const status = prediction?.status || "processing"
     const outputUrl = extractOutputUrl(prediction?.output)
+    const effectiveEmail = normalizeEmail(job.email) ?? (installMatch ? normalizeEmail(email) : null)
+    const entitlementNow =
+      !job.isPro && effectiveEmail ? await getEntitlementByEmail(effectiveEmail).catch(() => null) : null
     const updated: SharpenJob = {
       ...job,
       status,
       updatedAt: Date.now(),
       outputUrl: outputUrl ?? job.outputUrl ?? null,
+      email: job.email ?? (installMatch ? normalizeEmail(email) : job.email),
+      isPro: job.isPro || !!entitlementNow,
       error: prediction?.error ?? null,
     }
 
@@ -148,4 +155,8 @@ export async function GET(request: NextRequest) {
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || "Internal server error" }, { status: 500 })
   }
+}
+
+function normalizeEmail(email: string | null) {
+  return typeof email === "string" && email.trim().length > 0 ? email.trim().toLowerCase() : null
 }
