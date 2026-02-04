@@ -126,6 +126,25 @@ function formatSpotsLeft(spots: number) {
   return `${spots} spots left`
 }
 
+const EXPERIMENT_ID = "upsell_modal_v1"
+type UpsellVariant = "strong_modal" | "intent_modal"
+
+function hashToBucket(value: string) {
+  let hash = 0
+  for (let i = 0; i < value.length; i++) {
+    hash = (hash * 31 + value.charCodeAt(i)) | 0
+  }
+  return Math.abs(hash) % 100
+}
+
+function assignUpsellVariant(installId: string): UpsellVariant {
+  return hashToBucket(installId) < 20 ? "strong_modal" : "intent_modal"
+}
+
+function getVariantKey(installId: string) {
+  return `imgsharer:upsell_variant:${installId}`
+}
+
 function Loader2Icon({ className }: { className?: string }) {
   return (
     <svg
@@ -284,6 +303,10 @@ export function ImageUploader({
   const [showWatermarkModal, setShowWatermarkModal] = useState(false)
   const [watermarkModalUtcDay, setWatermarkModalUtcDay] = useState<string | null>(null)
   const [campaignStartUtcDay, setCampaignStartUtcDay] = useState<string | null>(null)
+  const [upsellVariant, setUpsellVariant] = useState<UpsellVariant | null>(null)
+  const [showCampaignModal, setShowCampaignModal] = useState(false)
+  const [campaignModalUtcDay, setCampaignModalUtcDay] = useState<string | null>(null)
+  const [campaignModalDay, setCampaignModalDay] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [scale, setScale] = useState<number>(4)
   const [blockedHighScale, setBlockedHighScale] = useState(false)
@@ -457,6 +480,48 @@ export function ImageUploader({
     [getLocalInstallId],
   )
 
+  const trackEvent = useCallback((name: string, params: Record<string, any> = {}) => {
+    if (typeof window === "undefined") return
+    const gtagFn = (window as any).gtag
+    if (typeof gtagFn !== "function") return
+    gtagFn("event", name, params)
+  }, [])
+
+  const trackUpsellEvent = useCallback(
+    (name: string, params: Record<string, any> = {}) => {
+      trackEvent(name, {
+        experiment_id: EXPERIMENT_ID,
+        variant: upsellVariant ?? "unknown",
+        user_type: userType,
+        ...params,
+      })
+    },
+    [trackEvent, upsellVariant, userType],
+  )
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const installId = getLocalInstallId()
+    if (!installId) return
+    const key = getVariantKey(installId)
+    const existing = window.localStorage?.getItem(key)
+    const validExisting = existing === "strong_modal" || existing === "intent_modal"
+    const variant: UpsellVariant = validExisting ? (existing as UpsellVariant) : assignUpsellVariant(installId)
+    if (!validExisting) {
+      window.localStorage?.setItem(key, variant)
+      trackEvent("upsell_experiment_assigned", { experiment_id: EXPERIMENT_ID, variant })
+    }
+    setUpsellVariant(variant)
+
+    const gtagFn = (window as any).gtag
+    if (typeof gtagFn === "function") {
+      gtagFn("set", "user_properties", {
+        upsell_variant: variant,
+        upsell_experiment: EXPERIMENT_ID,
+      })
+    }
+  }, [getLocalInstallId, trackEvent])
+
   const trackUpscaleFactor = useCallback(
     (nextScale: number) => {
       try {
@@ -580,9 +645,40 @@ export function ImageUploader({
         setBlockedHighScale(true)
       }
       setShowPaywallModal(true)
+      trackUpsellEvent("upsell_modal_shown", { trigger: "high_scale" })
     },
-    [ensureCampaignStarted],
+    [ensureCampaignStarted, trackUpsellEvent],
   )
+
+  useEffect(() => {
+    if (upsellVariant !== "strong_modal") return
+    if (isPro) return
+    if (showCampaignModal) return
+
+    const startUtcDay = campaignStartUtcDay ?? ensureCampaignStarted()
+    if (!startUtcDay) return
+    const campaignDay = getUtcDayDiff(startUtcDay)
+    if (campaignDay === null || ![0, 3, 6, 7].includes(campaignDay)) return
+    const utcDay = getUtcDayString()
+    const variantKey = `modal:campaign_day${campaignDay}`
+    if (hasSeen(variantKey, utcDay)) return
+
+    setCampaignModalUtcDay(utcDay)
+    setCampaignModalDay(campaignDay)
+    setShowRateLimitModal(false)
+    setShowWatermarkModal(false)
+    setShowPaywallModal(false)
+    setShowCampaignModal(true)
+    trackUpsellEvent("upsell_modal_shown", { trigger: `campaign_day${campaignDay}`, campaign_day: campaignDay })
+  }, [
+    upsellVariant,
+    isPro,
+    showCampaignModal,
+    campaignStartUtcDay,
+    ensureCampaignStarted,
+    hasSeen,
+    trackUpsellEvent,
+  ])
 
   useEffect(() => {
     if (initialImage) {
@@ -905,6 +1001,7 @@ export function ImageUploader({
             setShowPaywallModal(false)
             setShowWatermarkModal(false)
             setShowRateLimitModal(true)
+            trackUpsellEvent("upsell_modal_shown", { trigger: "free_daily" })
           } else {
             toast({ title: label, description })
           }
@@ -1157,6 +1254,7 @@ export function ImageUploader({
         setShowPaywallModal(false)
         setShowRateLimitModal(false)
         setShowWatermarkModal(true)
+        trackUpsellEvent("upsell_modal_shown", { trigger: "watermark_download" })
         return
       }
     }
@@ -1203,6 +1301,12 @@ export function ImageUploader({
     const variant = `banner:day${campaignDay}`
     if (hasSeen(variant, utcDay)) return null
 
+    const shownKey = `banner_shown:day${campaignDay}`
+    if (!hasSeen(shownKey, utcDay)) {
+      trackUpsellEvent("upsell_banner_shown", { campaign_day: campaignDay })
+      markSeen(shownKey, utcDay)
+    }
+
     const baseOffer = `Early Bird $2.99/mo (reg. $4.99) · ${formatSpotsLeft(earlyBirdSpotsLeft)}`
     const message =
       campaignDay === 0
@@ -1221,6 +1325,7 @@ export function ImageUploader({
             <Link
               href="/pricing"
               onClick={() => {
+                trackUpsellEvent("upsell_cta_click", { location: "banner", action: "pricing", campaign_day: campaignDay })
                 markSeen(variant, utcDay)
               }}
             >
@@ -1232,6 +1337,7 @@ export function ImageUploader({
             className="rounded-full p-2 text-neutral-600 hover:bg-black/5"
             aria-label="Dismiss"
             onClick={() => {
+              trackUpsellEvent("upsell_banner_dismissed", { campaign_day: campaignDay })
               markSeen(variant, utcDay)
             }}
           >
@@ -1241,6 +1347,9 @@ export function ImageUploader({
       </div>
     )
   })()
+
+  const campaignEmoji =
+    campaignModalDay === 7 ? "⚡" : campaignModalDay === 6 ? "⏳" : campaignModalDay === 3 ? "⏰" : "🚀"
 
   return (
     <>
@@ -1418,6 +1527,66 @@ export function ImageUploader({
       </Reveal>
 
       <Dialog
+        open={showCampaignModal}
+        onOpenChange={(open) => {
+          if (!open && campaignModalUtcDay && campaignModalDay !== null) {
+            const key = `modal:campaign_day${campaignModalDay}`
+            markSeen(key, campaignModalUtcDay)
+            trackUpsellEvent("upsell_modal_dismissed", { trigger: `campaign_day${campaignModalDay}`, campaign_day: campaignModalDay })
+          }
+          setShowCampaignModal(open)
+        }}
+      >
+        <DialogPortal>
+          <DialogOverlay className="!z-[150] bg-black/70 backdrop-blur-sm" />
+          <DialogContent className="!z-[160] sm:max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl">
+            <DialogHeader className="text-left">
+              <DialogTitle className="text-2xl font-display text-neutral-900">
+                {campaignEmoji} Early Bird $2.99/mo
+              </DialogTitle>
+              <DialogDescription className="text-neutral-600">
+                Unlock 6x/8x, no watermark, unlimited daily usage.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800">
+              <div className="font-medium">Reg. $4.99 · {formatSpotsLeft(earlyBirdSpotsLeft)}</div>
+            </div>
+
+            <div className="mt-6 space-y-3">
+              <Button asChild className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] rounded-full py-6 h-auto">
+                <Link
+                  href="/pricing"
+                  onClick={() => {
+                    if (campaignModalUtcDay && campaignModalDay !== null) {
+                      markSeen(`modal:campaign_day${campaignModalDay}`, campaignModalUtcDay)
+                    }
+                    trackUpsellEvent("upsell_cta_click", { location: "modal", trigger: `campaign_day${campaignModalDay ?? 0}`, action: "pricing" })
+                    setShowCampaignModal(false)
+                  }}
+                >
+                  See pricing
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full rounded-full border-[#ff7959] text-[#ff5733] hover:bg-[#ff5733]/10 hover:border-[#ff5733] py-6 h-auto"
+                onClick={() => {
+                  if (campaignModalUtcDay && campaignModalDay !== null) {
+                    markSeen(`modal:campaign_day${campaignModalDay}`, campaignModalUtcDay)
+                  }
+                  trackUpsellEvent("upsell_cta_click", { location: "modal", trigger: `campaign_day${campaignModalDay ?? 0}`, action: "dismiss" })
+                  setShowCampaignModal(false)
+                }}
+              >
+                Not now
+              </Button>
+            </div>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
+
+      <Dialog
         open={showPaywallModal}
         onOpenChange={(open) => {
           if (!open && blockedHighScale) {
@@ -1446,7 +1615,13 @@ export function ImageUploader({
 
             <div className="mt-6 space-y-3">
               <Button asChild className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] rounded-full py-6 h-auto">
-                <Link href="/pricing" onClick={() => setShowPaywallModal(false)}>
+                <Link
+                  href="/pricing"
+                  onClick={() => {
+                    trackUpsellEvent("upsell_cta_click", { location: "modal", trigger: "high_scale", action: "pricing" })
+                    setShowPaywallModal(false)
+                  }}
+                >
                   Upgrade to Pro
                 </Link>
               </Button>
@@ -1454,6 +1629,7 @@ export function ImageUploader({
                 variant="outline"
                 className="w-full rounded-full border-[#ff7959] text-[#ff5733] hover:bg-[#ff5733]/10 hover:border-[#ff5733] py-6 h-auto"
                 onClick={() => {
+                  trackUpsellEvent("upsell_cta_click", { location: "modal", trigger: "high_scale", action: "continue_4x" })
                   setBlockedHighScale(false)
                   setScale(4)
                   setShowPaywallModal(false)
@@ -1500,6 +1676,7 @@ export function ImageUploader({
                 <Link
                   href="/pricing"
                   onClick={() => {
+                    trackUpsellEvent("upsell_cta_click", { location: "modal", trigger: "free_daily", action: "pricing" })
                     if (rateLimitModalUtcDay) markSeen("modal:free_daily", rateLimitModalUtcDay)
                     setShowRateLimitModal(false)
                   }}
@@ -1511,6 +1688,7 @@ export function ImageUploader({
                 variant="outline"
                 className="w-full rounded-full border-[#ff7959] text-[#ff5733] hover:bg-[#ff5733]/10 hover:border-[#ff5733] py-6 h-auto"
                 onClick={() => {
+                  trackUpsellEvent("upsell_cta_click", { location: "modal", trigger: "free_daily", action: "come_back_tomorrow" })
                   if (rateLimitModalUtcDay) markSeen("modal:free_daily", rateLimitModalUtcDay)
                   setShowRateLimitModal(false)
                 }}
@@ -1548,6 +1726,7 @@ export function ImageUploader({
                 <Link
                   href="/pricing"
                   onClick={() => {
+                    trackUpsellEvent("upsell_cta_click", { location: "modal", trigger: "watermark_download", action: "pricing" })
                     if (watermarkModalUtcDay) markSeen("modal:watermark", watermarkModalUtcDay)
                     setShowWatermarkModal(false)
                   }}
@@ -1559,6 +1738,7 @@ export function ImageUploader({
                 variant="outline"
                 className="w-full rounded-full border-[#ff7959] text-[#ff5733] hover:bg-[#ff5733]/10 hover:border-[#ff5733] py-6 h-auto"
                 onClick={() => {
+                  trackUpsellEvent("upsell_cta_click", { location: "modal", trigger: "watermark_download", action: "download_with_watermark" })
                   if (watermarkModalUtcDay) markSeen("modal:watermark", watermarkModalUtcDay)
                   setShowWatermarkModal(false)
                   downloadSharpenedImage()

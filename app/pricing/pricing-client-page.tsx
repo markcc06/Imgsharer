@@ -32,6 +32,9 @@ const paddleEnv = (process.env.NEXT_PUBLIC_PADDLE_ENV as "sandbox" | "production
 const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
 const paymentProvider = (process.env.NEXT_PUBLIC_PAYMENT_PROVIDER as "creem" | "paddle" | undefined) ?? "paddle"
 const MS_PER_DAY = 86_400_000
+const EXPERIMENT_ID = "upsell_modal_v1"
+
+type UpsellVariant = "strong_modal" | "intent_modal"
 
 function getUtcDayString(date = new Date()) {
   return date.toISOString().slice(0, 10)
@@ -57,6 +60,22 @@ function getSeenKey(installId: string, variant: string, utcDay: string) {
   return `imgsharer:seen:${installId}:${variant}:${utcDay}`
 }
 
+function getVariantKey(installId: string) {
+  return `imgsharer:upsell_variant:${installId}`
+}
+
+function hashToBucket(value: string) {
+  let hash = 0
+  for (let i = 0; i < value.length; i++) {
+    hash = (hash * 31 + value.charCodeAt(i)) | 0
+  }
+  return Math.abs(hash) % 100
+}
+
+function assignUpsellVariant(installId: string): UpsellVariant {
+  return hashToBucket(installId) < 20 ? "strong_modal" : "intent_modal"
+}
+
 function formatRemaining(n: number) {
   if (n <= 0) return "Sold out"
   if (n === 1) return "1 spot left"
@@ -75,6 +94,7 @@ export default function PricingClientPage() {
   const [checkoutPolling, setCheckoutPolling] = useState(false)
   const [checkoutStarting, setCheckoutStarting] = useState(false)
   const [campaignStartUtcDay, setCampaignStartUtcDay] = useState<string | null>(null)
+  const [upsellVariant, setUpsellVariant] = useState<UpsellVariant | null>(null)
 
   const hasAccess = true
 
@@ -126,6 +146,41 @@ export default function PricingClientPage() {
     [getLocalInstallId],
   )
 
+  const trackEvent = useCallback((name: string, params: Record<string, any> = {}) => {
+    if (typeof window === "undefined") return
+    const gtagFn = (window as any).gtag
+    if (typeof gtagFn !== "function") return
+    gtagFn("event", name, params)
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const installId = getLocalInstallId()
+    if (!installId) return
+    const key = getVariantKey(installId)
+    const existing = window.localStorage?.getItem(key)
+    const validExisting = existing === "strong_modal" || existing === "intent_modal"
+    const variant: UpsellVariant = validExisting ? (existing as UpsellVariant) : assignUpsellVariant(installId)
+    if (!validExisting) {
+      window.localStorage?.setItem(key, variant)
+      trackEvent("upsell_experiment_assigned", { experiment_id: EXPERIMENT_ID, variant })
+    }
+    setUpsellVariant(variant)
+
+    const gtagFn = (window as any).gtag
+    if (typeof gtagFn === "function") {
+      gtagFn("set", "user_properties", {
+        upsell_variant: variant,
+        upsell_experiment: EXPERIMENT_ID,
+      })
+    }
+  }, [getLocalInstallId, trackEvent])
+
+  useEffect(() => {
+    if (!upsellVariant) return
+    trackEvent("pricing_view", { experiment_id: EXPERIMENT_ID, variant: upsellVariant })
+  }, [trackEvent, upsellVariant])
+
   const campaignBanner = useMemo(() => {
     if (isPro) return null
     if (!campaignStartUtcDay) return null
@@ -138,6 +193,17 @@ export default function PricingClientPage() {
     const utcDay = getUtcDayString()
     const variant = `banner:day${campaignDay}`
     if (hasSeen(variant, utcDay)) return null
+
+    const shownKey = `banner_shown:day${campaignDay}`
+    if (!hasSeen(shownKey, utcDay)) {
+      trackEvent("upsell_banner_shown", {
+        experiment_id: EXPERIMENT_ID,
+        variant: upsellVariant ?? "unknown",
+        campaign_day: campaignDay,
+        location: "pricing",
+      })
+      markSeen(shownKey, utcDay)
+    }
 
     const baseOffer = `Early Bird $2.99/mo (reg. $4.99) · ${formatRemaining(earlyBirdRemaining)}`
     const message =
@@ -157,6 +223,13 @@ export default function PricingClientPage() {
             <Link
               href="/pricing"
               onClick={() => {
+                trackEvent("upsell_cta_click", {
+                  experiment_id: EXPERIMENT_ID,
+                  variant: upsellVariant ?? "unknown",
+                  location: "banner",
+                  action: "pricing",
+                  campaign_day: campaignDay,
+                })
                 markSeen(variant, utcDay)
               }}
             >
@@ -168,6 +241,12 @@ export default function PricingClientPage() {
             className="rounded-full p-2 text-neutral-600 hover:bg-black/5"
             aria-label="Dismiss"
             onClick={() => {
+              trackEvent("upsell_banner_dismissed", {
+                experiment_id: EXPERIMENT_ID,
+                variant: upsellVariant ?? "unknown",
+                campaign_day: campaignDay,
+                location: "pricing",
+              })
               markSeen(variant, utcDay)
             }}
           >
@@ -176,7 +255,7 @@ export default function PricingClientPage() {
         </div>
       </div>
     )
-  }, [campaignStartUtcDay, earlyBirdRemaining, hasSeen, isPro, markSeen])
+  }, [campaignStartUtcDay, earlyBirdRemaining, hasSeen, isPro, markSeen, trackEvent, upsellVariant])
 
   const loadEntitlement = useCallback(async () => {
     setLoading(true)
@@ -304,10 +383,20 @@ export default function PricingClientPage() {
         return
       }
 
+      if (paymentProvider === "creem" && checkoutStarting) return
+
+      const selectedTier = preferEarlyBird && earlyBirdAvailable ? "early_bird" : "standard"
+      trackEvent("upsell_cta_click", {
+        experiment_id: EXPERIMENT_ID,
+        variant: upsellVariant ?? "unknown",
+        location: "pricing",
+        action: "checkout",
+        plan: selectedTier,
+      })
+
       if (paymentProvider === "creem") {
-        if (checkoutStarting) return
         setCheckoutStarting(true)
-        const tier = preferEarlyBird && earlyBirdAvailable ? "early_bird" : "standard"
+        const tier = selectedTier
         try {
           const res = await fetch("/api/creem/checkout", {
             method: "POST",
@@ -370,7 +459,7 @@ export default function PricingClientPage() {
         },
       })
     },
-    [earlyBirdAvailable, getOrCreateInstallId, hasAccess, paddle, prices.earlyBirdPriceId, prices.standardPriceId, toast],
+    [earlyBirdAvailable, getOrCreateInstallId, hasAccess, paddle, prices.earlyBirdPriceId, prices.standardPriceId, toast, trackEvent, upsellVariant],
   )
 
   if (!hasAccess) {
@@ -415,7 +504,19 @@ export default function PricingClientPage() {
                     <p className="text-sm text-neutral-600">Pro is tied to your signed-in email across devices.</p>
                   </div>
                   <SignInButton mode="modal" redirectUrl={typeof window !== "undefined" ? window.location.href : "/pricing"}>
-                    <Button className="bg-[#ff5733] text-white hover:bg-[#ff7959] rounded-full">Sign in</Button>
+                    <Button
+                      className="bg-[#ff5733] text-white hover:bg-[#ff7959] rounded-full"
+                      onClick={() =>
+                        trackEvent("upsell_cta_click", {
+                          experiment_id: EXPERIMENT_ID,
+                          variant: upsellVariant ?? "unknown",
+                          location: "pricing",
+                          action: "sign_in",
+                        })
+                      }
+                    >
+                      Sign in
+                    </Button>
                   </SignInButton>
                 </div>
               </Card>
