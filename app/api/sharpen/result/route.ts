@@ -68,6 +68,23 @@ function safeOutputUrl(raw: string | null): string | null {
   return null
 }
 
+function sanitizeJobForStorage(job: SharpenJob) {
+  return {
+    jobId: job.jobId,
+    status: job.status,
+    createdAt: job.createdAt,
+    updatedAt: job.updatedAt,
+    installId: job.installId ?? null,
+    email: job.email ?? null,
+    isPro: !!job.isPro,
+    scale: job.scale,
+    faceEnhance: !!job.faceEnhance,
+    remaining: typeof job.remaining === "number" ? job.remaining : null,
+    outputUrl: safeOutputUrl(job.outputUrl) ?? null,
+    error: typeof job.error === "string" ? job.error.slice(0, 2000) : null,
+  } satisfies SharpenJob
+}
+
 function parseDataUriImage(dataUri: string): { buffer: Buffer; mimeType: string } | null {
   const match = /^data:([^;]+);base64,(.+)$/i.exec(dataUri)
   if (!match) return null
@@ -129,6 +146,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "job_not_found" }, { status: 404 })
     }
 
+    const jobSnapshot = sanitizeJobForStorage(job)
+    const rawOutputUrl = typeof job.outputUrl === "string" ? job.outputUrl : null
+    const rawOutputIsData = !!rawOutputUrl && rawOutputUrl.startsWith("data:")
+
     const installId = getInstallId(request)
     const { userId } = getAuth(request)
     const email = await getEmail(request)
@@ -155,16 +176,16 @@ export async function GET(request: NextRequest) {
     if (effectiveIsPro && (!job.isPro || (!job.email && requestEmail))) {
       try {
         await kvSetJSON(jobKey, {
-          ...job,
+          ...jobSnapshot,
           isPro: true,
-          email: job.email ?? (installMatch || !job.installId ? requestEmail : job.email),
+          email: jobSnapshot.email ?? (installMatch || !job.installId ? requestEmail : jobSnapshot.email),
           updatedAt: Date.now(),
         })
         await kvExpire(jobKey, SHARPEN_JOB_TTL_SECONDS)
       } catch {}
     }
 
-    let outputUrl = job.outputUrl
+    let outputUrl = jobSnapshot.outputUrl ?? (rawOutputIsData ? rawOutputUrl : null)
     if (!outputUrl) {
       const pollRes = await fetch(`https://api.replicate.com/v1/predictions/${jobId}`, {
         headers: {
@@ -181,14 +202,18 @@ export async function GET(request: NextRequest) {
       const extractedRaw = extractOutputUrl(prediction?.output)
       const extracted = safeOutputUrl(extractedRaw)
       const updated: SharpenJob = {
-        ...job,
+        ...jobSnapshot,
         status,
         updatedAt: Date.now(),
-        outputUrl: extracted ?? job.outputUrl ?? null,
+        outputUrl: extracted ?? jobSnapshot.outputUrl ?? null,
         error: prediction?.error ?? null,
       }
-      await kvSetJSON(jobKey, updated)
-      await kvExpire(jobKey, SHARPEN_JOB_TTL_SECONDS)
+      try {
+        await kvSetJSON(jobKey, updated)
+        await kvExpire(jobKey, SHARPEN_JOB_TTL_SECONDS)
+      } catch (err) {
+        console.warn("[SERVER] Failed to persist job update", err)
+      }
 
       if (status !== "succeeded") {
         return NextResponse.json({ error: "job_not_ready" }, { status: 409 })

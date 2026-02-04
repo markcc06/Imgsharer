@@ -58,6 +58,23 @@ function safeOutputUrl(raw: string | null): string | null {
   return null
 }
 
+function sanitizeJobForStorage(job: SharpenJob) {
+  return {
+    jobId: job.jobId,
+    status: job.status,
+    createdAt: job.createdAt,
+    updatedAt: job.updatedAt,
+    installId: job.installId ?? null,
+    email: job.email ?? null,
+    isPro: !!job.isPro,
+    scale: job.scale,
+    faceEnhance: !!job.faceEnhance,
+    remaining: typeof job.remaining === "number" ? job.remaining : null,
+    outputUrl: safeOutputUrl(job.outputUrl) ?? null,
+    error: typeof job.error === "string" ? job.error.slice(0, 2000) : null,
+  } satisfies SharpenJob
+}
+
 export async function GET(request: NextRequest) {
   try {
     const apiToken = process.env.REPLICATE_API_TOKEN
@@ -77,6 +94,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "job_not_found" }, { status: 404 })
     }
 
+    const jobSnapshot = sanitizeJobForStorage(job)
+    const rawOutputUrl = typeof job.outputUrl === "string" ? job.outputUrl : null
+    const rawOutputIsData = !!rawOutputUrl && rawOutputUrl.startsWith("data:")
+
     const installId = getInstallId(request)
     const email = await getEmail(request)
     const installMatch = job.installId && installId && job.installId === installId
@@ -92,7 +113,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    if (job.status === "succeeded" && job.outputUrl) {
+    if (job.status === "succeeded" && (jobSnapshot.outputUrl || rawOutputIsData)) {
       return NextResponse.json(
         {
           jobId,
@@ -122,17 +143,21 @@ export async function GET(request: NextRequest) {
     const entitlementNow =
       !job.isPro && effectiveEmail ? await getEntitlementByEmail(effectiveEmail).catch(() => null) : null
     const updated: SharpenJob = {
-      ...job,
+      ...jobSnapshot,
       status,
       updatedAt: Date.now(),
-      outputUrl: outputUrl ?? job.outputUrl ?? null,
-      email: job.email ?? (installMatch ? normalizeEmail(email) : job.email),
-      isPro: job.isPro || !!entitlementNow,
+      outputUrl: outputUrl ?? jobSnapshot.outputUrl ?? null,
+      email: jobSnapshot.email ?? (installMatch ? normalizeEmail(email) : jobSnapshot.email),
+      isPro: jobSnapshot.isPro || !!entitlementNow,
       error: prediction?.error ?? null,
     }
 
-    await kvSetJSON(jobKey, updated)
-    await kvExpire(jobKey, SHARPEN_JOB_TTL_SECONDS)
+    try {
+      await kvSetJSON(jobKey, updated)
+      await kvExpire(jobKey, SHARPEN_JOB_TTL_SECONDS)
+    } catch (err) {
+      console.warn("[SERVER] Failed to persist job update", err)
+    }
 
     if (status === "failed") {
       return NextResponse.json(
