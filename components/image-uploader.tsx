@@ -94,6 +94,37 @@ const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
 const pricingToken = process.env.NEXT_PUBLIC_PRICING_TOKEN ?? "prc-9b8f4c1d"
 const paymentProvider = (process.env.NEXT_PUBLIC_PAYMENT_PROVIDER as "creem" | "paddle" | undefined) ?? "paddle"
 const EARLY_BIRD_LIMIT = 50
+const MS_PER_DAY = 86_400_000
+
+function getUtcDayString(date = new Date()) {
+  return date.toISOString().slice(0, 10)
+}
+
+function utcMidnightMs(utcDay: string) {
+  const date = new Date(`${utcDay}T00:00:00.000Z`)
+  const ms = date.getTime()
+  return Number.isFinite(ms) ? ms : null
+}
+
+function getUtcDayDiff(startUtcDay: string, now = new Date()) {
+  const startMs = utcMidnightMs(startUtcDay)
+  if (startMs === null) return null
+  return Math.floor((now.getTime() - startMs) / MS_PER_DAY)
+}
+
+function getCampaignStartKey(installId: string) {
+  return `imgsharer:campaign_start:${installId}`
+}
+
+function getSeenKey(installId: string, variant: string, utcDay: string) {
+  return `imgsharer:seen:${installId}:${variant}:${utcDay}`
+}
+
+function formatSpotsLeft(spots: number) {
+  if (spots <= 0) return "Sold out"
+  if (spots === 1) return "1 spot left"
+  return `${spots} spots left`
+}
 
 function Loader2Icon({ className }: { className?: string }) {
   return (
@@ -249,6 +280,10 @@ export function ImageUploader({
   const [rateLimitLabel, setRateLimitLabel] = useState<string | null>(null)
   const [showRateLimitModal, setShowRateLimitModal] = useState(false)
   const [rateLimitDailyLimit, setRateLimitDailyLimit] = useState<number | null>(null)
+  const [rateLimitModalUtcDay, setRateLimitModalUtcDay] = useState<string | null>(null)
+  const [showWatermarkModal, setShowWatermarkModal] = useState(false)
+  const [watermarkModalUtcDay, setWatermarkModalUtcDay] = useState<string | null>(null)
+  const [campaignStartUtcDay, setCampaignStartUtcDay] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [scale, setScale] = useState<number>(4)
   const [blockedHighScale, setBlockedHighScale] = useState(false)
@@ -306,6 +341,12 @@ export function ImageUploader({
   useEffect(() => {
     sessionIdRef.current = getOrCreateSessionId()
     installIdRef.current = getOrCreateInstallId()
+
+    const installId = installIdRef.current
+    if (installId && typeof window !== "undefined") {
+      const existing = window.localStorage?.getItem(getCampaignStartKey(installId)) ?? null
+      setCampaignStartUtcDay(existing)
+    }
 
     setHasPricingAccess(true)
     setUserType("free")
@@ -373,6 +414,49 @@ export function ImageUploader({
     setUserType(entitlement ? "pro" : "free")
   }, [entitlement])
 
+  const getLocalInstallId = useCallback(() => {
+    if (typeof window === "undefined") return null
+    const current = installIdRef.current || getOrCreateInstallId()
+    installIdRef.current = current
+    return current
+  }, [getOrCreateInstallId])
+
+  const ensureCampaignStarted = useCallback(() => {
+    if (typeof window === "undefined") return null
+    const installId = getLocalInstallId()
+    if (!installId) return null
+    const key = getCampaignStartKey(installId)
+    const existing = window.localStorage?.getItem(key) ?? null
+    if (existing) {
+      setCampaignStartUtcDay((prev) => prev ?? existing)
+      return existing
+    }
+    const utcDay = getUtcDayString()
+    window.localStorage?.setItem(key, utcDay)
+    setCampaignStartUtcDay(utcDay)
+    return utcDay
+  }, [getLocalInstallId])
+
+  const hasSeen = useCallback(
+    (variant: string, utcDay: string) => {
+      if (typeof window === "undefined") return false
+      const installId = getLocalInstallId()
+      if (!installId) return false
+      return window.localStorage?.getItem(getSeenKey(installId, variant, utcDay)) === "1"
+    },
+    [getLocalInstallId],
+  )
+
+  const markSeen = useCallback(
+    (variant: string, utcDay: string) => {
+      if (typeof window === "undefined") return
+      const installId = getLocalInstallId()
+      if (!installId) return
+      window.localStorage?.setItem(getSeenKey(installId, variant, utcDay), "1")
+    },
+    [getLocalInstallId],
+  )
+
   const trackUpscaleFactor = useCallback(
     (nextScale: number) => {
       try {
@@ -400,6 +484,7 @@ export function ImageUploader({
 
   const earlyBirdAvailable =
     paymentProvider === "creem" ? earlyBirdSold < EARLY_BIRD_LIMIT : priceIds?.earlyBirdPriceId && earlyBirdSold < EARLY_BIRD_LIMIT
+  const earlyBirdSpotsLeft = Math.max(0, EARLY_BIRD_LIMIT - earlyBirdSold)
 
   const openCheckout = useCallback(
     async (preferEarlyBird = true) => {
@@ -490,12 +575,13 @@ export function ImageUploader({
 
   const showPaywall = useCallback(
     (options?: { blockHighScale?: boolean }) => {
+      ensureCampaignStarted()
       if (options?.blockHighScale) {
         setBlockedHighScale(true)
       }
       setShowPaywallModal(true)
     },
-    [toast],
+    [ensureCampaignStarted],
   )
 
   useEffect(() => {
@@ -807,17 +893,30 @@ export function ImageUploader({
             ? `Free users can process up to ${dailyLimit ?? 3} images per day. Please try again tomorrow or upgrade.`
             : errorMessage
 
+        setIsRateLimited(true)
+        setRateLimitLabel(label)
+        if (limitType === "free_daily") {
+          ensureCampaignStarted()
+          const utcDay = getUtcDayString()
+          setRateLimitDailyLimit(dailyLimit ?? 3)
+          setRateLimitModalUtcDay(utcDay)
+
+          if (!hasSeen("modal:free_daily", utcDay)) {
+            setShowPaywallModal(false)
+            setShowWatermarkModal(false)
+            setShowRateLimitModal(true)
+          } else {
+            toast({ title: label, description })
+          }
+
+          stopProgress()
+          return
+        }
+
         toast({
           title: label,
           description,
         })
-
-        setIsRateLimited(true)
-        setRateLimitLabel(label)
-        if (limitType === "free_daily") {
-          setRateLimitDailyLimit(dailyLimit ?? 3)
-          setShowRateLimitModal(true)
-        }
 
         if (limitType !== "free_daily" && resetAt && resetAt > Date.now()) {
           const ms = Math.min(Math.max(1000, resetAt - Date.now()), 60 * 60 * 1000)
@@ -1036,7 +1135,7 @@ export function ImageUploader({
     }
   }
 
-  const handleDownload = () => {
+  const downloadSharpenedImage = () => {
     if (!sharpenedImage) return
 
     const link = document.createElement("a")
@@ -1045,6 +1144,24 @@ export function ImageUploader({
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  const handleDownload = () => {
+    if (!sharpenedImage) return
+
+    if (!isPro && !isFakeMode) {
+      const utcDay = getUtcDayString()
+      ensureCampaignStarted()
+      if (!hasSeen("modal:watermark", utcDay)) {
+        setWatermarkModalUtcDay(utcDay)
+        setShowPaywallModal(false)
+        setShowRateLimitModal(false)
+        setShowWatermarkModal(true)
+        return
+      }
+    }
+
+    downloadSharpenedImage()
   }
 
   const handleReset = () => {
@@ -1073,10 +1190,63 @@ export function ImageUploader({
     closeModal()
   }
 
+  const upsellBanner = (() => {
+    if (isPro) return null
+    if (!campaignStartUtcDay) return null
+    if (typeof window === "undefined") return null
+
+    const campaignDay = getUtcDayDiff(campaignStartUtcDay)
+    if (campaignDay === null) return null
+    if (![0, 3, 6, 7].includes(campaignDay)) return null
+
+    const utcDay = getUtcDayString()
+    const variant = `banner:day${campaignDay}`
+    if (hasSeen(variant, utcDay)) return null
+
+    const baseOffer = `Early Bird $2.99/mo (reg. $4.99) · ${formatSpotsLeft(earlyBirdSpotsLeft)}`
+    const message =
+      campaignDay === 0
+        ? baseOffer
+        : campaignDay === 3
+          ? `Reminder: ${baseOffer}`
+          : campaignDay === 6
+            ? `Early Bird may end anytime · ${formatSpotsLeft(earlyBirdSpotsLeft)}`
+            : `Final reminder: ${baseOffer}`
+
+    return (
+      <div className="rounded-2xl border border-[#ff5733]/20 bg-[#ff5733]/5 px-4 py-3 flex items-center justify-between gap-3">
+        <p className="text-sm text-neutral-800">{message}</p>
+        <div className="flex items-center gap-2">
+          <Button asChild className="rounded-full bg-[#ff5733] text-white hover:bg-[#ff7959] px-4 py-2 h-auto">
+            <Link
+              href="/pricing"
+              onClick={() => {
+                markSeen(variant, utcDay)
+              }}
+            >
+              See pricing
+            </Link>
+          </Button>
+          <button
+            type="button"
+            className="rounded-full p-2 text-neutral-600 hover:bg-black/5"
+            aria-label="Dismiss"
+            onClick={() => {
+              markSeen(variant, utcDay)
+            }}
+          >
+            <XIcon className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    )
+  })()
+
   return (
     <>
       <Reveal>
         <div className="space-y-8">
+          {upsellBanner}
           {!originalImage ? (
             <BlurPanel className="p-8 lg:p-12 bg-white/40 backdrop-blur-md grain-texture border border-white/30">
               <div
@@ -1247,49 +1417,49 @@ export function ImageUploader({
         </div>
       </Reveal>
 
-      <Dialog open={showPaywallModal} onOpenChange={setShowPaywallModal}>
+      <Dialog
+        open={showPaywallModal}
+        onOpenChange={(open) => {
+          if (!open && blockedHighScale) {
+            setBlockedHighScale(false)
+            setScale((current) => (current > 4 ? 4 : current))
+          }
+          setShowPaywallModal(open)
+        }}
+      >
         <DialogPortal>
           <DialogOverlay className="!z-[130] bg-black/70 backdrop-blur-sm" />
           <DialogContent className="!z-[140] sm:max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl">
             <DialogHeader className="text-left">
-              <DialogTitle className="text-2xl font-display text-neutral-900">Unlock 6x / 8x upscaling</DialogTitle>
+              <DialogTitle className="text-2xl font-display text-neutral-900">Unlock 6x &amp; 8x Upscaling</DialogTitle>
               <DialogDescription className="text-neutral-600">
-                Upgrade to remove the watermark and unlock higher scales. Early Bird pricing is available while supplies last.
+                Get sharper, high-resolution results. Free plan supports up to 4x.
               </DialogDescription>
             </DialogHeader>
 
-            <ul className="mt-4 space-y-2 text-sm text-neutral-700">
-              <li>• 6x / 8x upscaling</li>
-              <li>• Watermark-free downloads</li>
-              <li>• Unlimited daily usage</li>
-            </ul>
+            <div className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800">
+              <div className="font-medium">
+                Early Bird $2.99/mo <span className="text-neutral-500">(reg. $4.99)</span> · {formatSpotsLeft(earlyBirdSpotsLeft)}
+              </div>
+              <div className="mt-1 text-neutral-600">Unlimited daily usage · No watermark</div>
+            </div>
 
             <div className="mt-6 space-y-3">
-              <Button
-                className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] disabled:bg-[#ff5733]/60 rounded-full"
-                disabled={
-                  !earlyBirdAvailable ||
-                  (paymentProvider === "paddle" && (!earlyBirdAvailable || !paddle))
-                }
-                onClick={() => {
-                  setShowPaywallModal(false)
-                  openCheckout(true)
-                }}
-              >
-                {earlyBirdAvailable
-                  ? `Claim Early Bird (${Math.max(0, EARLY_BIRD_LIMIT - earlyBirdSold)} left)`
-                  : "Early Bird sold out"}
+              <Button asChild className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] rounded-full py-6 h-auto">
+                <Link href="/pricing" onClick={() => setShowPaywallModal(false)}>
+                  Upgrade to Pro
+                </Link>
               </Button>
               <Button
                 variant="outline"
-                className="w-full rounded-full border-[#ff7959] text-[#ff5733] hover:bg-[#ff5733]/10 hover:border-[#ff5733]"
-                disabled={paymentProvider === "paddle" ? !priceIds?.standardPriceId || !paddle : false}
+                className="w-full rounded-full border-[#ff7959] text-[#ff5733] hover:bg-[#ff5733]/10 hover:border-[#ff5733] py-6 h-auto"
                 onClick={() => {
+                  setBlockedHighScale(false)
+                  setScale(4)
                   setShowPaywallModal(false)
-                  openCheckout(false)
                 }}
               >
-                Upgrade (Standard)
+                Continue with 4x
               </Button>
             </div>
 
@@ -1300,34 +1470,101 @@ export function ImageUploader({
         </DialogPortal>
       </Dialog>
 
-      <Dialog open={showRateLimitModal} onOpenChange={setShowRateLimitModal}>
+      <Dialog
+        open={showRateLimitModal}
+        onOpenChange={(open) => {
+          if (!open && rateLimitModalUtcDay) {
+            markSeen("modal:free_daily", rateLimitModalUtcDay)
+          }
+          setShowRateLimitModal(open)
+        }}
+      >
         <DialogPortal>
           <DialogOverlay className="!z-[150] bg-black/70 backdrop-blur-sm" />
           <DialogContent className="!z-[160] sm:max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl">
             <DialogHeader className="text-left">
-              <DialogTitle className="text-2xl font-display text-neutral-900">Daily limit reached</DialogTitle>
+              <DialogTitle className="text-2xl font-display text-neutral-900">
+                You&apos;ve used all {rateLimitDailyLimit ?? 3} free sharpens today
+              </DialogTitle>
               <DialogDescription className="text-neutral-600">
-                Free users can process {rateLimitDailyLimit ?? 3} images per day. Unlock Pro for unlimited daily usage and
-                watermark-free downloads.
+                Upgrade to Pro for unlimited daily usage + 6x/8x + no watermark.
               </DialogDescription>
             </DialogHeader>
 
-            <ul className="mt-4 space-y-2 text-sm text-neutral-700">
-              <li>• Unlimited daily usage</li>
-              <li>• 6x / 8x upscaling</li>
-              <li>• Watermark-free downloads</li>
-            </ul>
+            <div className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800">
+              <div className="font-medium">Early Bird $2.99/mo · {formatSpotsLeft(earlyBirdSpotsLeft)}</div>
+            </div>
 
             <div className="mt-6 space-y-3">
-              <Button asChild className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] rounded-full">
-                <Link href="/pricing">Unlock Pro</Link>
+              <Button asChild className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] rounded-full py-6 h-auto">
+                <Link
+                  href="/pricing"
+                  onClick={() => {
+                    if (rateLimitModalUtcDay) markSeen("modal:free_daily", rateLimitModalUtcDay)
+                    setShowRateLimitModal(false)
+                  }}
+                >
+                  Upgrade to Pro
+                </Link>
               </Button>
               <Button
                 variant="outline"
-                className="w-full rounded-full border-[#ff7959] text-[#ff5733] hover:bg-[#ff5733]/10 hover:border-[#ff5733]"
-                onClick={() => setShowRateLimitModal(false)}
+                className="w-full rounded-full border-[#ff7959] text-[#ff5733] hover:bg-[#ff5733]/10 hover:border-[#ff5733] py-6 h-auto"
+                onClick={() => {
+                  if (rateLimitModalUtcDay) markSeen("modal:free_daily", rateLimitModalUtcDay)
+                  setShowRateLimitModal(false)
+                }}
               >
-                Maybe later
+                Come back tomorrow
+              </Button>
+            </div>
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
+
+      <Dialog
+        open={showWatermarkModal}
+        onOpenChange={(open) => {
+          if (!open && watermarkModalUtcDay) {
+            markSeen("modal:watermark", watermarkModalUtcDay)
+          }
+          setShowWatermarkModal(open)
+        }}
+      >
+        <DialogPortal>
+          <DialogOverlay className="!z-[150] bg-black/70 backdrop-blur-sm" />
+          <DialogContent className="!z-[160] sm:max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl">
+            <DialogHeader className="text-left">
+              <DialogTitle className="text-2xl font-display text-neutral-900">This download includes a watermark</DialogTitle>
+              <DialogDescription className="text-neutral-600">Pro removes watermarks from all downloads.</DialogDescription>
+            </DialogHeader>
+
+            <div className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800">
+              <div className="font-medium">Early Bird $2.99/mo · {formatSpotsLeft(earlyBirdSpotsLeft)}</div>
+            </div>
+
+            <div className="mt-6 space-y-3">
+              <Button asChild className="w-full bg-[#ff5733] text-white hover:bg-[#ff7959] rounded-full py-6 h-auto">
+                <Link
+                  href="/pricing"
+                  onClick={() => {
+                    if (watermarkModalUtcDay) markSeen("modal:watermark", watermarkModalUtcDay)
+                    setShowWatermarkModal(false)
+                  }}
+                >
+                  Upgrade — $2.99/mo
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full rounded-full border-[#ff7959] text-[#ff5733] hover:bg-[#ff5733]/10 hover:border-[#ff5733] py-6 h-auto"
+                onClick={() => {
+                  if (watermarkModalUtcDay) markSeen("modal:watermark", watermarkModalUtcDay)
+                  setShowWatermarkModal(false)
+                  downloadSharpenedImage()
+                }}
+              >
+                Download with watermark
               </Button>
             </div>
           </DialogContent>

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { initializePaddle, type Paddle } from "@paddle/paddle-js"
 import { useSearchParams } from "next/navigation"
-import { useAuth } from "@clerk/nextjs"
+import { SignInButton, useAuth } from "@clerk/nextjs"
 
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
@@ -31,11 +31,36 @@ const EARLY_BIRD_LIMIT = 50
 const paddleEnv = (process.env.NEXT_PUBLIC_PADDLE_ENV as "sandbox" | "production" | undefined) ?? "production"
 const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
 const paymentProvider = (process.env.NEXT_PUBLIC_PAYMENT_PROVIDER as "creem" | "paddle" | undefined) ?? "paddle"
+const MS_PER_DAY = 86_400_000
+
+function getUtcDayString(date = new Date()) {
+  return date.toISOString().slice(0, 10)
+}
+
+function utcMidnightMs(utcDay: string) {
+  const date = new Date(`${utcDay}T00:00:00.000Z`)
+  const ms = date.getTime()
+  return Number.isFinite(ms) ? ms : null
+}
+
+function getUtcDayDiff(startUtcDay: string, now = new Date()) {
+  const startMs = utcMidnightMs(startUtcDay)
+  if (startMs === null) return null
+  return Math.floor((now.getTime() - startMs) / MS_PER_DAY)
+}
+
+function getCampaignStartKey(installId: string) {
+  return `imgsharer:campaign_start:${installId}`
+}
+
+function getSeenKey(installId: string, variant: string, utcDay: string) {
+  return `imgsharer:seen:${installId}:${variant}:${utcDay}`
+}
 
 function formatRemaining(n: number) {
   if (n <= 0) return "Sold out"
-  if (n === 1) return "1 license left"
-  return `${n} licenses left`
+  if (n === 1) return "1 spot left"
+  return `${n} spots left`
 }
 
 export default function PricingClientPage() {
@@ -49,6 +74,7 @@ export default function PricingClientPage() {
   const [loading, setLoading] = useState(true)
   const [checkoutPolling, setCheckoutPolling] = useState(false)
   const [checkoutStarting, setCheckoutStarting] = useState(false)
+  const [campaignStartUtcDay, setCampaignStartUtcDay] = useState<string | null>(null)
 
   const hasAccess = true
 
@@ -74,6 +100,83 @@ export default function PricingClientPage() {
     window.localStorage?.setItem(KEY, id)
     return id
   }, [])
+
+  const getLocalInstallId = useCallback(() => {
+    if (typeof window === "undefined") return null
+    return window.localStorage?.getItem("imgsharer_install_id") ?? getOrCreateInstallId()
+  }, [getOrCreateInstallId])
+
+  const hasSeen = useCallback(
+    (variant: string, utcDay: string) => {
+      if (typeof window === "undefined") return false
+      const installId = getLocalInstallId()
+      if (!installId) return false
+      return window.localStorage?.getItem(getSeenKey(installId, variant, utcDay)) === "1"
+    },
+    [getLocalInstallId],
+  )
+
+  const markSeen = useCallback(
+    (variant: string, utcDay: string) => {
+      if (typeof window === "undefined") return
+      const installId = getLocalInstallId()
+      if (!installId) return
+      window.localStorage?.setItem(getSeenKey(installId, variant, utcDay), "1")
+    },
+    [getLocalInstallId],
+  )
+
+  const campaignBanner = useMemo(() => {
+    if (isPro) return null
+    if (!campaignStartUtcDay) return null
+    if (typeof window === "undefined") return null
+
+    const campaignDay = getUtcDayDiff(campaignStartUtcDay)
+    if (campaignDay === null) return null
+    if (![0, 3, 6, 7].includes(campaignDay)) return null
+
+    const utcDay = getUtcDayString()
+    const variant = `banner:day${campaignDay}`
+    if (hasSeen(variant, utcDay)) return null
+
+    const baseOffer = `Early Bird $2.99/mo (reg. $4.99) · ${formatRemaining(earlyBirdRemaining)}`
+    const message =
+      campaignDay === 0
+        ? baseOffer
+        : campaignDay === 3
+          ? `Reminder: ${baseOffer}`
+          : campaignDay === 6
+            ? `Early Bird may end anytime · ${formatRemaining(earlyBirdRemaining)}`
+            : `Final reminder: ${baseOffer}`
+
+    return (
+      <div className="mb-6 rounded-2xl border border-[#ff5733]/20 bg-[#ff5733]/5 px-4 py-3 flex items-center justify-between gap-3">
+        <p className="text-sm text-neutral-800">{message}</p>
+        <div className="flex items-center gap-2">
+          <Button asChild className="rounded-full bg-[#ff5733] text-white hover:bg-[#ff7959] px-4 py-2 h-auto">
+            <Link
+              href="/pricing"
+              onClick={() => {
+                markSeen(variant, utcDay)
+              }}
+            >
+              See pricing
+            </Link>
+          </Button>
+          <button
+            type="button"
+            className="rounded-full p-2 text-neutral-600 hover:bg-black/5"
+            aria-label="Dismiss"
+            onClick={() => {
+              markSeen(variant, utcDay)
+            }}
+          >
+            ×
+          </button>
+        </div>
+      </div>
+    )
+  }, [campaignStartUtcDay, earlyBirdRemaining, hasSeen, isPro, markSeen])
 
   const loadEntitlement = useCallback(async () => {
     setLoading(true)
@@ -110,7 +213,17 @@ export default function PricingClientPage() {
   }, [isSignedIn])
 
   useEffect(() => {
-    getOrCreateInstallId()
+    const installId = getOrCreateInstallId()
+    if (!installId || typeof window === "undefined") return
+    const key = getCampaignStartKey(installId)
+    const existing = window.localStorage?.getItem(key) ?? null
+    if (existing) {
+      setCampaignStartUtcDay(existing)
+      return
+    }
+    const utcDay = getUtcDayString()
+    window.localStorage?.setItem(key, utcDay)
+    setCampaignStartUtcDay(utcDay)
   }, [getOrCreateInstallId])
 
   useEffect(() => {
@@ -285,12 +398,29 @@ export default function PricingClientPage() {
       <Header />
       <div className="flex-1 pt-24 pb-16 px-4">
         <div className="max-w-5xl mx-auto">
+          {campaignBanner}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-display font-bold text-neutral-900 mb-4">Pricing</h1>
             <p className="text-lg text-neutral-600">
               Start free. Upgrade for 6x/8x upscaling and watermark-free downloads.
             </p>
           </div>
+
+          {!isSignedIn ? (
+            <div className="mb-8">
+              <Card className="p-6 border border-neutral-200 bg-neutral-50">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <p className="text-neutral-900 font-medium">Sign in to activate Pro</p>
+                    <p className="text-sm text-neutral-600">Pro is tied to your signed-in email across devices.</p>
+                  </div>
+                  <SignInButton mode="modal" redirectUrl={typeof window !== "undefined" ? window.location.href : "/pricing"}>
+                    <Button className="bg-[#ff5733] text-white hover:bg-[#ff7959] rounded-full">Sign in</Button>
+                  </SignInButton>
+                </div>
+              </Card>
+            </div>
+          ) : null}
 
           {isPro ? (
             <div className="mb-8">
