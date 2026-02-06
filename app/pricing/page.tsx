@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import { Suspense } from "react"
 import { siteConfig } from "@/config/siteConfig"
+import { billingLive } from "@/config/billing"
 import PricingClientPage from "./pricing-client-page"
+import { notFound } from "next/navigation"
 
 const canonicalUrl = `${siteConfig.siteUrl.replace(/\/$/, "")}/pricing`
 
@@ -24,6 +26,9 @@ export const metadata: Metadata = {
 }
 
 export default function PricingPage() {
+  if (!billingLive) {
+    notFound()
+  }
   return (
     <Suspense fallback={null}>
       <PricingClientPage />

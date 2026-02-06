@@ -12,6 +12,7 @@ import {
   storeConsent,
 } from "@/lib/consent"
 import type { ConsentState } from "@/lib/consent"
+import { billingLive } from "@/config/billing"
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ""
 const ADS_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || ""
@@ -129,11 +130,17 @@ export default function CookieBanner() {
       <div className={bannerClass}>
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between md:gap-8">
           <p className="text-sm text-neutral-700 md:flex-1">
-            We use cookies to analyze traffic and improve your experience. For details, see our{" "}
-            <a href="/privacy" className="text-coral hover:underline">
-              Privacy &amp; Cookie Notice
-            </a>
-            .
+            We use cookies to analyze traffic and improve your experience.
+            {billingLive ? (
+              <>
+                {" "}
+                For details, see our{" "}
+                <a href="/privacy" className="text-coral hover:underline">
+                  Privacy &amp; Cookie Notice
+                </a>
+                .
+              </>
+            ) : null}
           </p>
           <div className="flex w-full flex-col gap-2 md:w-auto md:flex-row md:flex-nowrap md:items-center md:justify-end md:gap-3">
             <button

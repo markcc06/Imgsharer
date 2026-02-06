@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { siteConfig } from "@/config/siteConfig"
+import { billingLive } from "@/config/billing"
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs"
 
 function SparklesIcon() {
@@ -28,11 +29,10 @@ function SparklesIcon() {
   )
 }
 
-const navLinks = [
+const baseNavLinks = [
   { href: "/faq", label: "FAQ" },
   { href: "/blog", label: "Blog" },
   { href: "/about", label: "About" },
-  { href: "/pricing", label: "Pricing" },
   { href: "/christmas-wallpaper", label: "Christmas Wallpaper" },
   { href: "/contact", label: "Contact" },
 ]
@@ -60,6 +60,9 @@ export function Header() {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
+  const navLinks = billingLive
+    ? [...baseNavLinks.slice(0, 3), { href: "/pricing", label: "Pricing" }, ...baseNavLinks.slice(3)]
+    : baseNavLinks
   const mobileNav = [{ href: "/", label: "Home" }, ...navLinks]
 
   const closeMenu = () => setIsMenuOpen(false)
@@ -104,7 +107,7 @@ export function Header() {
             <SignedOut>
               <SignInButton mode="modal" redirectUrl={typeof window !== "undefined" ? window.location.href : "/"}>
                 <button className="ml-2 rounded-full border border-[#ff5733] px-4 py-2 text-sm font-semibold text-[#ff5733] bg-white/80 hover:bg-[#ff5733]/10 transition-colors shadow-sm">
-                  Sign in / Get Pro
+                  {billingLive ? "Sign in / Get Pro" : "Sign in"}
                 </button>
               </SignInButton>
             </SignedOut>

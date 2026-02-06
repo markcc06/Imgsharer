@@ -1,11 +1,20 @@
 import type { Metadata } from "next"
+import { billingMode } from "@/config/billing"
+import { notFound } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Refund Policy | ImgSharer",
   description: "ImgSharer refund policy and terms for paid subscriptions",
+  robots: {
+    index: billingMode === "live",
+    follow: billingMode === "live",
+  },
 }
 
 export default function RefundPage() {
+  if (billingMode === "off") {
+    notFound()
+  }
   return (
     <div className="container mx-auto max-w-4xl px-4 py-12">
       <h1 className="text-4xl font-bold mb-8">Refund Policy</h1>

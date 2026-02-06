@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
 import type { ConsentState } from "@/lib/consent"
+import { billingLive } from "@/config/billing"
 
 type CookiePreferencesProps = {
   open: boolean
@@ -80,15 +81,17 @@ export default function CookiePreferences({ open, onOpenChange, state, onConfirm
           </div>
 
           <p className="text-sm text-neutral-500">
-            Read more in our{" "}
-            <Link href="/privacy" className="text-coral hover:underline">
-              Privacy Notice
-            </Link>{" "}
-            and{" "}
-            <Link href="/cookies" className="text-coral hover:underline">
-              Cookie Policy
-            </Link>
-            .
+            {billingLive ? (
+              <>
+                Read more in our{" "}
+                <Link href="/privacy" className="text-coral hover:underline">
+                  Privacy Notice
+                </Link>
+                .
+              </>
+            ) : (
+              "Your choices are stored locally in your browser."
+            )}
           </p>
         </div>
 

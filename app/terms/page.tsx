@@ -2,6 +2,8 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import type { Metadata } from "next"
 import { siteConfig } from "@/config/siteConfig"
+import { billingMode } from "@/config/billing"
+import { notFound } from "next/navigation"
 
 export const metadata: Metadata = {
   title: `Terms of Service - ${siteConfig.brandName}`,
@@ -10,8 +12,8 @@ export const metadata: Metadata = {
     canonical: `${siteConfig.siteUrl}/terms`,
   },
   robots: {
-    index: true,
-    follow: true,
+    index: billingMode === "live",
+    follow: billingMode === "live",
   },
   openGraph: {
     title: `Terms of Service - ${siteConfig.brandName}`,
@@ -26,6 +28,9 @@ export const metadata: Metadata = {
 }
 
 export default function TermsPage() {
+  if (billingMode === "off") {
+    notFound()
+  }
   return (
     <main className="min-h-screen flex flex-col">
       <Header />

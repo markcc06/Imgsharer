@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 import { getAllBlogPosts } from "@/lib/blog-data"
 import { siteConfig } from "@/config/siteConfig"
+import { billingLive } from "@/config/billing"
 
 const BASE_URL = siteConfig.siteUrl
 
@@ -110,18 +111,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.5,
     },
-    {
-      url: `${BASE_URL}/privacy`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${BASE_URL}/terms`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
+    ...(billingLive
+      ? ([
+          {
+            url: `${BASE_URL}/privacy`,
+            lastModified: now,
+            changeFrequency: "yearly",
+            priority: 0.3,
+          },
+          {
+            url: `${BASE_URL}/terms`,
+            lastModified: now,
+            changeFrequency: "yearly",
+            priority: 0.3,
+          },
+          {
+            url: `${BASE_URL}/refund`,
+            lastModified: now,
+            changeFrequency: "yearly",
+            priority: 0.3,
+          },
+        ] as MetadataRoute.Sitemap)
+      : []),
   ]
 
   const posts = getAllBlogPosts()

@@ -15,6 +15,7 @@ import { REPLICATE_MAX_DIMENSION, REPLICATE_MAX_DIMENSION_PAID, STABILITY_DIM_MU
 import { publishHeroUpdate } from "@/lib/hero-bus"
 import { getToolUploadLimits, getToolApiEndpoint } from "@/lib/tool-pipeline"
 import { siteConfig } from "@/config/siteConfig"
+import { billingLive } from "@/config/billing"
 import {
   Dialog,
   DialogContent,
@@ -641,16 +642,28 @@ export function ImageUploader({
   const showPaywall = useCallback(
     (options?: { blockHighScale?: boolean }) => {
       ensureCampaignStarted()
+      if (!billingLive) {
+        if (options?.blockHighScale) {
+          setBlockedHighScale(false)
+          setScale(4)
+        }
+        toast({
+          title: "Unavailable",
+          description: "Upgrading is temporarily disabled.",
+        })
+        return
+      }
       if (options?.blockHighScale) {
         setBlockedHighScale(true)
       }
       setShowPaywallModal(true)
       trackUpsellEvent("upsell_modal_shown", { trigger: "high_scale" })
     },
-    [ensureCampaignStarted, trackUpsellEvent],
+    [ensureCampaignStarted, toast, trackUpsellEvent],
   )
 
   useEffect(() => {
+    if (!billingLive) return
     if (upsellVariant !== "strong_modal") return
     if (isPro) return
     if (showCampaignModal) return
@@ -830,15 +843,23 @@ export function ImageUploader({
   }
 
   const handleScaleSelect = (nextScale: number) => {
+    trackUpscaleFactor(nextScale)
     if (nextScale > 4 && !isPro) {
+      if (!billingLive) {
+        toast({
+          title: "Unavailable",
+          description: "6x/8x upscaling is temporarily unavailable.",
+        })
+        setBlockedHighScale(false)
+        setScale(4)
+        return
+      }
       setBlockedHighScale(true)
       showPaywall({ blockHighScale: true })
-      trackUpscaleFactor(nextScale)
       return
     }
     setBlockedHighScale(false)
     setScale(nextScale)
-    trackUpscaleFactor(nextScale)
   }
 
   const handleSharpen = async () => {
@@ -849,6 +870,15 @@ export function ImageUploader({
     if (!originalImage) return
 
     if (!isPro && (scale > 4 || blockedHighScale)) {
+      if (!billingLive) {
+        toast({
+          title: "Unavailable",
+          description: "6x/8x upscaling is temporarily unavailable.",
+        })
+        setBlockedHighScale(false)
+        setScale(4)
+        return
+      }
       showPaywall({ blockHighScale: true })
       return
     }
@@ -992,16 +1022,20 @@ export function ImageUploader({
         setIsRateLimited(true)
         setRateLimitLabel(label)
         if (limitType === "free_daily") {
-          ensureCampaignStarted()
           const utcDay = getUtcDayString()
           setRateLimitDailyLimit(dailyLimit ?? 3)
-          setRateLimitModalUtcDay(utcDay)
+          setRateLimitModalUtcDay(billingLive ? utcDay : null)
 
-          if (!hasSeen("modal:free_daily", utcDay)) {
-            setShowPaywallModal(false)
-            setShowWatermarkModal(false)
-            setShowRateLimitModal(true)
-            trackUpsellEvent("upsell_modal_shown", { trigger: "free_daily" })
+          if (billingLive) {
+            ensureCampaignStarted()
+            if (!hasSeen("modal:free_daily", utcDay)) {
+              setShowPaywallModal(false)
+              setShowWatermarkModal(false)
+              setShowRateLimitModal(true)
+              trackUpsellEvent("upsell_modal_shown", { trigger: "free_daily" })
+            } else {
+              toast({ title: label, description })
+            }
           } else {
             toast({ title: label, description })
           }
@@ -1038,7 +1072,14 @@ export function ImageUploader({
             standardPriceId: data.prices.standardPriceId,
           })
         }
-        showPaywall()
+        if (billingLive) {
+          showPaywall()
+        } else {
+          toast({
+            title: "Unavailable",
+            description: "This feature is temporarily unavailable.",
+          })
+        }
         stopProgress()
         return
       }
@@ -1246,7 +1287,7 @@ export function ImageUploader({
   const handleDownload = () => {
     if (!sharpenedImage) return
 
-    if (!isPro && !isFakeMode) {
+    if (billingLive && !isPro && !isFakeMode) {
       const utcDay = getUtcDayString()
       ensureCampaignStarted()
       if (!hasSeen("modal:watermark", utcDay)) {
@@ -1289,6 +1330,7 @@ export function ImageUploader({
   }
 
   const upsellBanner = (() => {
+    if (!billingLive) return null
     if (isPro) return null
     if (!campaignStartUtcDay) return null
     if (typeof window === "undefined") return null

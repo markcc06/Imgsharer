@@ -1,6 +1,7 @@
 import crypto from "crypto"
 import { NextRequest, NextResponse } from "next/server"
 import { currentUser, getAuth } from "@clerk/nextjs/server"
+import { billingLive } from "@/config/billing"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -29,6 +30,10 @@ function getPricingToken() {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!billingLive) {
+      return NextResponse.json({ error: "not_found" }, { status: 404 })
+    }
+
     // Use getAuth(request) so the session is parsed from this request, avoiding
     // cases where auth() loses context in route handlers.
     const { userId } = getAuth(request)
