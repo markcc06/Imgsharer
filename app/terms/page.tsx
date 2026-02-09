@@ -2,6 +2,8 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import type { Metadata } from "next"
 import { siteConfig } from "@/config/siteConfig"
+import { billingMode } from "@/config/billing"
+import { notFound } from "next/navigation"
 
 export const metadata: Metadata = {
   title: `Terms of Service - ${siteConfig.brandName}`,
@@ -10,8 +12,8 @@ export const metadata: Metadata = {
     canonical: `${siteConfig.siteUrl}/terms`,
   },
   robots: {
-    index: true,
-    follow: true,
+    index: billingMode === "live",
+    follow: billingMode === "live",
   },
   openGraph: {
     title: `Terms of Service - ${siteConfig.brandName}`,
@@ -26,13 +28,16 @@ export const metadata: Metadata = {
 }
 
 export default function TermsPage() {
+  if (billingMode === "off") {
+    notFound()
+  }
   return (
     <main className="min-h-screen flex flex-col">
       <Header />
       <div className="flex-1 pt-24 pb-16 px-4">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="text-4xl font-display font-bold text-neutral-900 mb-8">Terms of Service</h1>
-          <p className="text-sm text-neutral-500 mb-8">Last updated: January 28, 2025</p>
+          <p className="text-sm text-neutral-500 mb-8">Last updated: January 26, 2026</p>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-neutral-900 mb-4">1. Acceptance of Terms</h2>
@@ -89,15 +94,57 @@ export default function TermsPage() {
             <h2 className="text-2xl font-semibold text-neutral-900 mb-4">7. Contact</h2>
             <p className="text-neutral-600 leading-relaxed">
               For questions about these Terms, contact us at{" "}
-              {siteConfig.contactEmail ? (
-                <a href={`mailto:${siteConfig.contactEmail}`} className="text-coral hover:underline">
-                  {siteConfig.contactEmail}
-                </a>
-              ) : (
-                <a href="/contact" className="text-coral hover:underline">
-                  our contact page
-                </a>
-              )}
+              <a href="mailto:support@imagesharpenerai.pro" className="text-coral hover:underline">
+                support@imagesharpenerai.pro
+              </a>
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-neutral-900 mb-4">8. Paid Features &amp; Subscriptions</h2>
+
+            <h3 className="text-xl font-semibold text-neutral-900 mb-3">8.1 Pricing Tiers</h3>
+            <ul className="list-disc pl-6 text-neutral-600 space-y-2 mb-4">
+              <li>
+                <strong>Early Bird:</strong> $2.99 USD per month (limited to first 50 customers)
+              </li>
+              <li>
+                <strong>Standard:</strong> $4.99 USD per month (after Early Bird sold out)
+              </li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-neutral-900 mb-3">8.2 Payment Processing</h3>
+            <p className="text-neutral-600 leading-relaxed mb-4">
+              All payments are processed by Creem, our authorized payment service provider. By purchasing a subscription,
+              you agree to Creem&apos;s Terms of Service and Privacy Policy.
+            </p>
+
+            <h3 className="text-xl font-semibold text-neutral-900 mb-3">8.3 Subscription Terms</h3>
+            <ul className="list-disc pl-6 text-neutral-600 space-y-2 mb-4">
+              <li>Subscriptions automatically renew annually unless cancelled before the renewal date</li>
+              <li>
+                You can cancel your subscription at any time through your account settings or by contacting
+                support@imagesharpenerai.pro
+              </li>
+              <li>Cancellation takes effect at the end of the current billing period</li>
+              <li>No refunds for partial subscription periods unless specified in our Refund Policy</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-neutral-900 mb-3">8.4 Feature Access</h3>
+            <ul className="list-disc pl-6 text-neutral-600 space-y-2 mb-4">
+              <li>Free users: 2x/4x upscaling, 3 images per day, watermarked output</li>
+              <li>Pro users: 6x/8x upscaling, unlimited images, no watermark, priority processing</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-neutral-900 mb-3">8.5 Refund Policy</h3>
+            <p className="text-neutral-600 leading-relaxed mb-4">
+              For refund terms and conditions, please see our Refund Policy at /refund
+            </p>
+
+            <h3 className="text-xl font-semibold text-neutral-900 mb-3">8.6 Price Changes</h3>
+            <p className="text-neutral-600 leading-relaxed">
+              We reserve the right to modify subscription prices with 30 days&apos; notice to active subscribers. Price
+              changes do not affect current subscription periods.
             </p>
           </section>
         </div>

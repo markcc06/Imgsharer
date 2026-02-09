@@ -6,6 +6,7 @@ import { Reveal } from "./reveal"
 import { BlurPanel } from "./blur-panel"
 import { AnimatedText } from "./animated-text"
 import Link from "next/link"
+import { billingLive } from "@/config/billing"
 
 function MailIcon({ className }: { className?: string }) {
   return (
@@ -131,11 +132,17 @@ export function NewsletterSection() {
               )}
 
               <p className="text-xs text-neutral-500 text-center mt-6">
-                We respect your privacy. Unsubscribe at any time. Read our{" "}
-                <Link href="/privacy" className="underline hover:text-[#ff5733] transition-colors">
-                  Privacy Policy
-                </Link>
-                .
+                We respect your privacy. Unsubscribe at any time.
+                {billingLive ? (
+                  <>
+                    {" "}
+                    Read our{" "}
+                    <Link href="/privacy" className="underline hover:text-[#ff5733] transition-colors">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </>
+                ) : null}
               </p>
             </BlurPanel>
           </div>

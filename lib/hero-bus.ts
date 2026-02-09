@@ -7,7 +7,14 @@ export const loadSessionPair = (): HeroPair | null => {
   if (typeof window === "undefined") return null
   try {
     const s = sessionStorage.getItem(HERO_SESSION_KEY)
-    return s ? JSON.parse(s) : null
+    const parsed = s ? (JSON.parse(s) as HeroPair) : null
+    if (!parsed) return null
+    const isBlob = (value?: string | null) => typeof value === "string" && value.startsWith("blob:")
+    if (isBlob(parsed.originalUrl) || isBlob(parsed.resultUrl ?? null)) {
+      sessionStorage.removeItem(HERO_SESSION_KEY)
+      return null
+    }
+    return parsed
   } catch {
     return null
   }

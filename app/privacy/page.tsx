@@ -2,6 +2,8 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import type { Metadata } from "next"
 import { siteConfig } from "@/config/siteConfig"
+import { billingMode } from "@/config/billing"
+import { notFound } from "next/navigation"
 
 export const metadata: Metadata = {
   title: `Privacy Policy - ${siteConfig.brandName}`,
@@ -10,8 +12,8 @@ export const metadata: Metadata = {
     canonical: `${siteConfig.siteUrl}/privacy`,
   },
   robots: {
-    index: true,
-    follow: true,
+    index: billingMode === "live",
+    follow: billingMode === "live",
   },
   openGraph: {
     title: `Privacy Policy - ${siteConfig.brandName}`,
@@ -26,13 +28,16 @@ export const metadata: Metadata = {
 }
 
 export default function PrivacyPage() {
+  if (billingMode === "off") {
+    notFound()
+  }
   return (
     <main className="min-h-screen flex flex-col">
       <Header />
       <div className="flex-1 pt-24 pb-16 px-4">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="text-4xl font-display font-bold text-neutral-900 mb-8">Privacy Policy</h1>
-          <p className="text-sm text-neutral-500 mb-8">Last updated: January 28, 2025</p>
+          <p className="text-sm text-neutral-500 mb-8">Last updated: January 26, 2026</p>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-neutral-900 mb-4">1. Information We Collect</h2>
@@ -58,9 +63,55 @@ export default function PrivacyPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-neutral-900 mb-4">3. Third-Party Services</h2>
             <p className="text-neutral-600 leading-relaxed mb-4">
-              We use Stability AI for image processing. Your images are sent to their API for processing and are subject
-              to their privacy policy. Stability AI does not store images processed through their API.
+              We use the following third-party services to operate ImgSharer:
             </p>
+
+            <h3 className="text-xl font-semibold text-neutral-900 mb-3">3.1 Image Processing</h3>
+            <ul className="list-disc pl-6 text-neutral-600 space-y-2 mb-4">
+              <li>
+                <strong>Replicate API:</strong> Processes your uploaded images for enhancement and upscaling
+              </li>
+              <li>
+                <strong>Data handling:</strong> Images are sent to Replicate&apos;s servers, processed in real-time, and
+                immediately discarded. No images are stored by Replicate or ImgSharer
+              </li>
+              <li>
+                <strong>Privacy policy:</strong>{" "}
+                <a href="https://replicate.com/privacy" className="text-coral hover:underline">
+                  https://replicate.com/privacy
+                </a>
+              </li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-neutral-900 mb-3">3.2 Payment Processing</h3>
+            <ul className="list-disc pl-6 text-neutral-600 space-y-2 mb-4">
+              <li>
+                <strong>Creem:</strong> Handles all payment transactions, billing information, and subscription
+                management for paid features
+              </li>
+              <li>
+                <strong>Data collected:</strong> Email address, payment method, billing address (collected and stored by
+                Creem, not ImgSharer)
+              </li>
+              <li>
+                <strong>Privacy policy:</strong>{" "}
+                <a href="https://www.creem.io/privacy" className="text-coral hover:underline">
+                  https://www.creem.io/privacy
+                </a>
+              </li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-neutral-900 mb-3">3.3 Analytics (Optional)</h3>
+            <ul className="list-disc pl-6 text-neutral-600 space-y-2">
+              <li>
+                <strong>Google Analytics:</strong> Used only if NEXT_PUBLIC_GA_MEASUREMENT_ID is configured
+              </li>
+              <li>
+                <strong>Data collected:</strong> Anonymous usage statistics, page views, device information
+              </li>
+              <li>Cookies: Only essential cookies for functionality; no third-party tracking cookies</li>
+              <li>You can opt out of analytics through our cookie consent banner</li>
+            </ul>
           </section>
 
           <section className="mb-8">
@@ -99,15 +150,9 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-semibold text-neutral-900 mb-4">8. Contact Us</h2>
             <p className="text-neutral-600 leading-relaxed">
               If you have questions about this Privacy Policy, contact us at{" "}
-              {siteConfig.contactEmail ? (
-                <a href={`mailto:${siteConfig.contactEmail}`} className="text-coral hover:underline">
-                  {siteConfig.contactEmail}
-                </a>
-              ) : (
-                <a href="/contact" className="text-coral hover:underline">
-                  our contact page
-                </a>
-              )}
+              <a href="mailto:support@imagesharpenerai.pro" className="text-coral hover:underline">
+                support@imagesharpenerai.pro
+              </a>
             </p>
           </section>
         </div>

@@ -1,6 +1,7 @@
 "use client"
 import Link from "next/link"
 import { siteConfig } from "@/config/siteConfig"
+import { billingLive } from "@/config/billing"
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -66,29 +67,40 @@ export function Footer() {
           </div>
 
           {/* Legal */}
-          <div>
-            <h4 className="font-semibold mb-4 text-[#1a1a1a]">Legal</h4>
-            <ul className="space-y-3 text-sm">
-              <li>
-                <Link
-                  href="/terms"
-                  title="Terms of Service — usage and license"
-                  className="text-[#555555] hover:text-[#ff7959] hover:underline transition-colors"
-                >
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/privacy"
-                  title="Privacy Policy — how we handle your data"
-                  className="text-[#555555] hover:text-[#ff7959] hover:underline transition-colors"
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {billingLive ? (
+            <div>
+              <h4 className="font-semibold mb-4 text-[#1a1a1a]">Legal</h4>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <Link
+                    href="/terms"
+                    title="Terms of Service — usage and license"
+                    className="text-[#555555] hover:text-[#ff7959] hover:underline transition-colors"
+                  >
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/privacy"
+                    title="Privacy Policy — how we handle your data"
+                    className="text-[#555555] hover:text-[#ff7959] hover:underline transition-colors"
+                  >
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/refund"
+                    title="Refund Policy — how refunds and cancellations work"
+                    className="text-[#555555] hover:text-[#ff7959] hover:underline transition-colors"
+                  >
+                    Refund Policy
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          ) : null}
         </div>
 
         {/* Bottom */}
