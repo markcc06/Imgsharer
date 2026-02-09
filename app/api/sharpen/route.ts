@@ -401,7 +401,7 @@ export async function POST(request: NextRequest) {
         : "image/jpeg"
 
     if (wantsBinary) {
-      const binaryResponse = new NextResponse(finalBuffer, {
+      const binaryResponse = new NextResponse(new Uint8Array(finalBuffer), {
         status: 200,
         headers: {
           "Content-Type": outputMime,

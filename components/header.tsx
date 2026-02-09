@@ -105,7 +105,7 @@ export function Header() {
               </Link>
             ))}
             <SignedOut>
-              <SignInButton mode="modal" redirectUrl={typeof window !== "undefined" ? window.location.href : "/"}>
+              <SignInButton mode="modal">
                 <button className="ml-2 rounded-full border border-[#ff5733] px-4 py-2 text-sm font-semibold text-[#ff5733] bg-white/80 hover:bg-[#ff5733]/10 transition-colors shadow-sm">
                   {billingLive ? "Sign in / Get Pro" : "Sign in"}
                 </button>

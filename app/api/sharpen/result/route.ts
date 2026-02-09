@@ -225,6 +225,10 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    if (!outputUrl) {
+      return NextResponse.json({ error: "missing_output_url" }, { status: 502 })
+    }
+
     let downloaded: Buffer
     let sourceMime = "image/png"
     if (outputUrl.startsWith("data:")) {
@@ -246,7 +250,7 @@ export async function GET(request: NextRequest) {
     const finalBuffer = effectiveIsPro ? downloaded : await addWatermark(downloaded)
     const outputMime = effectiveIsPro ? sourceMime : "image/jpeg"
 
-    return new NextResponse(finalBuffer, {
+    return new NextResponse(new Uint8Array(finalBuffer), {
       status: 200,
       headers: {
         "Content-Type": outputMime,

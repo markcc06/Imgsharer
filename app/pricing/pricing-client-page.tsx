@@ -30,6 +30,7 @@ type PriceConfig = {
 const EARLY_BIRD_LIMIT = 50
 const paddleEnv = (process.env.NEXT_PUBLIC_PADDLE_ENV as "sandbox" | "production" | undefined) ?? "production"
 const paddleToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
+const pricingToken = process.env.NEXT_PUBLIC_PRICING_TOKEN ?? "YOUR_TOKEN"
 const paymentProvider = (process.env.NEXT_PUBLIC_PAYMENT_PROVIDER as "creem" | "paddle" | undefined) ?? "paddle"
 const MS_PER_DAY = 86_400_000
 const EXPERIMENT_ID = "upsell_modal_v1"
@@ -503,7 +504,7 @@ export default function PricingClientPage() {
                     <p className="text-neutral-900 font-medium">Sign in to activate Pro</p>
                     <p className="text-sm text-neutral-600">Pro is tied to your signed-in email across devices.</p>
                   </div>
-                  <SignInButton mode="modal" redirectUrl={typeof window !== "undefined" ? window.location.href : "/pricing"}>
+                  <SignInButton mode="modal">
                     <Button
                       className="bg-[#ff5733] text-white hover:bg-[#ff7959] rounded-full"
                       onClick={() =>

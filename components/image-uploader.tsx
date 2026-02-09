@@ -727,8 +727,9 @@ export function ImageUploader({
         window.clearInterval(fakeIntervalRef.current)
         fakeIntervalRef.current = null
       }
-      if (pollAbortRef.current) {
-        pollAbortRef.current.abort()
+      const activePollAbort = pollAbortRef.current
+      if (activePollAbort) {
+        activePollAbort.abort()
         pollAbortRef.current = null
       }
       if (pollTimeoutRef.current !== null) {
@@ -757,8 +758,9 @@ export function ImageUploader({
       window.clearInterval(fakeIntervalRef.current)
       fakeIntervalRef.current = null
     }
-    if (pollAbortRef.current) {
-      pollAbortRef.current.abort()
+    const pendingPollAbort = pollAbortRef.current
+    if (pendingPollAbort) {
+      pendingPollAbort.abort()
       pollAbortRef.current = null
     }
     if (pollTimeoutRef.current !== null) {
@@ -886,8 +888,9 @@ export function ImageUploader({
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
-    if (pollAbortRef.current) {
-      pollAbortRef.current.abort()
+    const inFlightPollAbort = pollAbortRef.current
+    if (inFlightPollAbort) {
+      inFlightPollAbort.abort()
       pollAbortRef.current = null
     }
     if (pollTimeoutRef.current !== null) {
@@ -1091,8 +1094,10 @@ export function ImageUploader({
       }
 
       const pollForResult = async (jobId: string) => {
-        if (pollAbortRef.current) {
-          pollAbortRef.current.abort()
+        const previousPollAbort = pollAbortRef.current
+        if (previousPollAbort) {
+          previousPollAbort.abort()
+          pollAbortRef.current = null
         }
         if (pollTimeoutRef.current !== null) {
           window.clearTimeout(pollTimeoutRef.current)
@@ -1262,8 +1267,9 @@ export function ImageUploader({
       setIsProcessing(false)
       setProgress(0)
       abortControllerRef.current = null
-      if (pollAbortRef.current) {
-        pollAbortRef.current.abort()
+      const finalPollAbort = pollAbortRef.current
+      if (finalPollAbort) {
+        finalPollAbort.abort()
         pollAbortRef.current = null
       }
       if (pollTimeoutRef.current !== null) {
