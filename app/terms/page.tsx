@@ -37,7 +37,7 @@ export default function TermsPage() {
       <div className="flex-1 pt-24 pb-16 px-4">
         <div className="max-w-3xl mx-auto prose prose-neutral">
           <h1 className="text-4xl font-display font-bold text-neutral-900 mb-8">Terms of Service</h1>
-          <p className="text-sm text-neutral-500 mb-8">Last updated: January 26, 2026</p>
+          <p className="text-sm text-neutral-500 mb-8">Last updated: February 10, 2026</p>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-neutral-900 mb-4">1. Acceptance of Terms</h2>
@@ -121,12 +121,12 @@ export default function TermsPage() {
 
             <h3 className="text-xl font-semibold text-neutral-900 mb-3">8.3 Subscription Terms</h3>
             <ul className="list-disc pl-6 text-neutral-600 space-y-2 mb-4">
-              <li>Subscriptions automatically renew annually unless cancelled before the renewal date</li>
+              <li>Subscriptions automatically renew monthly unless cancelled before the next billing date</li>
               <li>
                 You can cancel your subscription at any time through your account settings or by contacting
                 support@imagesharpenerai.pro
               </li>
-              <li>Cancellation takes effect at the end of the current billing period</li>
+              <li>Cancellation takes effect at the end of the current monthly billing period</li>
               <li>No refunds for partial subscription periods unless specified in our Refund Policy</li>
             </ul>
 

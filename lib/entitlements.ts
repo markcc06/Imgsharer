@@ -13,6 +13,8 @@ export type EntitlementRecord = {
   sourceEvent?: string
   subscriptionId?: string
   transactionId?: string
+  expiresAt?: number
+  revokedAt?: number
 }
 
 const EARLY_BIRD_KEY = "earlybird:sold"
@@ -33,6 +35,14 @@ export function resolveTierFromPriceId(priceId?: string | null): EntitlementTier
 }
 
 function isValidEntitlementRecord(record: EntitlementRecord) {
+  const now = Date.now()
+  if (typeof record.revokedAt === "number" && Number.isFinite(record.revokedAt) && record.revokedAt <= now) {
+    return false
+  }
+  if (typeof record.expiresAt === "number" && Number.isFinite(record.expiresAt) && record.expiresAt <= now) {
+    return false
+  }
+
   // For Creem, only treat first successful payment as a valid grant.
   // Older test data may have been written on `checkout.completed`; we must ignore it.
   if (record.sourceEvent?.startsWith("creem:")) {

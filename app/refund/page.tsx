@@ -18,7 +18,7 @@ export default function RefundPage() {
   return (
     <div className="container mx-auto max-w-4xl px-4 py-12">
       <h1 className="text-4xl font-bold mb-8">Refund Policy</h1>
-      <p className="text-sm text-gray-600 mb-8">Last updated: January 26, 2026</p>
+      <p className="text-sm text-gray-600 mb-8">Last updated: February 10, 2026</p>
 
       <div className="prose prose-lg max-w-none">
         <section className="mb-8">
@@ -46,11 +46,11 @@ export default function RefundPage() {
                 support@imagesharpenerai.pro
               </a>
             </li>
-            <li>Include your Paddle order number or transaction ID</li>
+            <li>Include your Creem order number or transaction ID</li>
             <li>Briefly explain the reason for your refund request</li>
             <li>Allow up to 7 business days for processing</li>
           </ol>
-          <p>Approved refunds will be returned to your original payment method through Paddle&apos;s payment system.</p>
+          <p>Approved refunds will be returned to your original payment method through Creem&apos;s payment system.</p>
         </section>
 
         <section className="mb-8">
@@ -117,7 +117,7 @@ export default function RefundPage() {
             provider, it may take an additional 5-10 business days for funds to appear in your account.
           </p>
           <p className="mt-2">
-            You will receive email confirmation once your refund has been processed through Paddle&apos;s system.
+            You will receive email confirmation once your refund has been processed through Creem&apos;s system.
           </p>
         </section>
 
@@ -131,6 +131,10 @@ export default function RefundPage() {
             <li>Submit a refund request per Section 1.2 (if within 7 days and eligible)</li>
             <li>Separately cancel your subscription to prevent auto-renewal</li>
           </ol>
+          <ul className="list-disc pl-6 mb-4">
+            <li>Approved refunds take effect immediately and Pro access is removed once the refund is confirmed</li>
+            <li>Subscription cancellation takes effect at the end of the current billing period</li>
+          </ul>
         </section>
 
         <section className="mb-8">

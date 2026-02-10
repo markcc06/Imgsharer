@@ -61,3 +61,10 @@ export async function kvExpire(key: string, seconds: number): Promise<boolean> {
   })
   return res === "OK" || res === true || res === 1
 }
+
+export async function kvDel(key: string): Promise<boolean> {
+  const res = await kvFetch<number>(`/del/${encodeURIComponent(key)}`, {
+    method: "POST",
+  })
+  return res === 1
+}
