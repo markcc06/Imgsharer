@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { siteConfig } from "@/config/siteConfig"
-import { billingLive } from "@/config/billing"
+import { billingMode } from "@/config/billing"
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs"
 
 function SparklesIcon() {
@@ -60,7 +60,8 @@ export function Header() {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  const navLinks = billingLive
+  const showBillingLinks = billingMode !== "off"
+  const navLinks = showBillingLinks
     ? [...baseNavLinks.slice(0, 3), { href: "/pricing", label: "Pricing" }, ...baseNavLinks.slice(3)]
     : baseNavLinks
   const mobileNav = [{ href: "/", label: "Home" }, ...navLinks]
@@ -107,7 +108,7 @@ export function Header() {
             <SignedOut>
               <SignInButton mode="modal">
                 <button className="ml-2 rounded-full border border-[#ff5733] px-4 py-2 text-sm font-semibold text-[#ff5733] bg-white/80 hover:bg-[#ff5733]/10 transition-colors shadow-sm">
-                  {billingLive ? "Sign in / Get Pro" : "Sign in"}
+                  {showBillingLinks ? "Sign in / Get Pro" : "Sign in"}
                 </button>
               </SignInButton>
             </SignedOut>

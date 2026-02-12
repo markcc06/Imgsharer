@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Suspense } from "react"
 import { siteConfig } from "@/config/siteConfig"
-import { billingLive } from "@/config/billing"
+import { billingMode } from "@/config/billing"
 import PricingClientPage from "./pricing-client-page"
 import { notFound } from "next/navigation"
 
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 }
 
 export default function PricingPage() {
-  if (!billingLive) {
+  if (billingMode === "off") {
     notFound()
   }
   return (

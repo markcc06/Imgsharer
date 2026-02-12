@@ -1,10 +1,12 @@
 "use client"
 import Link from "next/link"
 import { siteConfig } from "@/config/siteConfig"
-import { billingLive } from "@/config/billing"
+import { billingMode } from "@/config/billing"
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
+  const showBillingLinks = billingMode !== "off"
+  const supportEmail = siteConfig.contactEmail ?? "support@imagesharpenerai.pro"
 
   return (
     <footer className="bg-white border-t border-neutral-200">
@@ -67,10 +69,19 @@ export function Footer() {
           </div>
 
           {/* Legal */}
-          {billingLive ? (
+          {showBillingLinks ? (
             <div>
               <h4 className="font-semibold mb-4 text-[#1a1a1a]">Legal</h4>
               <ul className="space-y-3 text-sm">
+                <li>
+                  <Link
+                    href="/pricing"
+                    title="Pricing — plans and billing details"
+                    className="text-[#555555] hover:text-[#ff7959] hover:underline transition-colors"
+                  >
+                    Pricing
+                  </Link>
+                </li>
                 <li>
                   <Link
                     href="/terms"
@@ -106,7 +117,12 @@ export function Footer() {
         {/* Bottom */}
         <div className="pt-8 border-t border-neutral-200 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-[#555555]">&copy; {currentYear} {siteConfig.brandName}. All rights reserved.</p>
-          <p className="text-sm text-[#555555]">Powered by {siteConfig.brandName}</p>
+          <p className="text-sm text-[#555555]">
+            Support:{" "}
+            <a href={`mailto:${supportEmail}`} className="hover:text-[#ff7959] hover:underline transition-colors">
+              {supportEmail}
+            </a>
+          </p>
         </div>
       </div>
     </footer>
