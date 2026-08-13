@@ -1,129 +1,116 @@
 # Imgsharer — AI Image Sharpening & HD Wallpaper Generator
 
-Imgsharer is a modern, AI-powered image enhancement platform that makes it easy to **remove blur, upscale photos, sharpen details, and download curated HD wallpapers**.  
-Built with **Next.js 15**, **TypeScript**, and **Vercel**, the project focuses on speed, usability, and high-quality visual output.
+Imgsharer is an AI-powered image enhancement platform for removing blur, upscaling photos, sharpening details, and browsing curated HD wallpapers.
 
-👉 **Live Site:** https://www.imgsharer.pro/  
-👉 **Christmas Wallpapers Hub:** https://www.imgsharer.pro/christmas-wallpaper  
-👉 **AI Wallpaper Collections:** https://www.imgsharer.pro/wallpapers  
+Built with **Next.js 14**, **TypeScript**, and **Vercel**, the project focuses on speed, usability, and high-quality visual output.
 
----
+- **Live site:** https://www.imgsharer.pro/
+- **Christmas wallpapers:** https://www.imgsharer.pro/christmas-wallpaper
+- **AI wallpaper collections:** https://www.imgsharer.pro/wallpapers
 
-## ✨ Features
+## Features
 
-### 🖼 AI Image Enhancement
-- Remove blur and noise from low-quality photos  
-- Smart sharpening for faces, objects, and landscapes  
-- AI-driven upscaling for clearer, more detailed results  
-- Perfect for selfies, product images, wallpapers, and artwork  
+### AI image enhancement
+- Remove blur and noise from low-quality photos
+- Sharpen faces, objects, and landscapes
+- AI-driven upscaling for clearer output
+- Workflows for selfies, product images, wallpapers, and artwork
 
-### 🎨 HD & 4K AI Wallpapers
-- Curated themed wallpaper collections  
-- Christmas, nature, pastel candy, robots, cosmic scenes, and more  
-- Mobile, desktop, ultrawide, and 4K formats  
-- Fast preview and one-click download  
+### HD & 4K wallpapers
+- Curated themed wallpaper collections
+- Mobile, desktop, ultrawide, and 4K formats
+- Fast previews and one-click downloads
 
-### ⚡ Performance & UX
-- Fully optimized using modern **Next.js App Router**  
-- Instant page loads with Vercel Edge Network  
-- Responsive UI for all devices  
-- High-quality JPEG/WEBP wallpapers  
+### Performance & UX
+- Next.js App Router architecture
+- Responsive UI
+- Vercel deployment
+- JPEG/WEBP image delivery and optimization
 
----
-
-## 🔧 Tech Stack
+## Tech stack
 
 | Layer | Technology |
-|------|------------|
-| Framework | **Next.js 15 (App Router)** |
-| Language | **TypeScript** |
-| Deployment | **Vercel** |
-| Styling | **Tailwind CSS** |
+|---|---|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript |
+| Deployment | Vercel |
+| Styling | Tailwind CSS |
 | Images | Sharp / AI-generated asset pipeline |
 | SEO | Dynamic metadata, sitemap, Open Graph |
 
----
+## Project structure
 
-## 📁 Project Structure
+```text
+app/
+components/
+config/
+hooks/
+lib/
+public/
+scripts/
+styles/
+types/
+```
 
-/app
-/wallpapers
-/christmas-wallpaper
-/api
-/components
-/public
-/styles
+Wallpaper collections are optimized for performance and discoverability. Image metadata and thumbnails can be generated with project scripts.
 
-Each wallpaper collection is statically optimized for SEO and performance.  
-Image metadata and thumbnails are generated via custom scripts.
+## Local development
 
----
-
-## 🌐 Related Sites / Collections
-
-- Christmas Wallpapers → https://www.imgsharer.pro/christmas-wallpaper  
-- Mobile HD Wallpapers → https://www.imgsharer.pro/wallpapers/mobile  
-- 4K AI Wallpapers → https://www.imgsharer.pro/wallpapers/4k  
-
-(These links help Google establish the Imgsharer entity and improve authority.)
-
----
-
-## 🚀 Development
+Requirements:
+- Node.js 20.10–20.x or 22.x
+- pnpm
 
 ```bash
 pnpm install
 pnpm dev
+```
 
-Create a .env.local file with your environment variables for image processing and deployment.
+Create a `.env.local` file for services you enable locally. Never commit real secrets.
+
+Example Replicate variables:
 
 ```bash
 REPLICATE_API_TOKEN="your-token"
 REPLICATE_UPSCALE_MODEL="owner/model-name"
-REPLICATE_UPSCALE_VERSION="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+REPLICATE_UPSCALE_VERSION="model-version"
 ```
 
-⸻
+Other integrations used by the production application may require their own environment variables. Keep all credentials outside source control.
 
-📦 Deployment
+## Useful scripts
 
-Imgsharer is deployed on Vercel with automatic GitHub integration.
+```bash
+pnpm dev
+pnpm build
+pnpm lint
+pnpm wallpapers:sync
+pnpm ctx:snapshot
+```
 
-Steps:
-	1.	Push to main
-	2.	Vercel triggers automatic build
-	3.	Wallpapers and metadata sync scripts run post-build
+## Deployment
 
-⸻
+The production application is deployed on Vercel with GitHub integration. Deployment configuration and credentials should remain in the deployment environment, not in the repository.
 
-🔍 SEO & Metadata
+## Contributing
 
-The project includes:
-	•	Auto-generated sitemap
-	•	Clean URL structure
-	•	Pre-rendered wallpaper pages
-	•	Optimized <meta> + OpenGraph previews
-	•	Structured data for images
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the recommended workflow.
 
-⸻
+Good contribution areas include:
+- UI and accessibility improvements
+- Image-processing workflows
+- Performance improvements
+- Wallpaper collection tooling
+- Documentation and tests
 
-⭐ Contributing
+## Security
 
-Pull requests for:
-	•	New wallpaper collections
-	•	UI improvements
-	•	Image optimization scripts
-…are always welcome.
+Please do not disclose credentials or security-sensitive issues in public issues. See [SECURITY.md](SECURITY.md).
 
-⸻
+## Project links
 
-🔗 Project Links
-	•	Live App: https://www.imgsharer.pro/
-	•	GitHub Repo: this repository
-	•	Contact: mark@imgsharer.pro (optional if you want)
+- Live app: https://www.imgsharer.pro/
+- Repository: https://github.com/markcc06/Imgsharer
 
-⸻
+## License
 
-📜 License
-
-This project is licensed under a permissive license for educational and non-commercial use.
+A formal open-source license has not yet been selected for this repository. Until a license is added, copyright remains with the repository owner and normal copyright restrictions apply.
