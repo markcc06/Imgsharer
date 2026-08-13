@@ -113,4 +113,4 @@ Please do not disclose credentials or security-sensitive issues in public issues
 
 ## License
 
-A formal open-source license has not yet been selected for this repository. Until a license is added, copyright remains with the repository owner and normal copyright restrictions apply.
+This project is open source under the [MIT License](LICENSE).
